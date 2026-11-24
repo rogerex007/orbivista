@@ -1,7 +1,7 @@
 <div align="center">
 
 
-## Orbivista
+# Orbivista para LG webOS
 
 Orbivista es la edición para LG webOS mantenida por Roger Mesa, basada en
 Xuper Port webOS. El repositorio de esta edición es
@@ -16,18 +16,13 @@ Xuper Port webOS. El repositorio de esta edición es
 - Solo después de aprobarlo, ejecuta **Orbivista IPK y Release** en `main`
   con la operación `publish`, el ID de la ejecución que compiló el IPK probado
   y la casilla de aprobación marcada. Se publica ese mismo IPK con su manifiesto.
-- En la TV, abre **Ajustes → Acerca de → Buscar actualizaciones**. Orbivista
+- En la TV, abre **Mi cuenta → Acerca de → Buscar actualizaciones**. Orbivista
   consulta la última release y comprueba el SHA-256 antes de instalar.
 
-
-# XuperTV para LG webOS
-
-**Port comunitario de XuperTV para televisores LG webOS** — aplicación HTML/CSS/JS con catálogo, TV en vivo, navegación con mando, reproducción directa y relay FFmpeg local para títulos que lo necesitan.
 
 ![webOS](https://img.shields.io/badge/webOS-1–6-a50034?style=flat-square&logo=lg&logoColor=white)
 ![compatibilidad](https://img.shields.io/badge/webOS-1.x%20a%20versiones%20modernas-4285F4?style=flat-square&logo=lg&logoColor=white)
 ![1920x1080](https://img.shields.io/badge/render-1920%C3%971080-0b7285?style=flat-square)
-![versión](https://img.shields.io/badge/IPK-3.0.4-c91923?style=flat-square)
 ![licencia](https://img.shields.io/badge/c%C3%B3digo-MIT-2ea44f?style=flat-square)
 
 [Instalación](#instalación-en-el-televisor) ·
@@ -39,7 +34,7 @@ Xuper Port webOS. El repositorio de esta edición es
 
 </div>
 
-![Inicio con el catálogo real](docs/screenshots/home.jpg)
+![Sección Destacados de Orbivista en el emulador LG webOS](docs/screenshots/orbivista-inicio.jpg)
 
 ---
 
@@ -50,14 +45,14 @@ reescrita en HTML/CSS/JavaScript para los navegadores antiguos y modernos de
 webOS, y un servicio Node local del televisor resuelve catálogo, búsqueda,
 detalle, canales en vivo y URLs de reproducción.
 
-El objetivo es que en un LG de 2019 se sienta como la app de Android TV:
-misma disposición, mismos recursos gráficos, mismo mando a distancia.
+Orbivista organiza el catálogo por secciones y adapta la búsqueda, los filtros y
+la reproducción a los controles del mando.
 
 | | |
 |---|---|
 | **Compatibilidad objetivo** | webOS 1.x · 2.x · 3.x/3.5 · 4.x · 5.x · 6.x y generaciones posteriores |
 | **ID de paquete** | `com.webosflux.xuptertv.fidelity` |
-| **Versión actual** | `3.0.4` |
+| **Versión de desarrollo** | `3.1.89` |
 | **Runtime** | Chromium (web app) + servicio Node del TV |
 | **Dependencias en el TV** | ninguna: FFmpeg viaja dentro del IPK |
 
@@ -75,7 +70,7 @@ misma disposición, mismos recursos gráficos, mismo mando a distancia.
 | «Modo fluido» (relay FFmpeg local) | ✅ por título; entrega fMP4 en todas las versiones de webOS |
 | Audio y subtítulos | ✅ preferencia de audio por serie y selección de subtítulos |
 | DNS alterado por la operadora | ✅ DNS-over-HTTPS multi-resolvedor + diagnóstico |
-| TV en vivo con timestamps HLS absolutos | ✅ normalización y colchón de segmentos en 3.0.4 |
+| TV en vivo con timestamps HLS absolutos | ✅ normalización y colchón de segmentos |
 | Modo desarrollador / instalación por IPK | ✅ |
 | DRM, geobloqueo, control parental del portal | ❌ fuera de alcance (no se elude nada) |
 
@@ -84,19 +79,21 @@ Detalle fino de lo que falta en
 
 ## Versiones y pruebas
 
-- **Release estable:** descarga siempre desde [Releases](https://github.com/cristianco7/XUPER-HYDRA-PORT-WEBOS/releases). Solo las versiones con tag y archivo IPK en esa página están disponibles para actualización dentro de la TV.
+- **Release estable:** descarga siempre desde [Releases de Orbivista](https://github.com/rogerex007/orbivista/releases). Solo las versiones con tag y archivo IPK en esa página están disponibles para actualización dentro de la TV.
 - **Build de prueba:** puede existir una versión superior en el código o en `dist/` antes de que se publique. Se prueba primero de forma manual; no se debe configurar como actualización automática hasta tener confirmación.
 - **Reporte de TV en vivo:** si un canal salta, se congela o vuelve atrás, abre **Ajustes → Diagnóstico → Ver TV en vivo** tras reproducirlo. La pantalla registra tiempo, buffer, estado del reproductor y errores del proxy sin mostrar URL, token ni cabeceras.
 
 ## Capturas
 
-| TV en vivo · panel de canales | Categorías (38 columnas del portal) |
-|---|---|
-| ![Panel de canales](docs/screenshots/live-panel.png) | ![Categorías](docs/screenshots/live-categories.png) |
+Capturas tomadas en el emulador LG webOS 6.0.
 
-| Canales filtrados por «Deportes» | Búsqueda real |
+| TV en vivo | Filtros del catálogo |
 |---|---|
-| ![Deportes](docs/screenshots/live-panel-filtered.png) | ![Búsqueda](docs/screenshots/search.jpg) |
+| ![Controles de TV en vivo con el portal en reintento](docs/screenshots/orbivista-tv.jpg) | ![Filtros por tipo, género, año y orden](docs/screenshots/orbivista-filtros.jpg) |
+
+| Búsqueda | Acerca de |
+|---|---|
+| ![Teclado y búsquedas populares](docs/screenshots/orbivista-busqueda.jpg) | ![Créditos y botón Buscar actualizaciones](docs/screenshots/orbivista-acerca.jpg) |
 
 ## Funcionalidades
 
@@ -118,6 +115,8 @@ Detalle fino de lo que falta en
 - **Búsqueda** con teclado en pantalla, historial y resultados paginados.
 - **Ajustes**: cuenta local, mi lista, compartir, bloqueo, configuración global,
   ayuda y «sobre nosotros».
+- **Temas**: 16 paletas en **Mi cuenta → Apariencia**, con colores adaptados
+  en las categorías de la guía de canales.
 - **Navegación completa con D-pad**, foco visible, botón Back y atajos de mando.
 - **Sin dependencias externas en el televisor**: el binario FFmpeg (7.0.2 armhf,
   estático) se instala junto con la app.
@@ -128,8 +127,8 @@ Detalle fino de lo que falta en
 
 Pensado para quien solo tiene el archivo y no quiere tocar una terminal:
 
-1. Descarga el ZIP de la [última release](https://github.com/cristianco7/XUPER-HYDRA-PORT-WEBOS/releases/latest), o compila tu propio kit con `tools/make-kit.ps1`.
-2. Extráela y haz **doble clic en `INSTALAR-XUPERTV.bat`**.
+1. Descarga el IPK desde [Releases de Orbivista](https://github.com/rogerex007/orbivista/releases) o, para probar una compilación, extrae el IPK del artefacto **orbivista-ipk** en [Actions](https://github.com/rogerex007/orbivista/actions).
+2. Coloca el IPK en la carpeta del repositorio extraído, junto a `INSTALAR-XUPERTV.bat` y su carpeta `tools/`. Haz **doble clic en `INSTALAR-XUPERTV.bat`**.
 3. Escribe la **IP** del televisor y la **clave** que muestra la app
    *Developer Mode* (se pide una sola vez: el instalador la comprueba con la TV
    antes de copiar nada).
@@ -177,15 +176,15 @@ Detalles que resuelve solo, porque son la causa habitual de que falle:
    sudo apt install bash openssh-client sshpass curl python3 tar binutils coreutils
    ```
 
-3. Descarga el `.ipk` de la [última release](https://github.com/cristianco7/XUPER-HYDRA-PORT-WEBOS/releases/latest),
-   colócalo junto a `INSTALAR-XUPERTV.sh` y ejecuta desde esa carpeta:
+3. Descarga el IPK desde **Releases** o usa el artefacto **orbivista-ipk**
+   de **Actions** para una prueba. Colócalo junto a `INSTALAR-XUPERTV.sh` y ejecuta desde esa carpeta:
 
    ```bash
    bash ./INSTALAR-XUPERTV.sh
    ```
 
 4. Introduce la IP y, cuando se solicite, la clave de *Developer Mode*. Al
-   terminar, el instalador comprueba la versión instalada y abre XuperTV en la TV.
+   terminar, el instalador comprueba la versión instalada y abre Orbivista en la TV.
 
 Si tienes el paquete en otra carpeta, indica su ruta con `--ipk`. Puedes
 pasar la IP con `--tv-host` y ver todas las opciones con `--help`.
@@ -254,21 +253,18 @@ Guía extendida, desinstalación y notas de red:
 ## Compilar el IPK
 
 ```bash
-git clone https://github.com/cristianco7/XUPER-HYDRA-PORT-WEBOS.git
-cd XUPER-HYDRA-PORT-WEBOS
+git clone https://github.com/rogerex007/orbivista.git
+cd orbivista
 
 # Windows (PowerShell): restaura FFmpeg si falta, empaqueta app + servicio y
 # reescribe data.tar.gz para conservar el bit 0755 del binario.
 powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-ipk.ps1
 
-# Linux/macOS
-powershell -NoProfile -ExecutionPolicy Bypass -File tools/setup-ffmpeg.ps1 2>/dev/null || \
-  tar -xJf tools/vendor/ffmpeg-7.0.2-armhf-static.tar.xz -C /tmp
-ares-package webos/fidelity webos/services/com.webosflux.xuptertv.fidelity.service -o dist -e shots -e '*.md'
-python3 tools/fix_ipk_modes.py dist/com.webosflux.xuptertv.fidelity_<versión>_all.ipk
+# Linux
+tools/build-orbivista.sh
 ```
 
-Salida de referencia: el número y el hash cambian en cada compilación.
+El número de versión y el hash se indican al final de la compilación. En Linux, el IPK y el manifiesto quedan en `dist/orbivista-release/`. En Windows, el script de PowerShell deja el IPK en `dist/`.
 
 | Dato | Valor |
 |---|---|

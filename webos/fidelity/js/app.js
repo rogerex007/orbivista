@@ -1,6 +1,6 @@
 !(function () {
   "use strict";
-  var APP_VERSION = "3.1.84";
+  var APP_VERSION = "3.1.89";
   var BRAND_NAME = "Orbivista";
   var BRAND_PROJECT = "github.com/rogerex007/orbivista";
   window.APP_VERSION = APP_VERSION;
@@ -1123,6 +1123,12 @@
         group: "Aplicación",
       },
       {
+        id: "themes",
+        label: "Apariencia",
+        desc: "Temas y colores de la guía",
+        group: "Aplicación",
+      },
+      {
         id: "parent",
         label: "Control parental",
         desc: "Bloqueo de contenido adulto",
@@ -1164,6 +1170,8 @@
         '<svg viewBox="0 0 32 32"><circle cx="8" cy="16" r="3"/><circle cx="24" cy="7" r="3"/><circle cx="24" cy="25" r="3"/><path d="M10.6 14.5l10.8-6M10.6 17.5l10.8 6"/></svg>',
       parent:
         '<svg viewBox="0 0 32 32"><rect x="7" y="14" width="18" height="14" rx="2"/><path d="M11 14V10a5 5 0 0 1 10 0v4"/><path d="M16 19v4"/></svg>',
+      themes:
+        '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="11"/><path d="M16 5v22M16 9h6M16 16h10M16 23h6"/></svg>',
       display:
         '<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="18" rx="2"/><path d="M10 28h12M16 24v4"/><path d="M8 10h16v10H8z"/></svg>',
       playback:
@@ -1268,13 +1276,16 @@
         t.groupTitle || "",
         t.tags || "",
       ].join(" ");
-    return /(^|[^a-z])(xxx|adult|porno|porn|sex|erotic|onlyfans|18\+|\+18)([^a-z]|$)/i.test(a);
+    return t.isAdult === true || String(t.id) === "76208" ||
+      /(^|[^a-z])(xxx|adults?|adultos?|adultas?|porno|porn|sex|erotic|erótico|onlyfans|18\+|\+18)([^a-z]|$)/i.test(a);
+  }
+  function isAllowedLiveChannel(channel) {
+    return !!channel && (X.adultEnabled || !isAdultLiveChannel(channel));
   }
   function isVisibleLiveChannel(e) {
     var t = String(liveSearchText || "").replace(/^\s+|\s+$/g, "");
     return !!(
-      e &&
-      (X.adultEnabled || !isAdultLiveChannel(e)) &&
+      isAllowedLiveChannel(e) &&
       (!liveFavoritesOnly || !!X.liveFavorites[liveChannelKey(e)]) &&
       (!t || o((e.name || "") + " " + (e.category || "")).indexOf(o(t)) >= 0)
     );
@@ -3845,7 +3856,7 @@
           (function (e) {
             if (
               Ot &&
-              e &&
+              isAllowedLiveChannel(e) &&
               (e.channelCode || e.streamUrl) &&
               "home" === X.screen &&
               0 === X.tab
@@ -3922,7 +3933,7 @@
       }, 220)));
   }
   function Xt(e, t) {
-    if (e) {
+    if (isAllowedLiveChannel(e)) {
       Mt = e;
       /* "Todos" y Favoritos son filtros excluyentes. */
       if (isAllLiveCategory(e)) liveFavoritesOnly = !1;
@@ -4001,7 +4012,8 @@
   }
   var liveListUnavailable = false;
   function Gt(e, t, force) {
-    var a = e || 76182;
+    var a = e || 76182,
+      adultCategory = String(a) === "76208" || (Mt && Mt.id === a && isAdultLiveChannel(Mt));
     if (force || !At || Pt !== a) {
       var i = ++Dt;
       ((Pt = a),
@@ -4024,6 +4036,7 @@
                   F[c] && F[c].channelCode && (d[F[c].channelCode] = !0);
                 for (var p = 0; p < l.length; p++) {
                   var u = l[p];
+                  if (u && adultCategory) u.isAdult = true;
                   !u ||
                     (u.channelCode && d[u.channelCode]) ||
                     (u.channelCode && (d[u.channelCode] = !0), F.push(u));
@@ -4045,7 +4058,7 @@
                   (isFirstPage || isLastPage) &&
                   (Qt(liveFavoritesOnly),
                     "player" === X.screen && X.channelsOpen && hr()),
-                  F[X.channel] && ae && (ae.textContent = F[X.channel].name),
+                  ae && (ae.textContent = isAllowedLiveChannel(F[X.channel]) ? F[X.channel].name : ""),
                   "player" === X.screen && "live" === X.playerMode
                     ? ((isFirstPage || isLastPage) && ao())
                     : isFirstPage && Wt(F[X.channel]));
@@ -4333,9 +4346,9 @@
   }
   function stepLiveChannel(dir) {
     var visible = visibleLiveIndexes();
-    if (!visible || !visible.length) {
-      visible = [];
-      for (var i = 0; i < F.length; i++) visible.push(i);
+    if (!visible.length) {
+      for (var i = 0; i < F.length; i++)
+        if (isAllowedLiveChannel(F[i])) visible.push(i);
     }
     if (!visible.length) return;
     var pos = visible.indexOf(X.channel);
@@ -7861,6 +7874,7 @@
         "images/orbivista-proyecto.png",
         BRAND_PROJECT
       )),
+      (ze.themes = buildThemeSettings()),
       (ze.playback = (function () {
         var t = Fa("Configuración global de reproducción");
         (t.appendChild(
@@ -8375,48 +8389,74 @@
         );
       })()),
       (ze.parent = (function () {
-        var t = e("div", "settings-panel");
-        (t.appendChild(
-          e("div", "pl-title", "Contenido para adultos (+18)")
-        ),
-          t.appendChild(
-            e(
-              "div",
-              "pl-tip",
-              "Elige si deseas mostrar contenido y canales clasificados para mayores de edad en este televisor."
-            )
-          ),
-          t.appendChild(e("div", "pl-label", "Contenido +18")));
-        var a = e(
-          "div",
-          "sp-switch focusable " + (X.adultEnabled ? "on" : "off")
-        ),
-          i = e(
-            "div",
-            "pl-note",
-            X.adultEnabled
-              ? "Activo: se mostrarán categorías y canales +18."
-              : "Desactivado: se ocultarán categorías y canales +18."
-          );
-        return (
-          (a._activate = function () {
-            ((X.adultEnabled = !X.adultEnabled),
-              (Q.adultEnabled = X.adultEnabled),
-              K($, Q),
-              (a.className =
-                "sp-switch focusable " + (X.adultEnabled ? "on" : "off")),
-              (i.textContent = X.adultEnabled
-                ? "Activo: se mostrarán categorías y canales +18."
-                : "Desactivado: se ocultarán categorías y canales +18."),
-              Qt(liveFavoritesOnly),
-              hr(X.channel),
-              Yt(X.adultEnabled ? "Contenido +18 habilitado" : "Contenido +18 oculto"),
-              rt(a));
-          }),
-          t.appendChild(a),
-          t.appendChild(i),
-          t
-        );
+        var panel = e("div", "settings-panel"),
+          toggle = e("div", "sp-switch focusable"),
+          note = e("div", "pl-note"),
+          adultPanel = e("div", "pl-adult-panel"),
+          openGuide = e("button", "pl-adult-button focusable", "Abrir guía +18");
+
+        panel.appendChild(e("div", "pl-title", "Control parental"));
+        panel.appendChild(e("div", "pl-tip", "Elige si se muestran las categorías y canales para adultos en este televisor."));
+        panel.appendChild(e("div", "pl-label", "Contenido +18"));
+        toggle.setAttribute("role", "switch");
+        toggle.setAttribute("aria-label", "Mostrar contenido +18");
+        openGuide.type = "button";
+        adultPanel.appendChild(openGuide);
+        panel.appendChild(toggle);
+        panel.appendChild(note);
+        panel.appendChild(adultPanel);
+
+        function updatePanel() {
+          toggle.classList.toggle("on", X.adultEnabled);
+          toggle.classList.toggle("off", !X.adultEnabled);
+          toggle.setAttribute("aria-checked", String(X.adultEnabled));
+          adultPanel.hidden = !X.adultEnabled;
+          note.textContent = X.adultEnabled
+            ? "Categorías y canales +18 visibles."
+            : "Categorías y canales +18 ocultos.";
+        }
+        toggle._activate = function () {
+          X.adultEnabled = !X.adultEnabled;
+          Q.adultEnabled = X.adultEnabled;
+          K($, Q);
+          updatePanel();
+          if (!X.adultEnabled) {
+            if (isAdultLiveChannel(Mt)) Xt(getAllLiveCategory());
+            if (isAdultLiveChannel(F[X.channel])) {
+              jt();
+              var visible = visibleLiveIndexes();
+              X.channel = visible.length ? visible[0] : 0;
+              if (ae) ae.textContent = visible.length ? F[X.channel].name : "";
+            }
+          }
+          Qt(liveFavoritesOnly);
+          hr(X.channel);
+          dr();
+          Yt(note.textContent);
+        };
+        openGuide._activate = function () {
+          if (!X.adultEnabled) return;
+          var category = Lt.filter(isAdultLiveChannel)[0] ||
+            DEFAULT_LIVE_CATEGORIES.filter(isAdultLiveChannel)[0];
+          if (!category) return;
+          // Drop rows from the previous category while the new list loads.
+          F.splice(0, F.length);
+          X.channel = 0;
+          if (ae) ae.textContent = "";
+          liveSearchText = "";
+          liveFavoritesOnly = false;
+          lt("home");
+          bt(0, false);
+          if (Ue[0]) rt(Ue[0]);
+          Xt(category, function () {
+            if (X.adultEnabled && X.screen === "home" && X.tab === 0 &&
+                X.focus === Ue[0] && Fe.length) rt(Fe[0]);
+          });
+        };
+        bindMagicActivate(toggle);
+        bindMagicActivate(openGuide);
+        updatePanel();
+        return panel;
       })()),
       (ze.display = (function () {
         var t = Fa("Pantalla y compatibilidad"),
@@ -8589,6 +8629,34 @@
   function Fa(t) {
     var a = e("div", "settings-panel");
     return (a.appendChild(e("div", "sp-title", t)), a);
+  }
+  function buildThemeSettings() {
+    var panel = Fa("Apariencia"),
+      grid = e("div", "theme-settings-grid"),
+      themes = window.OrbivistaThemes;
+    panel.appendChild(grid);
+    if (!themes) return panel;
+    var options = [];
+    function updateSelection() {
+      options.forEach(function (button, index) {
+        button.setAttribute("aria-pressed", String(index === themes.current()));
+      });
+    }
+    themes.list.forEach(function (theme, index) {
+      var button = e("button", "theme-option focusable", theme[0]);
+      button.type = "button";
+      button.style.backgroundColor = theme[2];
+      button.style.color = theme[4];
+      button._activate = function () {
+        themes.select(index);
+        updateSelection();
+      };
+      bindMagicActivate(button);
+      options.push(button);
+      grid.appendChild(button);
+    });
+    updateSelection();
+    return panel;
   }
   function Ba(t, a, i, n, r, o) {
     var s = e("div", "pb-row");
@@ -11372,7 +11440,7 @@
             ];
         X.adultEnabled ||
           (i = i.filter(function (e) {
-            return !!(e && (e.isAddon || !isAdultLiveChannel(e)));
+            return isAllowedLiveChannel(e);
           }));
         for (var n = "", r = 0; r < i.length; r++)
           n += i[r].id + "|";
@@ -11493,7 +11561,7 @@
         var cats = Lt && Lt.length ? Lt : DEFAULT_LIVE_CATEGORIES.slice();
         X.adultEnabled ||
           (cats = cats.filter(function (el) {
-            return !!(el && (el.isAddon || !isAdultLiveChannel(el)));
+            return isAllowedLiveChannel(el);
           }));
         a(Ge);
         if (Qe) {
@@ -13174,7 +13242,7 @@
     if (
       (eo && (clearTimeout(eo), (eo = null)),
         e || (e = F[X.channel]),
-        e && (e.channelCode || e.streamUrl))
+        isAllowedLiveChannel(e) && (e.channelCode || e.streamUrl))
     ) {
       if (F && F.length) {
         var idx = F.indexOf(e);

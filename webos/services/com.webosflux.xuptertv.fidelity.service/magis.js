@@ -45,6 +45,8 @@ var crypto = require("crypto"),
   KINO_BEARER_DEFAULT = "UPdTgzYTsjit9K1MvT_KbCMnXOLOXeeWn3fYzluESfY",
   KINO_BEARER_FILE = "/tmp/xuper-bearer.json",
   SEED_URL =
+    "https://raw.githubusercontent.com/rogerex007/orbivista/seeds/seeds.json",
+  LEGACY_SEED_URL =
     "https://raw.githubusercontent.com/cristianco7/XUPER-HYDRA-PORT-WEBOS/seeds/seeds.json",
   SEED_FILE = "/tmp/xuper-seeds.json",
   SEED_DEAD_FILE = "/tmp/xuper-seeds-dead.json",
@@ -901,15 +903,22 @@ function refreshSeeds(e) {
         } catch (err) {}
     };
 
-    var doGithubFetch = function () {
+    var doGithubFetch = function (source) {
+      var completed = false;
+      var finish = function (err) {
+        if (completed) return;
+        completed = true;
+        if (err && source === SEED_URL) return doGithubFetch(LEGACY_SEED_URL);
+        n(err);
+      };
       var fullSeedUrl =
-        SEED_URL + (SEED_URL.indexOf("?") === -1 ? "?" : "&") + "_t=" + Date.now();
+        source + (source.indexOf("?") === -1 ? "?" : "&") + "_t=" + Date.now();
       var t = url.parse(fullSeedUrl);
       ((t.method = "GET"),
         (t.rejectUnauthorized = !1),
         (t.headers = { "User-Agent": "XuperTV/webOS" }),
         dnsx.prepare(t, function (e, r) {
-          if (e) return n(e);
+          if (e) return finish(e);
           var t;
           r.rejectUnauthorized = !1;
           try {
@@ -917,40 +926,41 @@ function refreshSeeds(e) {
               if (200 !== e.statusCode)
                 return (
                   e.resume(),
-                  n(new Error("semillas HTTP " + e.statusCode))
+                  finish(new Error("semillas HTTP " + e.statusCode))
                 );
               var r = [];
               (e.on("data", function (e) {
                 r.push(e);
               }),
                 e.on("error", function (e) {
-                  n(e);
+                  finish(e);
                 }),
                 e.on("end", function () {
+                  if (completed) return;
                   var e;
                   try {
                     e = JSON.parse(Buffer.concat(r).toString("utf8"));
                   } catch (e) {
-                    return n(e);
+                    return finish(e);
                   }
                   var t = e && e.seeds ? e.seeds : e;
                   if (!t || !t.length)
-                    return n(new Error("lista de semillas vacía"));
+                    return finish(new Error("lista de semillas vacía"));
                   (storeSeeds(t),
                     console.log(
                       "[magis] semillas actualizadas: " + seedPool.length
                     ),
-                    n(null));
+                    finish(null));
                 }));
             });
           } catch (e) {
-            return n(e);
+            return finish(e);
           }
           (t.on("error", function (e) {
-            n(e);
+            finish(e);
           }),
             t.setTimeout(6e3, function () {
-              (t.abort(), n(new Error("timeout de semillas")));
+              (t.abort(), finish(new Error("timeout de semillas")));
             }),
             t.end());
         }));
@@ -965,7 +975,7 @@ function refreshSeeds(e) {
       if (kErr) {
         console.log("[magis] kino seed no disponible (" + (kErr.message || kErr) + "), recurriendo a GitHub");
       }
-      doGithubFetch();
+      doGithubFetch(SEED_URL);
     });
   }
 }

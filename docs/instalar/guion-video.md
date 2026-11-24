@@ -1,4 +1,4 @@
-# Guion del vídeo: «Instalar XuperTV en tu LG»
+# Guion del vídeo: «Instalar Orbivista en tu LG»
 
 Guion listo para grabar. Está pensado para que lo pueda hacer alguien **sin
 experiencia en edición**: se graba la pantalla, se lee el texto en voz alta y
@@ -18,8 +18,8 @@ se cortan los silencios.
 |---|---|
 | Móvil con cámara | Grabar la pantalla de la TV (Modo Desarrollador) |
 | PC con OBS Studio (gratis) o Grabación de pantalla de Windows | Grabar la parte del ordenador |
-| La carpeta `XuperTV-instalador-1.5.9` extraída | Es lo que vas a enseñar |
-| La guía `guia-instalacion.html` | Tus diapositivas: ábrela y pulsa **Modo presentación** |
+| El repositorio `orbivista` extraído, con el IPK en la carpeta del instalador | Es lo que vas a enseñar |
+| La [guía de instalación](index.html) | Tus diapositivas: ábrela y pulsa **Modo presentación** |
 | Micrófono | El del móvil vale si la habitación está en silencio |
 
 > **Truco:** graba primero **sin voz** todo el proceso, y después graba la voz
@@ -29,7 +29,7 @@ se cortan los silencios.
 
 ## 2. Preparar las diapositivas
 
-1. Abre `guia-instalacion.html` con doble clic.
+1. Abre `docs/instalar/index.html` con doble clic. Si preparaste el kit de Windows, abre `guia-instalacion.html`.
 2. Pulsa **▶ Modo presentación** (arriba a la derecha).
 3. Se pone a pantalla completa. Con **← →** cambias de diapositiva, con **Esc**
    sales.
@@ -46,7 +46,7 @@ imágenes reales.
 
 **En pantalla:** la app funcionando en la TV (menú de inicio, catálogo).
 
-**Texto en pantalla:** `Instalar XuperTV en tu LG — paso a paso`
+**Texto en pantalla:** `Instalar Orbivista en tu LG — paso a paso`
 
 > «Si te han pasado esta aplicación y no sabes cómo meterla en la tele, tranquilo:
 > en cinco minutos la tienes funcionando. No hace falta saber nada de informática.
@@ -140,13 +140,13 @@ Escribir la IP. Escribir la clave dos veces. Los puntitos y el mensaje LISTO.
 
 ### Escena 6 · Abrir la app (3:10 – 3:40)
 
-**En pantalla:** la TV abriendo XuperTV sola. Luego el inicio con el catálogo.
+**En pantalla:** la TV abriendo Orbivista sola. Luego el inicio con el catálogo.
 
 **Texto en pantalla:** `Paso 4 · Listo`
 
 > «Cuando ponga “LISTO”, mirad la tele: la aplicación se abre sola.
 >
-> Si no se abre, botón de inicio del mando, buscáis el icono de XuperTV y ya está.
+> Si no se abre, botón de inicio del mando, buscáis el icono de Orbivista y ya está.
 >
 > La primera vez tarda unos segundos en cargar. Es normal.»
 
@@ -200,7 +200,7 @@ Escribir la IP. Escribir la clave dos veces. Los puntitos y el mensaje LISTO.
 ## 5. Texto para la descripción (YouTube)
 
 ```
-Instalar XuperTV en un televisor LG webOS paso a paso, sin conocimientos
+Instalar Orbivista en un televisor LG webOS paso a paso, sin conocimientos
 técnicos. Solo hay que extraer una carpeta y hacer doble clic en un instalador.
 
 0:00 Qué vamos a hacer
@@ -256,7 +256,7 @@ grabación de la terminal de Linux.
 
 3. Abre la terminal en esa carpeta y ejecuta `bash ./INSTALAR-XUPERTV.sh`.
    Introduce la IP del televisor y la clave de Developer Mode cuando se pida.
-4. Graba el mensaje **LISTO** y cambia a la toma de XuperTV abierta en la TV.
+4. Graba el mensaje **LISTO** y cambia a la toma de Orbivista abierta en la TV.
 
 **Locución**
 

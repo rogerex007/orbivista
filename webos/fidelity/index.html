@@ -8,7 +8,8 @@
 <title>Orbivista</title>
 <link rel="stylesheet" href="css/style.css?v=3.2.2">
 <link rel="stylesheet" href="css/ui-refresh.css?v=3.2.3">
-<link rel="stylesheet" href="css/clean.css?v=3.2.31">
+<link rel="stylesheet" href="css/clean.css?v=3.2.32">
+<link rel="stylesheet" href="css/orbivista.css?v=3.1.89">
 <!-- webOS 1.0-3.5 polyfills for legacy WebKit / Chromium -->
 <script>
 if (typeof Symbol === 'undefined') {
@@ -203,9 +204,8 @@ if (!Array.prototype.findIndex) {
         </div>
         <div class="vod-infobar-tips">
           <div class="vod-tip"><kbd>OK</kbd><span>Pausa / Reproducir</span></div>
-          <div class="vod-tip"><kbd>←</kbd><span>−10 s</span></div>
-          <div class="vod-tip"><kbd>→</kbd><span>+10 s</span></div>
-          <div class="vod-tip"><kbd>↑</kbd><span>Barra de progreso</span></div>
+          <div class="vod-tip"><kbd>←</kbd><kbd>→</kbd><span>Retroceder / avanzar 10 s</span></div>
+          <div class="vod-tip"><kbd>↑</kbd><span>Línea de tiempo</span></div>
           <div class="vod-tip"><kbd>↓</kbd><span>Ajustes</span></div>
         </div>
       </div>
@@ -444,6 +444,7 @@ if (!Array.prototype.findIndex) {
 <!-- Local, authorized VOD endpoint configuration.  Keep this file before app.js. -->
 <script src="config/api.js"></script>
 <script src="js/skip-segments.js"></script>
-<script src="js/app.js?v=3.1.84-orbivista"></script>
+<script src="js/themes.js?v=3.1.89"></script>
+<script src="js/app.js?v=3.1.89-orbivista"></script>
 </body>
 </html>

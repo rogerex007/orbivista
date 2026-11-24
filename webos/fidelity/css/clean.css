@@ -7170,3 +7170,34 @@ body.is-focused {
 .orbivista-link-url {
   margin-top: 18px;
 }
+
+/* Selector de temas de Mi cuenta */
+.theme-settings-grid {
+  display: flex;
+  flex-wrap: wrap;
+  padding-top: 90px;
+}
+.theme-option {
+  width: 23%;
+  min-height: 86px;
+  margin: 0 2% 16px 0;
+  padding: 0 14px;
+  border: 2px solid rgba(255, 255, 255, .25);
+  border-radius: 12px;
+  box-sizing: border-box;
+  color: #fff;
+  text-align: left;
+  font: inherit;
+  font-size: 23px;
+}
+.theme-option.is-focused {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+.theme-option[aria-pressed="true"] {
+  border-color: currentColor;
+}
+.theme-option[aria-pressed="true"]::after {
+  content: " · Activo";
+  font-size: 17px;
+}

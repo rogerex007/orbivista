@@ -1,6 +1,6 @@
 {
   "id": "com.webosflux.xuptertv.fidelity",
-  "version": "3.1.84",
+  "version": "3.1.89",
   "vendor": "rogerex007",
   "type": "web",
   "main": "index.html",
@@ -8,7 +8,7 @@
   "icon": "images/orbivista-icon.png",
   "largeIcon": "images/orbivista-large.png",
   "resolution": "1280x720",
-  "bgColor": "#000000",
+  "bgColor": "#0c141f",
   "bgImage": "",
   "spinnerOnLaunch": false,
   "uiRevision": 2,
