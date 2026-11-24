@@ -1,63 +1,34 @@
-name: seeds
+name: Seeds de prueba
 
 on:
-  schedule:
-    - cron: "17 * * * *"
-    - cron: "47 * * * *"
   workflow_dispatch:
-    inputs:
-      count:
-        description: "Semillas nuevas a acuñar"
-        required: false
-        default: "45"
 
 permissions:
-  contents: write
-
-concurrency:
-  group: seeds
-  cancel-in-progress: false
+  contents: read
 
 jobs:
-  mint:
-    if: github.repository == 'cristianco7/XUPER-HYDRA-PORT-WEBOS'
+  publish-fixture:
+    if: github.repository == 'rogerex007/orbivista' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    permissions:
+      contents: write
+    concurrency: orbivista-seeds-fixture
     steps:
-      - name: Codigo de la app
-        uses: actions/checkout@v4
-
-      - name: Pool actual (rama seeds)
+      - name: Descargar la rama seeds
         uses: actions/checkout@v4
         with:
           ref: seeds
-          path: pool
-
-      - name: Conectar Cloudflare WARP (evita bloqueo de IP datacenter de Azure)
-        uses: fscarmen/warp-on-actions@v1.4
-        with:
-          mode: wireguard
-          stack: dual
-        continue-on-error: true
-
-      - name: Verificar IP de salida
+      - name: Publicar el JSON de prueba
         run: |
-          curl -s https://cloudflare.com/cdn-cgi/trace || true
-
-      - name: Acunar semillas
-        run: |
-          node tools/mint-seeds.js --count "${{ inputs.count || '45' }}" --max 250 --ttl-hours 16 --pool pool/seeds.json --out pool/seeds.json --soft-fail || \
-          (sleep 15 && node tools/mint-seeds.js --count "${{ inputs.count || '45' }}" --max 250 --ttl-hours 16 --pool pool/seeds.json --out pool/seeds.json --soft-fail)
-
-      - name: Publicar pool
-        working-directory: pool
-        run: |
-          git config user.name "xupertv-seeds"
-          git config user.email "seeds@users.noreply.github.com"
-          git add seeds.json
-          if git diff --cached --quiet; then
-            echo "sin cambios en el pool"
+          set -euo pipefail
+          if [[ -e seeds.json ]]; then
+            jq -e '. == {at: 0, seeds: []}' seeds.json >/dev/null
+            echo 'El JSON de prueba ya está publicado.'
             exit 0
           fi
-          git commit -m "seeds: pool $(date -u +%Y-%m-%dT%H:%MZ)"
-          git push origin HEAD:seeds
+          printf '%s\n' '{"at":0,"seeds":[]}' > seeds.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- seeds.json
+          git commit -m 'Add empty seeds fixture'
+          git push origin HEAD:refs/heads/seeds
