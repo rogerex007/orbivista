@@ -1,0 +1,94 @@
+name: Orbivista IPK y Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Operación
+        type: choice
+        default: build
+        options: [build, publish]
+      build_run_id:
+        description: ID de la ejecución cuyo IPK ya se probó y aprobó
+        type: string
+      approved:
+        description: Confirmo la publicación del IPK probado
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    if: github.repository == 'rogerex007/orbivista' && github.ref == 'refs/heads/main' && (github.event_name == 'push' || inputs.operation == 'build')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validar sintaxis ES5 del servicio
+        run: |
+          for file in webos/services/com.webosflux.xuptertv.fidelity.service/*.js; do
+            npm exec --yes --package=acorn@8.15.0 -- acorn --ecma5 --silent "$file" || exit 1
+          done
+      - name: Construir IPK y manifiesto
+        run: tools/build-orbivista.sh dist/orbivista-release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: orbivista-ipk
+          path: dist/orbivista-release/
+          if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    if: github.repository == 'rogerex007/orbivista' && github.ref == 'refs/heads/main' && inputs.operation == 'publish'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    concurrency: orbivista-release
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verificar ejecución aprobada
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUILD_RUN_ID: ${{ inputs.build_run_id }}
+          APPROVED: ${{ inputs.approved }}
+        run: |
+          set -euo pipefail
+          [[ "$APPROVED" == true ]] || { echo 'Confirma que probaste y aprobaste el IPK.'; exit 1; }
+          [[ "$BUILD_RUN_ID" =~ ^[0-9]+$ ]]
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$BUILD_RUN_ID" > "$RUNNER_TEMP/build-run.json"
+          jq -e --arg repo "$GITHUB_REPOSITORY" '
+            .head_repository.full_name == $repo and .head_branch == "main" and
+            .path == ".github/workflows/orbivista-release.yml" and .conclusion == "success"
+          ' "$RUNNER_TEMP/build-run.json"
+          gh run download "$BUILD_RUN_ID" --name orbivista-ipk --dir "$RUNNER_TEMP/orbivista-ipk"
+      - name: Publicar exactamente el IPK aprobado
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          artifact="$RUNNER_TEMP/orbivista-ipk"
+          manifest="$artifact/version.json"
+          version="$(jq -er '.version' "$manifest")"
+          commit="$(jq -er '.sourceCommit' "$manifest")"
+          sha="$(jq -er '.sha256' "$manifest")"
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ && "$commit" =~ ^[0-9a-f]{40}$ && "$sha" =~ ^[0-9a-f]{64}$ ]]
+          [[ "$commit" == "$(jq -er '.head_sha' "$RUNNER_TEMP/build-run.json")" ]]
+          git merge-base --is-ancestor "$commit" origin/main
+          name="com.webosflux.xuptertv.fidelity_${version}_all.ipk"
+          [[ "$(jq -er '.ipkUrl' "$manifest")" == "https://github.com/$GITHUB_REPOSITORY/releases/download/v$version/$name" ]]
+          printf '%s  %s\n' "$sha" "$artifact/$name" | sha256sum -c
+          if git show-ref --verify --quiet "refs/tags/v$version"; then
+            [[ "$(git rev-parse "v$version^{commit}")" == "$commit" ]]
+          fi
+          jq -er '.changelog' "$manifest" > "$RUNNER_TEMP/release-notes.md"
+          gh release create "v$version" "$artifact/$name" "$manifest" \
+            --target "$commit" --title "Orbivista v$version" --notes-file "$RUNNER_TEMP/release-notes.md" --latest

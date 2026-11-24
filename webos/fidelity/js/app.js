@@ -1,0 +1,13760 @@
+!(function () {
+  "use strict";
+  var APP_VERSION = "3.1.84";
+  var BRAND_NAME = "Orbivista";
+  var BRAND_PROJECT = "github.com/rogerex007/orbivista";
+  window.APP_VERSION = APP_VERSION;
+  /* Iconos vectoriales inline: las fuentes de las TV webOS no incluyen
+     glifos ★ ☆ ▶ ⚙ ➕ ni emoji, por eso se dibujan en SVG. */
+  function starSvg(filled) {
+    return (
+      '<svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M16 3.2l4.1 8.3 9.2 1.3-6.7 6.5 1.6 9.1-8.2-4.3-8.2 4.3 1.6-9.1-6.7-6.5 9.2-1.3z" fill="' +
+      (filled ? "currentColor" : "none") +
+      '" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg>'
+    );
+  }
+  function playSvg() {
+    return '<svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M11 6.5l15 9.5-15 9.5z" fill="currentColor"/></svg>';
+  }
+  function plusSvg() {
+    return '<svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M16 6v20M6 16h20" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg>';
+  }
+  function searchSvg() {
+    return '<svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><circle cx="14" cy="14" r="8.5" fill="none" stroke="currentColor" stroke-width="2.8"/><path d="M20.5 20.5L28 28" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
+  }
+  function filterSvg() {
+    return '<svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M4 8h24M8 16h16M12 24h8" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/><circle cx="11" cy="8" r="3" fill="currentColor"/><circle cx="20" cy="16" r="3" fill="currentColor"/><circle cx="16" cy="24" r="3" fill="currentColor"/></svg>';
+  }
+  function gearSvg() {
+    return '<svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M16 3v4M16 25v4M3 16h4M25 16h4M6.8 6.8l2.8 2.8M22.4 22.4l2.8 2.8M25.2 6.8l-2.8 2.8M9.6 22.4l-2.8 2.8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
+  }
+  function subtitlesSvg() {
+    return '<svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><rect x="3" y="6" width="26" height="20" rx="3" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M8 19h6M18 19h6M8 14h4M16 14h8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
+  }
+  function bellSvg() {
+    return '<svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M16 4a7 7 0 0 0-7 7v5l-2.5 4.5h19L23 16v-5a7 7 0 0 0-7-7z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M13 24a3 3 0 0 0 6 0" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
+  }
+  function gaugeSvg() {
+    return '<svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><path d="M5 23a12 12 0 1 1 22 0" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M16 23l6-7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><circle cx="16" cy="23" r="2.2" fill="currentColor"/></svg>';
+  }
+  function clockSvg() {
+    return '<svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M16 9v7l5 3" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
+  }
+  function e(e, t, a) {
+    var i = document.createElement(e);
+    return (t && (i.className = t), null != a && (i.textContent = a), i);
+  }
+  function t(e) {
+    return document.getElementById(e);
+  }
+  function a(e) {
+    if (e) for (; e.firstChild;) e.removeChild(e.firstChild);
+  }
+  function clearChildren(e) {
+    if (e) for (; e.firstChild;) e.removeChild(e.firstChild);
+  }
+  function i(e, t, a, i, n) {
+    return (
+      (e.style.position = "absolute"),
+      (e.style.left = t + "px"),
+      (e.style.top = a + "px"),
+      void 0 !== i && (e.style.width = i + "px"),
+      void 0 !== n && (e.style.height = n + "px"),
+      e
+    );
+  }
+  function n(e, t) {
+    for (; e && e !== document;) {
+      if (1 === e.nodeType) {
+        var m = e.matches || e.webkitMatchesSelector || e.mozMatchesSelector || e.msMatchesSelector;
+        if (m && m.call(e, t)) return e;
+      }
+      e = e.parentNode;
+    }
+    return null;
+  }
+  function findScrollable(elem, horizontal) {
+    while (elem && elem !== document && elem !== document.body) {
+      if (1 === elem.nodeType) {
+        if (horizontal) {
+          if (elem.scrollWidth > elem.clientWidth + 4) {
+            var sx = window.getComputedStyle ? window.getComputedStyle(elem).overflowX : "";
+            if (sx === "auto" || sx === "scroll" || elem.classList.contains("catalog-rail") || elem.classList.contains("scrollable") || elem.classList.contains("search-suggestions")) return elem;
+          }
+        } else {
+          if (elem.scrollHeight > elem.clientHeight + 4) {
+            var sy = window.getComputedStyle ? window.getComputedStyle(elem).overflowY : "";
+            if (sy === "auto" || sy === "scroll" || elem.classList.contains("scrollable") || elem.classList.contains("search-results") || elem.classList.contains("da-body") || elem.classList.contains("pc-list") || elem.classList.contains("settings-body") || elem.classList.contains("pe-seasons") || elem.classList.contains("pe-episodes")) return elem;
+          }
+        }
+      }
+      elem = elem.parentNode;
+    }
+    return null;
+  }
+  function r(e) {
+    return e < 10 ? "0" + e : "" + e;
+  }
+  function o(e) {
+    return (
+      (e = String(e).toLowerCase()).normalize &&
+      (e = e.normalize("NFD").replace(/[\u0300-\u036f]/g, "")),
+      e
+    );
+  }
+  var s = [
+    "Acción",
+    "Drama",
+    "Comedia",
+    "Suspenso",
+    "Aventura",
+    "Animación",
+    "Familiar",
+    "Ciencia ficción",
+  ],
+    l = [],
+    d = {
+      Destacado: "destacado",
+      Película: "pelicula",
+      Serie: "serie",
+      Gratis: "gratis",
+      Infantil: "infantil",
+      UHD: "uhd",
+      Extra: "extra",
+    };
+  function c(e, t, a) {
+    for (var i = 1; i <= t; i++) {
+      var n = s[(a + i) % s.length],
+        o = s[(a + i + 3) % s.length];
+      l.push({
+        id: l.length + 1,
+        title: e + " demo " + r(i),
+        category: d[e] || "",
+        score: (7.9 + ((a + i) % 16) / 10).toFixed(1),
+        year: 2018 + ((a + i) % 7),
+        duration:
+          1 + ((a + i) % 2) + " h " + (10 + ((7 * a + 5 * i) % 45)) + " min",
+        genres: n === o ? [n] : [n, o],
+        director: "Director demo " + r(i),
+        actors: "Actor demo " + r(i) + ", Actriz demo " + r(i + 1),
+        synopsis:
+          "Sinopsis de demostración para " +
+          e.toLowerCase() +
+          " demo " +
+          r(i) +
+          '. Este texto sólo existe para comprobar el recorte a dos líneas, el interlineado y la sangría de la etiqueta "Sinopsis :" definidos en activity_voddetails.',
+        kind: e.toLowerCase(),
+      });
+    }
+  }
+  (c("Destacado", 5, 1),
+    c("Película", 7, 2),
+    c("Serie", 7, 3),
+    c("Gratis", 5, 4),
+    c("Infantil", 8, 5),
+    c("UHD", 4, 6),
+    c("Extra", 4, 7));
+  var p = window.XUPERTV_API || {},
+    u = /[?&]service=([^&]+)/.exec(window.location.search || "");
+  u && (p.devServiceUrl = decodeURIComponent(u[1]));
+  var v = { loading: !1, source: "demo", error: null },
+    f = { refreshing: !1, lastSync: 0, roots: 0, error: null },
+    h = ["featured", "movies", "series", "anime", "kids", "free"];
+  function m(e) {
+    if ("[object Array]" === Object.prototype.toString.call(e)) return e;
+    if (!e) return [];
+    for (
+      var t = [
+        "items",
+        "movies",
+        "results",
+        "recommendList",
+        "movieList",
+        "totalMovieList",
+        "programList",
+        "data",
+      ],
+      a = 0;
+      a < t.length;
+      a++
+    ) {
+      if ("[object Array]" === Object.prototype.toString.call(e[t[a]]))
+        return e[t[a]];
+      if (e[t[a]] && "object" == typeof e[t[a]]) {
+        var i = m(e[t[a]]);
+        if (i.length) return i;
+      }
+    }
+    return [];
+  }
+  function g(e) {
+    var t = p[e + "Url"];
+    if (t) return String(t);
+    var a = String(p.baseUrl || "").replace(/\/$/, ""),
+      i = String(p[e + "Path"] || "");
+    return a && i ? a + ("/" === i.charAt(0) ? i : "/" + i) : "";
+  }
+  function y() {
+    var e = p.session || {};
+    return {
+      userId: String(e.userId || ""),
+      userToken: String(e.userToken || ""),
+      portalCode: String(e.portalCode || ""),
+      homePageCode: String(e.homePageCode || ""),
+      version: String(e.version || "4.34.4"),
+    };
+  }
+  function b() {
+    var e = y();
+    return !!(e.userId && e.userToken && e.portalCode);
+  }
+  function C(e, t) {
+    var a = y();
+    return "catalog" === e
+      ? {
+        userId: a.userId,
+        userToken: a.userToken,
+        portalCode: a.portalCode,
+        homePageCode: a.homePageCode,
+        version: a.version,
+      }
+      : "search" === e
+        ? {
+          userToken: a.userToken,
+          userId: a.userId,
+          portalCode: a.portalCode,
+          columnId: "",
+          value: t || "",
+          type: "",
+          pageSize: 20,
+          pageNum: 1,
+          filter: "",
+        }
+        : {
+          userToken: a.userToken,
+          userId: a.userId,
+          portalCode: a.portalCode,
+          programId: t,
+        };
+  }
+  function w(e) {
+    return e
+      ? ((e = String(e)),
+        /^https?:\/\//i.test(e) || 0 === e.indexOf("data:")
+          ? e
+          : p.imageBaseUrl
+            ? String(p.imageBaseUrl).replace(/\/$/, "") +
+            "/" +
+            e.replace(/^\//, "")
+            : e)
+      : "";
+  }
+  function S(e, t) {
+    return null == e || "" === e ? t : String(e);
+  }
+  function x(e) {
+    if (!e) return !1;
+    /* Si el backend o catálogo indica explícitamente película, no es serie salvo que tenga más de 1 episodio real o múltiples temporadas */
+    var isMovieExplicit = "movie" === e.type || "película" === e.kind || "pelicula" === e.category;
+    if (isMovieExplicit) {
+      if (e.seasons && e.seasons.length > 1) return !0;
+      if (e.episodes && e.episodes.length > 1) return !0;
+      return !1;
+    }
+    return (
+      "teleplay" === e.type ||
+      "series" === e.type ||
+      "serie" === e.kind ||
+      (e.category && -1 !== e.category.indexOf("serie")) ||
+      (e.episodes && e.episodes.length > 1) ||
+      (e.seasons && e.seasons.length > 0) ||
+      (e.volumeCount && parseInt(e.volumeCount, 10) > 1)
+    );
+  }
+  function T(e, t) {
+    var a = (e = e || {}).genres || e.genre || [];
+    ("string" == typeof a && (a = a.split(",")),
+      "[object Array]" !== Object.prototype.toString.call(a) && (a = []));
+    for (var i = [], n = 0; n < a.length; n++)
+      i.push("string" == typeof a[n] ? a[n] : a[n].name || "");
+    var r = e.duration || e.runtime || e.runtimeMinutes || "";
+    "number" == typeof r &&
+      (r = Math.floor(r / 60) + " h " + (r % 60) + " min");
+    var s = S(e.type || e.programType, ""),
+      l =
+        "teleplay" === s ||
+        "series" === s ||
+        "serie" === o(S(e.kind || "", "")) ||
+        -1 !== o(S(e.category || "", "")).indexOf("serie") ||
+        (e.episodes && e.episodes.length > 0) ||
+        (e.seasons && e.seasons.length > 0) ||
+        (e.volumeCount && parseInt(e.volumeCount, 10) > 1) ||
+        (e.volumnCount && parseInt(e.volumnCount, 10) > 1);
+    return {
+      id: S(
+        e.id || e.vodId || e.programId || e.program_id || e.tmdb_id,
+        "api-" + t
+      ),
+      imdbId: S(e.imdbId || e.imdb_id, ""),
+      tmdbId: S(e.tmdbId || e.tmdb_id, ""),
+      title: S(
+        e.title ||
+        e.name ||
+        e.programName ||
+        e.programTitle ||
+        e.original_title,
+        "Sin título"
+      ),
+      category: o(
+        S(e.category || e.section || e.collection || e.homeSection, "")
+      ),
+      score: S(
+        e.score || e.vote_average || e.rating || e.movieRate || e.programScore,
+        "—"
+      ),
+      year: S(
+        e.year ||
+        e.release_year ||
+        e.programYear ||
+        (e.releaseDate || e.releaseTime || e.release_date || "").slice(0, 4),
+        "—"
+      ),
+      duration: S(r, "—"),
+      genres: i.length ? i : ["Sin clasificar"],
+      director: S(e.director, "—"),
+      actors: S(e.actors || e.actorDisplay || e.cast, "—"),
+      synopsis: S(
+        e.synopsis || e.overview || e.description || e.programUpdateContent,
+        "Sin sinopsis disponible."
+      ),
+      kind: l ? "serie" : S(e.kind || e.media_type, "película"),
+      poster: w(
+        e.posterUrl ||
+        e.poster_url ||
+        e.poster ||
+        e.poster_path ||
+        e.image ||
+        e.imageUrl ||
+        e.cover ||
+        e.coverUrl ||
+        e.programPoster ||
+        e.programImage
+      ),
+      landscape: w(
+        e.landscapeUrl ||
+        e.landscape_url ||
+        e.landscape ||
+        e.wideImage ||
+        e.bannerImage
+      ),
+      backdrop: w(
+        e.backdropUrl || e.backdrop_url || e.backdrop || e.backdrop_path
+      ),
+      streamUrl: e.streamUrl || e.stream_url || "",
+      type: s || (l ? "teleplay" : "movie"),
+      row: S(e.row, ""),
+      alias: S(e.alias, ""),
+      country: S(e.country || e.originalCountry, ""),
+      releaseDate: S(e.releaseDate || e.releaseTime, ""),
+      tagline: S(e.tagline || e.viewPoint, ""),
+      volumeCount: parseInt(e.volumeCount || e.volumnCount, 10) || 0,
+      updateCount: parseInt(e.updateCount, 10) || 0,
+      episodes: e.episodes || [],
+      seasons: e.seasons || [],
+      moreAudio: void 0 !== e.moreAudio ? e.moreAudio : 0,
+      moreSubtitle: void 0 !== e.moreSubtitle ? e.moreSubtitle : 0,
+      _portal:
+        !0 === e.portal ||
+        !0 === e._portal ||
+        (p && "portal" === p.mode && String(e.id || "").length > 10),
+    };
+  }
+  function _(e, t, a) {
+    a = a || {};
+    var i = new XMLHttpRequest(),
+      n = !1,
+      r = parseInt(p.timeoutMs, 10) || 1e4;
+    function o(e, a) {
+      n || ((n = !0), t(e, a));
+    }
+    (i.open(a.method || "GET", e, !0), (i.timeout = r));
+    var s = p.headers || {};
+    for (var l in s)
+      Object.prototype.hasOwnProperty.call(s, l) && i.setRequestHeader(l, s[l]);
+    (void 0 === a.body ||
+      s["Content-Type"] ||
+      s["content-type"] ||
+      i.setRequestHeader("Content-Type", "application/json;charset=utf-8"),
+      (i.onreadystatechange = function () {
+        if (4 === i.readyState)
+          if (i.status < 200 || i.status >= 300) o("HTTP " + i.status);
+          else
+            try {
+              o(null, JSON.parse(i.responseText));
+            } catch (e) {
+              o("La API no devolvió JSON válido");
+            }
+      }),
+      (i.onerror = function () {
+        o("Error de red o CORS");
+      }),
+      (i.ontimeout = function () {
+        o("Tiempo de espera agotado");
+      }));
+    try {
+      i.send(void 0 === a.body ? null : JSON.stringify(a.body));
+    } catch (e) {
+      o(e.message || "No se pudo iniciar la petición");
+    }
+  }
+  /* El portal publica algunos títulos dos veces: una ficha en portugués
+     (título traducido, mismo alias original) y otra en español/multilenguaje.
+     Se conserva una sola ficha: la variante en portugués se descarta cuando
+     existe la versión en español o multilenguaje de la misma temporada. */
+  function catalogKeyText(value) {
+    return o(String(value || ""))
+      .replace(/[^a-z0-9]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+  function catalogSeasonNumber(item) {
+    var raw =
+      String((item && (item.title || item.name)) || "") +
+      " " +
+      String((item && item.alias) || ""),
+      m = /\b(?:t|temp\.?|temporada|season|s)\s*(\d{1,2})\b/i.exec(raw),
+      n = m ? parseInt(m[1], 10) : 0;
+    return !n || n > 99 ? 0 : n;
+  }
+  function catalogBaseTitle(item) {
+    return catalogKeyText(
+      String((item && item.title) || "").replace(
+        /\s*[-–:|]?\s*(?:t|temp\.?|temporada|season|s)\s*\d{1,2}\s*$/i,
+        ""
+      )
+    );
+  }
+  function catalogLooksPortuguese(value) {
+    var v = String(value || "").toLowerCase();
+    if (!v) return false;
+    if (/[ãõç]/.test(v)) return true;
+    if (/^(os|as)\s+(simpsons|vingadores|forças|forcas)\b/.test(v)) return true;
+    if (/(gatinhos|gatinhas|vingadores|monstros|guerreiros|sobre rodas|casa d[oa]s?\b)/.test(v))
+      return true;
+    if (/\b(não|nao|uma|você|voce|menino|menina|mulher|garota|garoto|escola|ilha)\b/.test(v))
+      return true;
+    return /(nhos|nhas)\b/.test(v);
+  }
+  function catalogVariantScore(item) {
+    var audio = parseInt(item && item.moreAudio, 10) || 0,
+      sub = parseInt(item && item.moreSubtitle, 10) || 0,
+      score = parseFloat(item && item.score);
+    return audio * 1e3 + sub * 100 + (isFinite(score) ? score : 0);
+  }
+  function dedupeCatalogVariants(list) {
+    if (!list || !list.length) return list;
+    var groups = {},
+      order = [],
+      out = [],
+      i,
+      it,
+      key;
+    for (i = 0; i < list.length; i++) {
+      it = list[i];
+      key = catalogKeyText(it.alias) || catalogKeyText(it.title);
+      key += "|" + catalogSeasonNumber(it);
+      if (!groups[key]) ((groups[key] = []), order.push(key));
+      groups[key].push(it);
+    }
+    for (i = 0; i < order.length; i++) {
+      var arr = groups[order[i]],
+        best = null,
+        hasPt = !1,
+        sameTitle = !0,
+        base = catalogBaseTitle(arr[0]),
+        j,
+        cand;
+      if (arr.length < 2) {
+        out.push(arr[0]);
+        continue;
+      }
+      for (j = 0; j < arr.length; j++) {
+        if (catalogLooksPortuguese(arr[j].title)) hasPt = !0;
+        if (catalogBaseTitle(arr[j]) !== base) sameTitle = !1;
+      }
+      /* Un alias compartido no basta: "Halloween" y "Halloween: el inicio"
+         son películas distintas. Solo se fusionan variantes de idioma o
+         duplicados con el mismo título base. */
+      if (!hasPt && !sameTitle) {
+        for (j = 0; j < arr.length; j++) out.push(arr[j]);
+        continue;
+      }
+      for (j = 0; j < arr.length; j++) {
+        cand = arr[j];
+        if (catalogLooksPortuguese(cand.title)) continue;
+        if (!best || catalogVariantScore(cand) > catalogVariantScore(best))
+          best = cand;
+      }
+      if (!best)
+        for (j = 0; j < arr.length; j++)
+          if (!best || catalogVariantScore(arr[j]) > catalogVariantScore(best))
+            best = arr[j];
+      out.push(best || arr[0]);
+    }
+    return out;
+  }
+  function k(e) {
+    if (!e || !x(e)) return null;
+    var t = String(e.title || e.alias || "")
+      .replace(/\s+/g, " ")
+      .replace(/^\s+|\s+$/g, ""),
+      a =
+        /^(.*?)(?:\s*[-–:|]?\s*(?:temporada|season)\s*(\d+)|\s*[-–:|]?\s*[st]\s*0?(\d+))\s*$/i.exec(
+          t
+        );
+    if (!a || !a[1]) return null;
+    var i = parseInt(a[2] || a[3], 10);
+    return !i || i > 99 ? null : { title: a[1].replace(/\s+$/, ""), number: i };
+  }
+  function L(e, a, i) {
+    if (!e.length) return !1;
+    for (var r = {}, s = 0; s < l.length; s++) r[String(l[s].id)] = l[s];
+    l.splice(0, l.length);
+    for (var d = [], c = 0; c < e.length; c++) {
+      var p = T(e[c], c + 1);
+      i && !1 !== e[c].portal && (p._portal = !0);
+      var u = r[String(p.id)];
+      (u &&
+        (u.episodes && (p.episodes = u.episodes),
+          u.seasons && (p.seasons = u.seasons),
+          u._detailsLoaded && (p._detailsLoaded = !0),
+          !p.streamUrl && u.streamUrl && (p.streamUrl = u.streamUrl)),
+        d.push(p));
+    }
+    for (
+      var f = (function (e) {
+        for (var t = {}, a = [], i = 0; i < e.length; i++) {
+          var n = k(e[i]); n
+            ? (t[(r = o(n.title))] || (t[r] = { title: n.title, items: [] }),
+              t[r].items.push({ item: e[i], number: n.number }))
+            : a.push(e[i]);
+        }
+        for (var r in t)
+          if (t.hasOwnProperty(r)) {
+            var s = t[r];
+            if (s.items.length < 2) a.push(s.items[0].item);
+            else {
+              s.items.sort(function (e, t) {
+                return e.number - t.number;
+              });
+              var l = s.items[0].item,
+                d = {};
+              ((l._catalogSeasons = []),
+                (l._seriesGroup = !0),
+                (l._seriesTitle = s.title),
+                (l.title = s.title),
+                (l.alias = s.title),
+                (l.seasons = []));
+              for (var c = 0; c < s.items.length; c++) {
+                for (
+                  var p = s.items[c],
+                  u = String(p.item.category || "").split(","),
+                  v = 0;
+                  v < u.length;
+                  v++
+                )
+                  u[v] && (d[u[v]] = !0);
+                var f = { id: p.item.id, number: p.number, title: s.title };
+                (l._catalogSeasons.push(f), l.seasons.push(f));
+              }
+              ((l.category = Object.keys(d).join(",")), a.push(l));
+            }
+          }
+        return a;
+      })(dedupeCatalogVariants(d)),
+      h = 0;
+      h < f.length;
+      h++
+    )
+      l.push(f[h]);
+    if (X.detail) {
+      for (var m = !1, g = 0; g < l.length; g++)
+        if (String(l[g].id) === String(X.detail.id)) {
+          ((X.detail = l[g]), (m = !0));
+          break;
+        }
+      m || (X.detail = l[0]);
+    }
+    return (
+      (v.source = a),
+      (v.error = null),
+      (function () {
+        if (Ve) {
+          var e = t("home-tabs"),
+            a = !(
+              !e ||
+              !e.classList.contains("is-expanded") ||
+              e.classList.contains("is-collapsed")
+            ),
+            i = !(!X.focus || void 0 === X.focus._tab),
+            r = !(!X.focus || !n(X.focus, "#home-notify")),
+            o = !(!X.focus || !n(X.focus, ".home-page"));
+          if (
+            ((He = []), (Ue = []), gt(), bt(X.tab, !1), "home" === X.screen)
+          ) {
+            if (i && Ue[X.tab]) rt(Ue[X.tab], !0);
+            else if (r) {
+              var s = ot(t("home-notify"));
+              s && rt(s, !0);
+            } else if (o) {
+              var l = He[z[X.tab].page],
+                d = l ? ot(l) : null;
+              d && rt(d, !0);
+            }
+            if (a && e) {
+              (e.classList.add("is-expanded"),
+                e.classList.remove("is-collapsed"));
+              var c = document.querySelector(".home-sidebar-bg");
+              c &&
+                (c.classList.add("is-on"), c.classList.remove("is-collapsed"));
+            }
+          }
+        }
+        ce && (_a(), X.searchQuery && Pa());
+        X.detail && Ca(X.detail);
+      })(),
+      !0
+    );
+  }
+  function M() {
+    var e = window.XUPERTV_CATALOG;
+    return e ? m(e) : [];
+  }
+  function I() {
+    return (
+      !window.PalmServiceBridge ||
+      (window.webOS && window.webOS.service) ||
+      ((window.webOS = window.webOS || {}),
+        (window.webOS.service = {
+          request: function (e, t) {
+            t = t || {};
+            var a = new window.PalmServiceBridge();
+            a.onservicecallback = function (e) {
+              var a;
+              try {
+                a = JSON.parse(e);
+              } catch (t) {
+                a = { returnValue: !1, errorText: e };
+              }
+              !1 === a.returnValue
+                ? t.onFailure && t.onFailure(a)
+                : t.onSuccess && t.onSuccess(a);
+            };
+            var i = t.method ? e.replace(/\/$/, "") + "/" + t.method : e;
+            return (a.call(i, JSON.stringify(t.parameters || {})), a);
+          },
+        })),
+      !!(window.webOS && window.webOS.service && window.webOS.service.request)
+    );
+  }
+  var E =
+    "La TV tiene bloqueado el servicio de Orbivista. Desenchufa la TV 10 segundos y vuelve a abrir la app; si sigue igual, reinstala con el instalador.";
+  /* Puerto de la API local del servicio. Se usa solo como respaldo cuando
+     Luna deniega la llamada (webOS 3.x con comandos "public": false). */
+  var SERVICE_HTTP_PORT = 8910;
+  function Ph(e, t, a, i) {
+    var n = !1,
+      r = null,
+      o = null,
+      s = i || parseInt(p.timeoutMs, 10) || 2e4;
+    function l(e, t) {
+      n || ((n = !0), r && (clearTimeout(r), (r = null)), a(e, t));
+    }
+    r = setTimeout(function () {
+      try {
+        o && o.abort();
+      } catch (e) { }
+      l("El servicio no respondió por la vía local", null);
+    }, s + 1e3);
+    try {
+      (o = new XMLHttpRequest()).open(
+        "GET",
+        "http://127.0.0.1:" +
+        SERVICE_HTTP_PORT +
+        "/" +
+        encodeURIComponent(e) +
+        "?q=" +
+        encodeURIComponent(JSON.stringify(t || {})),
+        !0
+      );
+      ((o.timeout = s),
+        (o.onreadystatechange = function () {
+          var e, r;
+          if (4 === o.readyState) {
+            if (o.status < 200 || o.status >= 300)
+              return l("Servicio local: HTTP " + o.status, null);
+            try {
+              e = JSON.parse(o.responseText);
+            } catch (t) {
+              return l("El servicio local no devolvió JSON válido", null);
+            }
+            return !1 === e.returnValue
+              ? l(e.errorText || "Error del servicio", null)
+              : l(null, e);
+          }
+        }),
+        (o.onerror = function () {
+          l("No se pudo hablar con el servicio de la TV", null);
+        }),
+        (o.ontimeout = function () {
+          l("El servicio no respondió por la vía local", null);
+        }),
+        o.send(null));
+    } catch (e) {
+      l(e.message || "No se pudo hablar con el servicio de la TV", null);
+    }
+  }
+  var A = { live: null, vod: null };
+  function D(e, t) {
+    try {
+      if (!t) return;
+      var a = t.url || "";
+      if (!/^https?:\/\//i.test(a)) return;
+      if (/^https?:\/\/(127\.0\.0\.1|localhost)[:/]/i.test(a)) return;
+      A[e] = { url: a, headers: t.headers || {} };
+    } catch (e) { }
+  }
+  function P(e, t, a, i) {
+    var n = p.serviceId || "com.webosflux.xuptertv.fidelity.service",
+      r = !1,
+      o = i || parseInt(p.timeoutMs, 10) || 2e4,
+      s = null,
+      w = !1;
+    function l(err, data) {
+      var i, n;
+      if (r) return;
+      /* Si Luna deniega el método (webOS 3.x), reintentar una sola vez por la
+         API HTTP local del servicio en lugar de dejar al usuario sin nada. */
+      if (err && !w && /denied|permission|not permitted/i.test(String(err))) {
+        w = !0;
+        return void Ph(e, t, l, o);
+      }
+      ((r = !0),
+        s && (clearTimeout(s), (s = null)),
+        a(
+          err
+            ? ((i = err),
+              (n = String(null == i ? "" : i)),
+              /denied|permission|not permitted/i.test(n)
+                ? E + " (" + n + ")"
+                : n)
+            : err,
+          data
+        ));
+    }
+    if (
+      ((s = setTimeout(function () {
+        l(
+          "El servicio de la TV no respondió en " +
+          Math.round(o / 1e3) +
+          " s. Desenchufa la TV de la corriente 10 segundos y vuelve a abrir la app.",
+          null
+        );
+      }, o + 1e3)),
+        I() && window.PalmServiceBridge)
+    )
+      try {
+        return (
+          window.webOS.service.request("luna://" + n, {
+            method: e,
+            parameters: t || {},
+            timeout: i || parseInt(p.timeoutMs, 10) || 2e4,
+            onSuccess: function (e) {
+              l(null, e);
+            },
+            onFailure: function (e) {
+              l((e && e.errorText) || "Error del servicio de Orbivista", null);
+            },
+          }),
+          !0
+        );
+      } catch (e) {
+        if (!p.devServiceUrl)
+          return (
+            l("Error comunicando con el servicio: " + (e.message || e), null),
+            !1
+          );
+      }
+    return p.devServiceUrl
+      ? (_(
+        String(p.devServiceUrl).replace(/\/$/, "") +
+        "/" +
+        e +
+        "?" +
+        (function (e) {
+          var t = [];
+          for (var a in e)
+            Object.prototype.hasOwnProperty.call(e, a) &&
+              t.push(
+                encodeURIComponent(a) + "=" + encodeURIComponent(e[a])
+              );
+          return t.join("&");
+        })(t || {}),
+        function (e, t) {
+          l(e, t);
+        },
+        null
+      ),
+        !0)
+      : (l("El servicio de Orbivista no está disponible", null), !1);
+  }
+  function O(e) {
+    var t = {},
+      a = [],
+      i = {};
+    function n(e) {
+      if (e && e.id) {
+        var n = String(e.id);
+        if (t[n]) {
+          var r = t[n];
+          for (var o in e)
+            Object.prototype.hasOwnProperty.call(e, o) &&
+              "" !== e[o] &&
+              "—" !== e[o] &&
+              null !== e[o] &&
+              void 0 !== e[o] &&
+              (r[o] = e[o]);
+        } else ((t[n] = e), a.push(n));
+        var s = String(e.category || "").split(",");
+        i[n] = i[n] || {};
+        for (var l = 0; l < s.length; l++) s[l] && (i[n][s[l]] = !0);
+      }
+    }
+    for (var r = 0; r < h.length; r++)
+      for (var o = e[h[r]] || [], s = 0; s < o.length; s++)
+        ((o[s].portal = !0), n(o[s]));
+    if (a.length) {
+      for (var l = [], d = 0; d < a.length; d++) {
+        var c = t[a[d]];
+        ((c.category = Object.keys(i[a[d]]).join(",")), l.push(c));
+      }
+      for (
+        var p = (function () {
+          for (var e = M(), t = [], a = 0; a < e.length; a++)
+            if (e[a] && e[a].streamUrl) {
+              var i = {};
+              for (var n in e[a])
+                Object.prototype.hasOwnProperty.call(e[a], n) &&
+                  (i[n] = e[a][n]);
+              ((i.category = "demo"), (i.portal = !1), t.push(i));
+            }
+          return t;
+        })(),
+        u = 0;
+        u < p.length;
+        u++
+      )
+        l.push(p[u]);
+      l.length && L(l, "portal", !0);
+    }
+  }
+  function q() {
+    if (!f.refreshing) {
+      ((f.refreshing = !0), (f.error = null));
+      var e = {},
+        t = 0,
+        a = !1;
+      !(function i() {
+        if (t >= h.length)
+          return (
+            (f.refreshing = !1),
+            (f.lastSync = Date.now()),
+            O(e),
+            a &&
+            f.retryTimer &&
+            (clearTimeout(f.retryTimer), (f.retryTimer = null)),
+            void (
+              a ||
+              f.retryTimer ||
+              ((f.error =
+                f.error || "El portal del catálogo no respondió desde tu red"),
+                Yt(
+                  "El portal del catálogo no respondió. Reintentando en 20 segundos…"
+                ),
+                (f.retryTimer = setTimeout(function () {
+                  ((f.retryTimer = null), q());
+                }, 2e4)))
+            )
+          );
+        var n = h[t++],
+          r = function (t) {
+            P("home", { root: n }, function (o, s) {
+              if (!o && s && !1 !== s.returnValue && s.items && s.items.length)
+                return ((e[n] = s.items), f.roots++, (a = !0), i());
+              t < 2
+                ? setTimeout(function () {
+                  r(t + 1);
+                }, 900 * t)
+                : (o && (f.error = o), i());
+            });
+          };
+        r(1);
+      })();
+    }
+  }
+  function N() {
+    var e,
+      t = (e = window.XUPERTV_PORTAL) ? m(e) : [];
+    (t.length && L(t, "portal-snapshot", !0),
+      !1 !== p.refresh
+        ? q()
+        : t.length || (v.error = "Sin snapshot del portal"));
+  }
+  function R(e, t) {
+    return L(M(), e || "bundled")
+      ? (t && (v.error = t), !0)
+      : ((v.error = t || "No hay catálogo local ni remoto"), !1);
+  }
+  function V() {
+    if (p.enabled)
+      if ("portal" !== p.mode)
+        if ("static" !== p.mode) {
+          var e = g("catalog");
+          "xuper" !== p.mode || b()
+            ? e
+              ? ((v.loading = !0),
+                _(
+                  e,
+                  function (e, t) {
+                    v.loading = !1;
+                    var a = (function (e) {
+                      if (!e || "object" != typeof e) return "";
+                      var t = e.returnCode || e.code || e.errorCode || "",
+                        a = e.errorMessage || e.message || e.msg || "";
+                      return t || a
+                        ? (t ? String(t) + ": " : "") +
+                        (a ? String(a) : "La API rechazó la petición")
+                        : "";
+                    })(t);
+                    if (e || a || !L(m(t), "api")) {
+                      var i = e || a || "La API no devolvió películas";
+                      R("bundled-fallback", i) || (v.error = i);
+                    }
+                  },
+                  "xuper" === p.mode
+                    ? { method: "POST", body: C("catalog") }
+                    : null
+                ))
+              : p.useBundledCatalog
+                ? R("bundled", null)
+                : (v.error = "Falta baseUrl/catalogUrl del catálogo autorizado")
+            : (v.error =
+              "Falta la sesión del proveedor (userId, userToken y portalCode)");
+        } else R("bundled", null);
+      else N();
+  }
+  function H(e, t) {
+    var a = e && e._seriesGroup ? e.id : null,
+      i = e && e._seriesGroup ? e._seriesTitle : null,
+      n = T(t, e.id);
+    for (var r in n)
+      Object.prototype.hasOwnProperty.call(n, r) &&
+        "—" !== n[r] &&
+        "" !== n[r] &&
+        "Sin título" !== n[r] &&
+        "Sin sinopsis disponible." !== n[r] &&
+        (e[r] = n[r]);
+    null !== a &&
+      ((e.id = a),
+        (e.title = i),
+        (e.alias = i),
+        (e.seasons = e._catalogSeasons || e.seasons));
+  }
+  function U(e, t) {
+    if (((t = t || function () { }), !e)) return t(null);
+    if (e._detailsLoaded) return t(e);
+    if (e._detailLoading)
+      return (
+        (e._detailWait = e._detailWait || []),
+        void e._detailWait.push(t)
+      );
+    if ("portal" === p.mode && e._portal)
+      return (
+        (e._detailLoading = !0),
+        (e._detailWait = [t]),
+        void P("detail", { contentId: e.id }, function (t, a) {
+          if (
+            ((e._detailLoading = !1), !t && a && !1 !== a.returnValue && a.item)
+          ) {
+            if (
+              (H(e, a.item),
+                (e.episodes = a.episodes || []),
+                (e.seasons = e._catalogSeasons || a.seasons || []),
+                e.seasonId || (e.seasonId = e.id),
+                e.seasons &&
+                e.seasons.length &&
+                e.seasons.sort(function (e, t) {
+                  return (
+                    (parseInt(e.number, 10) || 0) -
+                    (parseInt(t.number, 10) || 0)
+                  );
+                }),
+                (!e.seasons || !e.seasons.length) && x(e))
+            ) {
+              var i = 1,
+                n =
+                  /S(\d+)/i.exec(e.alias || "") ||
+                  /T(\d+)/i.exec(e.title || "");
+              (n && (i = parseInt(n[1], 10) || 1),
+                (e.seasons = [{ id: e.id, number: i }]));
+            }
+            if (e.seasons && e.seasons.length) {
+              for (var r = 0, o = 0; o < e.seasons.length; o++)
+                if (e.seasons[o].id === e.id) {
+                  r = o;
+                  break;
+                }
+              X.detailSeason = r;
+            }
+            (e.episodes &&
+              e.episodes.length &&
+              !X.detailEpisode &&
+              (X.detailEpisode = e.episodes[0]),
+              dn(e),
+              (e._detailsLoaded = !0));
+          } else
+            ((e._detailsLoaded = !0),
+              e.episodes || (e.episodes = []),
+              e.seasons || (e.seasons = []));
+          var s = e._detailWait || [];
+          e._detailWait = [];
+          for (var l = s.length > 0, d = 0; d < s.length; d++) s[d](e);
+          X.detail === e &&
+            "detail" === X.screen &&
+            (Ca(e),
+              restoreDetailFocus(),
+              l || (xe && xe.src && !xe.paused) || Jr(e, X.detailEpisode));
+        })
+      );
+    var a = g("detail");
+    return p.enabled && a && ("xuper" !== p.mode || b())
+      ? ((e._detailLoading = !0),
+        void _(
+          a.replace("{id}", encodeURIComponent(e.id)),
+          function (a, i) {
+            if (((e._detailLoading = !1), !a)) {
+              var n = m(i),
+                r = n.length ? n[0] : i && (i.item || i.movie || i);
+              r &&
+                "object" == typeof r &&
+                (H(e, r),
+                  (e._detailsLoaded = !0),
+                  X.detail === e &&
+                  "detail" === X.screen &&
+                  (Ca(e),
+                    restoreDetailFocus(),
+                    (xe && xe.src && !xe.paused) || Jr(e, X.detailEpisode)));
+            }
+            t(e);
+          },
+          "xuper" === p.mode
+            ? { method: "POST", body: C("detail", e.id) }
+            : null
+        ))
+      : t(e);
+  }
+  var F = [],
+    B = {
+      tv: '<svg viewBox="0 0 33 33"><rect x="3.5" y="7" width="26" height="17" rx="2.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M11 24.5v3h11v-3" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>',
+      thumb:
+        '<svg viewBox="0 0 33 33"><path d="M12 15.5V28H7.6A2.6 2.6 0 0 1 5 25.4v-7.3a2.6 2.6 0 0 1 2.6-2.6H12z" fill="currentColor"/><path d="M14 15.6l4.3-9.2a2.2 2.2 0 0 1 4 1.6V13h5.6a2.9 2.9 0 0 1 2.8 3.6l-2 9A3.4 3.4 0 0 1 25.4 28H14z" fill="currentColor"/></svg>',
+      film: '<svg viewBox="0 0 33 33"><circle cx="16.5" cy="16.5" r="11.5" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="16.5" cy="16.5" r="2.4" fill="currentColor"/><circle cx="16.5" cy="9.5" r="2.1" fill="currentColor"/><circle cx="16.5" cy="23.5" r="2.1" fill="currentColor"/><circle cx="9.5" cy="16.5" r="2.1" fill="currentColor"/><circle cx="23.5" cy="16.5" r="2.1" fill="currentColor"/></svg>',
+      strip:
+        '<svg viewBox="0 0 33 33"><rect x="4" y="7" width="25" height="19" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M9 7v19M24 7v19" stroke="currentColor" stroke-width="1.8"/><rect x="5.6" y="9" width="2.4" height="2.6" fill="currentColor"/><rect x="5.6" y="15.2" width="2.4" height="2.6" fill="currentColor"/><rect x="5.6" y="21.4" width="2.4" height="2.6" fill="currentColor"/><rect x="25" y="9" width="2.4" height="2.6" fill="currentColor"/><rect x="25" y="15.2" width="2.4" height="2.6" fill="currentColor"/><rect x="25" y="21.4" width="2.4" height="2.6" fill="currentColor"/></svg>',
+      kids: '<svg viewBox="0 0 33 33"><circle cx="8.6" cy="8.6" r="4" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="24.4" cy="8.6" r="4" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="16.5" cy="18" r="9.6" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="13" cy="17" r="1.5" fill="currentColor"/><circle cx="20" cy="17" r="1.5" fill="currentColor"/><ellipse cx="16.5" cy="21.6" rx="2.4" ry="1.7" fill="currentColor"/></svg>',
+      anime:
+        '<svg viewBox="0 0 33 33"><circle cx="8.5" cy="9" r="4.5" fill="currentColor"/><circle cx="24.5" cy="9" r="4.5" fill="currentColor"/><path d="M16.5 9c5.8 0 10.5 4.6 10.5 10.3 0 5.7-4.7 9.7-10.5 9.7S6 25 6 19.3C6 13.6 10.7 9 16.5 9z" fill="currentColor"/><circle cx="12.5" cy="18" r="1.6" fill="#0b0b0b"/><circle cx="20.5" cy="18" r="1.6" fill="#0b0b0b"/><ellipse cx="16.5" cy="23" rx="3" ry="2" fill="#0b0b0b"/></svg>',
+      compass:
+        '<svg viewBox="0 0 33 33"><circle cx="16.5" cy="16.5" r="11.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M22 11l-3.2 7.8L11 22l3.2-7.8z" fill="currentColor"/></svg>',
+      novel:
+        '<svg viewBox="0 0 33 33"><path d="M5 6.5h9.5c2.2 0 3.7 1 4.5 2.3.8-1.3 2.3-2.3 4.5-2.3H28v20h-5.5c-2.1 0-3.4.6-4.5 1.8-1.1-1.2-2.4-1.8-4.5-1.8H5z" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M18 9v19" stroke="currentColor" stroke-width="2.2"/></svg>',
+      history:
+        '<svg viewBox="0 0 33 33"><circle cx="16.5" cy="17" r="10.5" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M16.5 10.5V17l5 3" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M8 7v6h6" fill="none" stroke="currentColor" stroke-width="2.4"/></svg>',
+    },
+    z = [
+      { label: "TV", page: 0, icon: "tv" },
+      { label: "Destacados", page: 1, icon: "thumb" },
+      { label: "Películas", page: 2, icon: "film" },
+      { label: "Series", page: 3, icon: "strip" },
+      { label: "Infantil", page: 4, icon: "kids" },
+      { label: "Anime", page: 5, icon: "anime" },
+      { label: "Novelas", page: 6, icon: "novel" },
+      { label: "Historial", page: -1, icon: "history", action: "history" },
+    ],
+    j = [
+      {
+        id: "profile",
+        label: "Mi cuenta",
+        desc: "Tu perfil en este televisor",
+        group: "Tu cuenta",
+      },
+      {
+        id: "history",
+        label: "Mi lista",
+        desc: "Historial y favoritos",
+        group: "Tu cuenta",
+      },
+      {
+        id: "addons",
+        label: "Agregar Addons",
+        desc: "Anime, Cine, Novelas y TDT",
+        group: "Contenido",
+      },
+      {
+        id: "share",
+        label: "Compartir APP",
+        desc: "Instálala en otra TV",
+        group: "Aplicación",
+      },
+      {
+        id: "playback",
+        label: "Configuración global",
+        desc: "Subtítulos y preferencias",
+        group: "Aplicación",
+      },
+      {
+        id: "parent",
+        label: "Control parental",
+        desc: "Bloqueo de contenido adulto",
+        group: "Aplicación",
+      },
+      {
+        id: "display",
+        label: "Pantalla y compatibilidad",
+        desc: "Ajuste para TVs con imagen recortada",
+        group: "Aplicación",
+      },
+      {
+        id: "netdiag",
+        label: "Diagnóstico",
+        desc: "Pruebas de red y streaming",
+        group: "Sistema",
+      },
+      {
+        id: "feedback",
+        label: "Ayuda y Feedback",
+        desc: "Comunidad y soporte",
+        group: "Sistema",
+      },
+      {
+        id: "about",
+        label: "Acerca de",
+        desc: "Versión y actualizaciones",
+        group: "Sistema",
+      },
+    ],
+    W = {
+      profile:
+        '<svg viewBox="0 0 32 32"><circle cx="16" cy="10" r="5"/><path d="M6 27c.7-6 4.3-9 10-9s9.3 3 10 9"/></svg>',
+      history:
+        '<svg viewBox="0 0 32 32"><rect x="4" y="4" width="9" height="9"/><rect x="19" y="4" width="9" height="9"/><rect x="4" y="19" width="9" height="9"/><rect x="19" y="19" width="9" height="9"/></svg>',
+      addons:
+        '<svg viewBox="0 0 32 32"><rect x="5" y="5" width="9" height="9" rx="1.5"/><rect x="18" y="5" width="9" height="9" rx="1.5"/><rect x="5" y="18" width="9" height="9" rx="1.5"/><path d="M22.5 18v9M18 22.5h9"/></svg>',
+      share:
+        '<svg viewBox="0 0 32 32"><circle cx="8" cy="16" r="3"/><circle cx="24" cy="7" r="3"/><circle cx="24" cy="25" r="3"/><path d="M10.6 14.5l10.8-6M10.6 17.5l10.8 6"/></svg>',
+      parent:
+        '<svg viewBox="0 0 32 32"><rect x="7" y="14" width="18" height="14" rx="2"/><path d="M11 14V10a5 5 0 0 1 10 0v4"/><path d="M16 19v4"/></svg>',
+      display:
+        '<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="18" rx="2"/><path d="M10 28h12M16 24v4"/><path d="M8 10h16v10H8z"/></svg>',
+      playback:
+        '<svg viewBox="0 0 32 32"><rect x="4" y="6" width="24" height="20" rx="3"/><path d="M13 11l8 5-8 5z"/></svg>',
+      netdiag:
+        '<svg viewBox="0 0 32 32"><path d="M3 13a19 19 0 0 1 26 0"/><path d="M8 18a12 12 0 0 1 16 0"/><path d="M13 23a6 6 0 0 1 6 0"/><circle cx="16" cy="27.5" r="1.2"/></svg>',
+      feedback:
+        '<svg viewBox="0 0 32 32"><path d="M6 4h15l5 5v19H6z"/><path d="M20 4v6h6M10 16h12M10 21h8"/></svg>',
+      about:
+        '<svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12"/><path d="M16 14v8M16 10h.1"/></svg>',
+    },
+    X = {
+      screen: "welcome",
+      tab: 0,
+      channel: 0,
+      focus: null,
+      detail: null,
+      detailReturn: null,
+      detailRange: 0,
+      detailSeason: 0,
+      detailNeedsRebuild: !1,
+      playerReturn: null,
+      playerMode: "live",
+      playerItem: null,
+      playerEpisode: null,
+      playerSeasonIndex: 0,
+      episodeBrowserOpen: !1,
+      categoryPickerOpen: !1,
+      browserSeason: 0,
+      episodeBrowserPage: 0,
+      audioPreferenceCode: "es-lat",
+      resumePosition: 0,
+      streamError: "",
+      streamMode: "normal",
+      trackIndex: 0,
+      channelsOpen: !1,
+      infobar: !0,
+      infoTimer: null,
+      searchQuery: "",
+      searchNumeric: !1,
+      searchSeq: 0,
+      searchFocus: null,
+      playback: {
+        streamMode: "normal",
+        screen: 0,
+        audio: 0,
+        subLang: 0,
+        size: 0,
+        style: 0,
+        subtitle: !1,
+        subtitleBg: "outline",
+        skipIntroMode: 0,
+        quality: "auto",
+      },
+      crOn: !1,
+      favs: {},
+      adultEnabled: !1,
+      liveFavorites: {},
+    };
+  window.X = X;
+  var $ = "xuper_local_profile_v1",
+    G = "xuper_global_playback_v1",
+    Q = { id: "", createdAt: 0, history: [] };
+  function J(e, t) {
+    try {
+      var a = localStorage.getItem(e);
+      return a ? JSON.parse(a) : t;
+    } catch (e) {
+      return t;
+    }
+  }
+  function K(e, t) {
+    try {
+      localStorage.setItem(e, JSON.stringify(t));
+    } catch (e) { }
+  }
+  function Y() {
+    K(G, X.playback);
+  }
+  function Z(e) {
+    if (!e || !e.id) return !1;
+    var t = String(e.id),
+      a = !X.favs[t];
+    return (
+      a ? (X.favs[t] = !0) : delete X.favs[t],
+      (Q.favs = X.favs),
+      K($, Q),
+      a
+    );
+  }
+  function liveChannelKey(e) {
+    return e
+      ? String(e.channelCode || e.streamUrl || e.id || e.index || e.name || "")
+      : "";
+  }
+  function isAdultLiveChannel(e) {
+    var t = e || {},
+      a = [
+        t.name || "",
+        t.category || "",
+        t.group || "",
+        t.groupTitle || "",
+        t.tags || "",
+      ].join(" ");
+    return /(^|[^a-z])(xxx|adult|porno|porn|sex|erotic|onlyfans|18\+|\+18)([^a-z]|$)/i.test(a);
+  }
+  function isVisibleLiveChannel(e) {
+    var t = String(liveSearchText || "").replace(/^\s+|\s+$/g, "");
+    return !!(
+      e &&
+      (X.adultEnabled || !isAdultLiveChannel(e)) &&
+      (!liveFavoritesOnly || !!X.liveFavorites[liveChannelKey(e)]) &&
+      (!t || o((e.name || "") + " " + (e.category || "")).indexOf(o(t)) >= 0)
+    );
+  }
+  function toggleLiveFavorite(e) {
+    var t = liveChannelKey(e);
+    if (!t) return !1;
+    var a = !X.liveFavorites[t];
+    return (
+      a ? (X.liveFavorites[t] = !0) : delete X.liveFavorites[t],
+      (Q.liveFavorites = X.liveFavorites),
+      K($, Q),
+      a
+    );
+  }
+  !(function () {
+    var e = J(G, null);
+    if (e)
+      for (var t in X.playback)
+        X.playback.hasOwnProperty(t) &&
+          void 0 !== e[t] &&
+          (X.playback[t] = e[t]);
+    /* Detección de televisores webOS 1.x / 2.x o modelos legacy (UF, UB, UG, LF)
+       que no decodifican HEVC dentro de MPEG-TS crudo. Por defecto en estas TVs
+       se activa Modo Fluido (fMP4) para que la imagen se vea sin pantalla negra. */
+    try {
+      var ver = xWebosVersion();
+      var legacyModel = /^\d{2}(UB|UF|UG|LF)/i.test(String(panelInfo().modelName || ""));
+      var isLegacyTv = (ver > 0 && ver < 3) || legacyModel;
+      if (isLegacyTv && !localStorage.getItem("xuper_legacy_smooth_v1")) {
+        localStorage.setItem("xuper_legacy_smooth_v1", "1");
+        X.playback.streamMode = "smooth";
+        X.streamMode = "smooth";
+        K(G, X.playback);
+      } else if (!e && isLegacyTv) {
+        X.playback.streamMode = "smooth";
+        X.streamMode = "smooth";
+      }
+    } catch (e) { }
+    /* Migración: las versiones anteriores guardaban subtitle=true por defecto.
+       Se apaga una sola vez al actualizar. Después de esto, si el espectador
+       activa los subtítulos, su elección se conserva hasta que los desactive. */
+    try {
+      if (!localStorage.getItem("xuper_subtitle_pref_v2")) {
+        X.playback.subtitle = !1;
+        localStorage.setItem("xuper_subtitle_pref_v2", "1");
+        K(G, X.playback);
+      }
+    } catch (e) { }
+    var a = J($, null);
+    (a && a.id
+      ? ((Q = a).history && Q.history.length) || (Q.history = [])
+      : ((Q.id = "TV-" + String(Date.now()).slice(-8)),
+        (Q.createdAt = Date.now()),
+        K($, Q)),
+      Q.favs || (Q.favs = {}),
+      Q.liveFavorites || (Q.liveFavorites = {}),
+      Q.uiScaleMode || (Q.uiScaleMode = "auto"),
+      (X.favs = Q.favs),
+      (X.liveFavorites = Q.liveFavorites),
+      (X.adultEnabled = !0 === Q.adultEnabled));
+  })();
+  var ee,
+    te,
+    ae,
+    ie,
+    ne,
+    re,
+    oe,
+    se,
+    le,
+    de,
+    ce,
+    pe,
+    ue,
+    ve,
+    fe,
+    he,
+    me,
+    ge,
+    ye,
+    be,
+    Ce,
+    we,
+    Se,
+    xe,
+    Te,
+    _e,
+    ke,
+    Le,
+    Me,
+    Ie,
+    Ee,
+    Ae,
+    De,
+    Pe,
+    Oe,
+    qe,
+    Ne,
+    Re,
+    Ve = !1,
+    He = [],
+    Ue = [],
+    Fe = [],
+    Be = [],
+    ze = {},
+    je = [],
+    We = "history",
+    Xe = {},
+    homeRows = {},
+    $e = null,
+    Ge = null,
+    Qe = null,
+    catalogFilterDialog = null,
+    catalogFilterReturn = null,
+    liveFavoritePrompt = null,
+    Je = "",
+    Ke = 48,
+    Ye = !1,
+    Ze = 0,
+    tt = null;
+  function at(e) {
+    if (!e) return !1;
+    if (e.offsetWidth < 1 || e.offsetHeight < 1) return !1;
+    if (null === e.offsetParent) return !1;
+    if (DialogManager && DialogManager.isOpen()) {
+      var act = DialogManager.getActiveDialog();
+      if (act && act.el) {
+        var curr = e;
+        while (curr) {
+          if (curr === act.el) return !0;
+          curr = curr.parentNode;
+        }
+        return !1;
+      }
+    }
+    if (Ht) return !!n(e, "#dialog-addons");
+    if (X.episodeBrowserOpen) return !!n(e, "#player-episodes");
+    if (X.categoryPickerOpen) return !!n(e, "#player-categories");
+    if (catalogFilterDialog) return !!n(e, ".catalog-filter-dialog");
+    if (liveFavoritePrompt) return !!n(e, ".pc-favorite-confirm");
+    if (ji) return !!n(e, "#dialog-playsettings");
+    if (Ut) return !!n(e, "#dialog-update");
+    if (zi) return !!n(e, "#player-playsetting-view");
+    if (xa) return !!n(e, ".season-popup");
+    var a = n(e, ".home-page");
+    if (a && !a.classList.contains("is-current")) return !1;
+    var i = n(e, ".settings-panel");
+    if (i && !i.classList.contains("is-active")) return !1;
+    var r = n(e, ".search-hot");
+    if (r && r.classList.contains("is-hidden")) return !1;
+    var o = n(e, ".search-results");
+    if (o && !o.classList.contains("is-active")) return !1;
+    var s = n(e, ".player-channels");
+    if (s && !s.classList.contains("is-active")) return !1;
+    var l = n(e, ".player-infobar");
+    return !(l && !l.classList.contains("is-active"));
+  }
+  function it() {
+    var root = null;
+    if (DialogManager && DialogManager.isOpen()) {
+      var act = DialogManager.getActiveDialog();
+      if (act && act.el) root = act.el;
+    }
+    if (!root) {
+      if (Ht) root = t("dialog-addons");
+      else if (catalogFilterDialog) root = catalogFilterDialog;
+      else if (liveFavoritePrompt) root = liveFavoritePrompt;
+      else if (ji) root = t("dialog-playsettings");
+      else if (Ut) root = t("dialog-update");
+      else if (zi) root = t("player-playsetting-view");
+      else if (xa) root = xa;
+      else if (X.episodeBrowserOpen) root = t("player-episodes");
+      else if (X.categoryPickerOpen) root = t("player-categories");
+    }
+    if ("detail" === X.screen && !root) root = t("screen-detail");
+    else if ("search" === X.screen && !root) root = t("screen-search");
+    else if ("section" === X.screen && !root) root = t("screen-section");
+    else if ("settings" === X.screen && !root) root = t("screen-settings");
+    else if ("player" === X.screen && !root) root = t("screen-player");
+    else if ("home" === X.screen && !root) {
+      var curPage = document.querySelector(".home-page.is-current");
+      var tList = [];
+      var addN = function (nl) {
+        if (!nl) return;
+        for (var idx = 0; idx < nl.length; idx++) {
+          if (at(nl[idx])) tList.push(nl[idx]);
+        }
+      };
+      addN(document.querySelectorAll(".home-tabs .focusable"));
+      addN(document.querySelectorAll("#home-notify .focusable"));
+      if (curPage) addN(curPage.querySelectorAll(".focusable"));
+      addN(document.querySelectorAll(".live-fast .focusable"));
+      return tList;
+    }
+    root = root || document;
+    var raw = root.querySelectorAll(".focusable"), tRes = [];
+    for (var a = 0; a < raw.length; a++) {
+      if (at(raw[a])) tRes.push(raw[a]);
+    }
+    return tRes;
+  }
+  function smoothScroll(el, targetLeft, targetTop, duration) {
+    if (!el) return;
+    duration = duration || 190;
+    var hasX = typeof targetLeft === "number" && targetLeft !== null;
+    var hasY = typeof targetTop === "number" && targetTop !== null;
+    var startX = el.scrollLeft || 0;
+    var startY = el.scrollTop || 0;
+    var diffX = hasX ? targetLeft - startX : 0;
+    var diffY = hasY ? targetTop - startY : 0;
+    if (Math.abs(diffX) < 2 && Math.abs(diffY) < 2) {
+      if (hasX) el.scrollLeft = targetLeft;
+      if (hasY) el.scrollTop = targetTop;
+      return;
+    }
+    if (el._smoothAnim) {
+      cancelAnimationFrame(el._smoothAnim);
+      el._smoothAnim = null;
+    }
+    var startTime = (window.performance && window.performance.now) ? window.performance.now() : Date.now();
+    function step(now) {
+      var currentTime = (window.performance && window.performance.now) ? now : Date.now();
+      var elapsed = currentTime - startTime;
+      var p = Math.min(1, elapsed / duration);
+      var ease = p * (2 - p);
+      if (hasX) el.scrollLeft = Math.round(startX + diffX * ease);
+      if (hasY) el.scrollTop = Math.round(startY + diffY * ease);
+      if (p < 1) {
+        el._smoothAnim = requestAnimationFrame(step);
+      } else {
+        if (hasX) el.scrollLeft = targetLeft;
+        if (hasY) el.scrollTop = targetTop;
+        el._smoothAnim = null;
+      }
+    }
+    el._smoothAnim = requestAnimationFrame(step);
+  }
+  function findScrollContainer(elem) {
+    while (elem && elem !== document && elem !== document.body) {
+      if (1 === elem.nodeType) {
+        if (elem.classList && (
+          elem.classList.contains("scrollable") ||
+          elem.classList.contains("catalog-rail") ||
+          elem.classList.contains("home-page") ||
+          elem.classList.contains("pc-list") ||
+          elem.classList.contains("pcat-grid") ||
+          elem.classList.contains("search-results") ||
+          elem.classList.contains("search-grid") ||
+          elem.classList.contains("search-suggestions") ||
+          elem.classList.contains("settings-right") ||
+          elem.classList.contains("settings-body") ||
+          elem.classList.contains("psv-scroll") ||
+          elem.classList.contains("dps-body") ||
+          elem.classList.contains("pe-seasons") ||
+          elem.classList.contains("pe-episodes")
+        )) return elem;
+        if (elem.scrollHeight > elem.clientHeight + 4 || elem.scrollWidth > elem.clientWidth + 4) {
+          var sy = window.getComputedStyle ? window.getComputedStyle(elem).overflowY : "";
+          var sx = window.getComputedStyle ? window.getComputedStyle(elem).overflowX : "";
+          if (sy === "auto" || sy === "scroll" || sx === "auto" || sx === "scroll") return elem;
+        }
+      }
+      elem = elem.parentNode;
+    }
+    return null;
+  }
+  function nt(e) {
+    var cur = e;
+    while (cur) {
+      var t = findScrollContainer(cur.parentNode);
+      if (!t) break;
+      var a = e.getBoundingClientRect(),
+        i = t.getBoundingClientRect();
+      var deltaY = 0, deltaX = 0;
+      if (a.top < i.top + 8) deltaY = -(i.top - a.top + 24);
+      else if (a.bottom > i.bottom - 8) deltaY = a.bottom - i.bottom + 24;
+      if (t.scrollWidth > t.clientWidth + 2) {
+        if (a.left < i.left + 8) deltaX = -(i.left - a.left + 24);
+        else if (a.right > i.right - 8) deltaX = a.right - i.right + 24;
+      }
+      if (deltaX !== 0 || deltaY !== 0) {
+        if (t.classList.contains("catalog-rail") && deltaX !== 0) {
+          /* Riel horizontal de catalogo usa revealRailCard */
+        } else {
+          var targetX = deltaX !== 0 ? Math.max(0, t.scrollLeft + deltaX) : null;
+          var targetY = deltaY !== 0 ? Math.max(0, t.scrollTop + deltaY) : null;
+          smoothScroll(t, targetX, targetY, 190);
+        }
+      }
+      cur = t;
+    }
+  }
+  function rt(e, a) {
+    if (e)
+      if (X.focus !== e) {
+        (X.focus && X.focus.classList.remove("is-focused"),
+          (X.focus = e),
+          e.classList.add("is-focused"),
+          e._onFocus && e._onFocus(),
+          Nn());
+        var i = t("home-tabs");
+        if (i && "home" === X.screen) {
+          var r = n(e, ".home-tabs");
+          (i.classList.toggle("is-expanded", !!r),
+            i.classList.toggle("is-collapsed", !r));
+          var o = document.querySelector(".home-sidebar-bg");
+          o &&
+            (o.classList.toggle("is-on", !!r),
+              o.classList.toggle("is-collapsed", !r));
+          var s = t("screen-home");
+          s && s.classList.toggle("is-rail-open", !!r);
+        }
+        (a || nt(e), "player" !== X.screen && wt());
+      } else a || nt(e);
+  }
+  function ot(e) {
+    for (var t = e.querySelectorAll(".focusable"), a = 0; a < t.length; a++)
+      if (at(t[a])) return t[a];
+    return null;
+  }
+  /* =========================================================================
+     DialogManager: Nucleo unificado de gestion de dialogos y modales (ES5)
+     - Pila LIFO determinista con validacion de dialogId al cerrar (S1).
+     - Restauracion de foco con X.focus, rt() y at() (S2).
+     - Procesamiento unificado de Back con prevencion de doble cierre (S3).
+     - Validacion de conectividad, visibilidad y navegabilidad (S4).
+     - Prevencion de duplicados y limpieza estricta de referencias DOM (S5).
+     - Compatible con ES5 puro y Chromium 53 (S7).
+     ========================================================================= */
+  var DialogManager = (function () {
+    var stack = [];
+    var lastBackTime = 0;
+    var BACK_DEBOUNCE_MS = 220;
+
+    var isConnected = function (elem) {
+      if (!elem) return false;
+      var curr = elem;
+      while (curr) {
+        if (curr === document || curr === document.documentElement) return true;
+        curr = curr.parentNode;
+      }
+      return false;
+    };
+
+    var isDescendant = function (parent, child) {
+      if (!parent || !child) return false;
+      var curr = child;
+      while (curr) {
+        if (curr === parent) return true;
+        curr = curr.parentNode;
+      }
+      return false;
+    };
+
+    var isNavigable = function (elem) {
+      if (!elem || !isConnected(elem)) return false;
+      if (elem.offsetWidth < 1 || elem.offsetHeight < 1 || null === elem.offsetParent) return false;
+      if (stack.length > 0) {
+        var top = stack[stack.length - 1];
+        if (top && top.el) {
+          return isDescendant(top.el, elem);
+        }
+      }
+      if (typeof at === "function") {
+        return at(elem);
+      }
+      return true;
+    };
+
+    var purgeDeadEntries = function () {
+      var i = stack.length;
+      while (i--) {
+        var entry = stack[i];
+        if (entry.el && !isConnected(entry.el)) {
+          if (entry.onClose && typeof entry.onClose === "function") {
+            try {
+              entry.onClose();
+            } catch (err) { }
+          }
+          entry.el = null;
+          entry.returnFocus = null;
+          entry.initialFocus = null;
+          entry.fallbackFocus = null;
+          entry.canClose = null;
+          entry.onClose = null;
+          stack.splice(i, 1);
+        }
+      }
+    };
+
+    var findActiveFallback = function () {
+      if (stack.length > 0) {
+        var top = stack[stack.length - 1];
+        if (top && top.el && isConnected(top.el)) {
+          var inside = top.el.querySelectorAll(".focusable");
+          for (var j = 0; j < inside.length; j++) {
+            if (isNavigable(inside[j])) return inside[j];
+          }
+        }
+      }
+      var screenId = X && X.screen ? "screen-" + X.screen : "";
+      var screenElem = screenId ? (t(screenId) || document.getElementById(screenId)) : null;
+      if (typeof ot === "function" && screenElem) {
+        var f = ot(screenElem);
+        if (f) return f;
+      }
+      var root = screenElem || document.documentElement || document;
+      if (root && root.querySelectorAll) {
+        var focusables = root.querySelectorAll(".focusable");
+        for (var k = 0; k < focusables.length; k++) {
+          if (isNavigable(focusables[k])) return focusables[k];
+        }
+      }
+      return null;
+    };
+
+    var restoreFocus = function (target, customFallback) {
+      var elem = target;
+      if (elem && isNavigable(elem)) {
+        if (typeof rt === "function") {
+          rt(elem);
+        } else if (elem.focus) {
+          elem.focus();
+        }
+        return true;
+      }
+      if (customFallback) {
+        var cElem = typeof customFallback === "function" ? customFallback() : customFallback;
+        if (cElem && isNavigable(cElem)) {
+          if (typeof rt === "function") {
+            rt(cElem);
+          } else if (cElem.focus) {
+            cElem.focus();
+          }
+          return true;
+        }
+      }
+      var fallback = findActiveFallback();
+      if (fallback) {
+        if (typeof rt === "function") {
+          rt(fallback);
+        } else if (fallback.focus) {
+          fallback.focus();
+        }
+        return true;
+      }
+      return false;
+    };
+
+    return {
+      open: function (dialogId, element, options) {
+        if (!dialogId || !element) return false;
+        purgeDeadEntries();
+
+        for (var i = 0; i < stack.length; i++) {
+          if (stack[i].id === dialogId) {
+            stack[i].el = element;
+            if (options) {
+              if (options.onClose) stack[i].onClose = options.onClose;
+              if (options.initialFocus) stack[i].initialFocus = options.initialFocus;
+              if (options.returnFocus) stack[i].returnFocus = options.returnFocus;
+              if (options.fallbackFocus) stack[i].fallbackFocus = options.fallbackFocus;
+            }
+            if (!element.classList.contains("is-active")) {
+              element.classList.add("is-active");
+            }
+            var initFocus = options && options.initialFocus ? options.initialFocus : null;
+            if (initFocus && isNavigable(initFocus)) {
+              if (typeof rt === "function") rt(initFocus);
+            }
+            return true;
+          }
+        }
+
+        var returnElem = null;
+        if (options && options.returnFocus) {
+          returnElem = options.returnFocus;
+        } else if (X && X.focus && isConnected(X.focus)) {
+          returnElem = X.focus;
+        } else if (document.activeElement && isConnected(document.activeElement)) {
+          returnElem = document.activeElement;
+        }
+
+        var entry = {
+          id: dialogId,
+          el: element,
+          returnFocus: returnElem,
+          fallbackFocus: options && options.fallbackFocus ? options.fallbackFocus : null,
+          canClose: options && options.canClose ? options.canClose : null,
+          onClose: options && options.onClose ? options.onClose : null,
+          initialFocus: options && options.initialFocus ? options.initialFocus : null
+        };
+
+        stack.push(entry);
+        element.classList.add("is-active");
+
+        if (entry.initialFocus && isNavigable(entry.initialFocus)) {
+          if (typeof rt === "function") rt(entry.initialFocus);
+        } else {
+          var firstInModal = element.querySelectorAll(".focusable");
+          for (var m = 0; m < firstInModal.length; m++) {
+            if (isNavigable(firstInModal[m])) {
+              if (typeof rt === "function") rt(firstInModal[m]);
+              break;
+            }
+          }
+        }
+
+        return true;
+      },
+
+      close: function (dialogId, skipFocusRestoration) {
+        purgeDeadEntries();
+        if (stack.length === 0) return false;
+
+        var top = stack[stack.length - 1];
+
+        if (dialogId !== void 0 && dialogId !== null && top.id !== dialogId) {
+          return false;
+        }
+
+        if (top.canClose && typeof top.canClose === "function") {
+          try {
+            if (!top.canClose()) return false;
+          } catch (err) { }
+        }
+
+        var popped = stack.pop();
+        if (popped.el) {
+          popped.el.classList.remove("is-active");
+        }
+
+        if (popped.onClose && typeof popped.onClose === "function") {
+          try {
+            popped.onClose();
+          } catch (err) {
+            console.error("[DialogManager] error en onClose:", err);
+          }
+        }
+
+        var targetToRestore = popped.returnFocus;
+        var fallbackTarget = popped.fallbackFocus;
+
+        popped.el = null;
+        popped.returnFocus = null;
+        popped.initialFocus = null;
+        popped.fallbackFocus = null;
+        popped.canClose = null;
+        popped.onClose = null;
+
+        if (!skipFocusRestoration) {
+          restoreFocus(targetToRestore, fallbackTarget);
+        }
+        return true;
+      },
+
+      handleBack: function () {
+        purgeDeadEntries();
+        if (stack.length === 0) return false;
+
+        var now = Date.now ? Date.now() : new Date().getTime();
+        if (now - lastBackTime < BACK_DEBOUNCE_MS) {
+          return true;
+        }
+        lastBackTime = now;
+
+        return this.close();
+      },
+
+      isOpen: function (dialogId) {
+        if (!dialogId) return stack.length > 0;
+        for (var i = 0; i < stack.length; i++) {
+          if (stack[i].id === dialogId) return true;
+        }
+        return false;
+      },
+
+      getActiveDialog: function () {
+        return stack.length > 0 ? stack[stack.length - 1] : null;
+      },
+
+      getStackCount: function () {
+        return stack.length;
+      },
+
+      restoreFocus: restoreFocus,
+      isNavigable: isNavigable,
+      isConnected: isConnected,
+
+      reset: function () {
+        while (stack.length > 0) {
+          var p = stack.pop();
+          if (p.el) p.el.classList.remove("is-active");
+          p.el = null;
+          p.returnFocus = null;
+          p.initialFocus = null;
+          p.fallbackFocus = null;
+          p.canClose = null;
+          p.onClose = null;
+        }
+        lastBackTime = 0;
+      }
+    };
+  })();
+  window.DialogManager = DialogManager;
+  if (typeof X !== "undefined") {
+    X.dialogManager = DialogManager;
+  }
+  function st(e) {
+    if (X.focus) {
+      if (!at(X.focus)) {
+        var screenElem = document.getElementById("screen-" + X.screen) || document;
+        var fallback = ot(screenElem);
+        if (fallback) {
+          rt(fallback);
+          return;
+        }
+      }
+      if (!X.focus._onMove || !X.focus._onMove(e)) {
+        for (
+          var isHomePage = "home" === X.screen && n(X.focus, ".home-page"),
+          a = "home" === X.screen && n(X.focus, ".home-tabs"),
+          i = it(),
+          r = X.focus.getBoundingClientRect(),
+          o = r.left + r.width / 2,
+          s = r.top + r.height / 2,
+          l = null,
+          d = 1e9,
+          c = 0;
+          c < i.length;
+          c++
+        ) {
+          var p = i[c];
+          if (
+            p !== X.focus &&
+            (!isHomePage || !n(p, ".home-tabs")) &&
+            (!a || n(p, ".home-tabs"))
+          ) {
+            var u,
+              v,
+              f,
+              h = p.getBoundingClientRect(),
+              m = h.left + h.width / 2 - o,
+              g = h.top + h.height / 2 - s;
+            if ("left" === e) {
+              if (m > -4) continue;
+              ((u = Math.max(0, r.left - h.right)),
+                (v = Math.abs(g)),
+                (f = h.bottom > r.top + 2 && h.top < r.bottom - 2));
+            } else if ("right" === e) {
+              if (m < 4) continue;
+              ((u = Math.max(0, h.left - r.right)),
+                (v = Math.abs(g)),
+                (f = h.bottom > r.top + 2 && h.top < r.bottom - 2));
+            } else if ("up" === e) {
+              if (g > -4) continue;
+              ((u = Math.max(0, r.top - h.bottom)),
+                (v = Math.abs(m)),
+                (f = h.right > r.left + 2 && h.left < r.right - 2));
+            } else {
+              if (g < 4) continue;
+              ((u = Math.max(0, h.top - r.bottom)),
+                (v = Math.abs(m)),
+                (f = h.right > r.left + 2 && h.left < r.right - 2));
+            }
+            var y = u + 2 * v + (f ? 0 : 320);
+            y < d && ((d = y), (l = p));
+          }
+        }
+        l ? rt(l) : ("left" === e || "up" === e) && t && Ue[X.tab] && rt(Ue[X.tab]);
+      }
+    } else {
+      var b = it();
+      b.length && rt(b[0]);
+    }
+  }
+  function lt(e) {
+    if ("player" !== e && (X.channelsOpen || (Se && Se.classList.contains("is-active")))) {
+      ro();
+    }
+    for (var a = document.querySelectorAll(".screen"), i = 0; i < a.length; i++)
+      a[i].classList.remove("is-active");
+    var n = t("screen-" + e);
+    if (
+      (n && n.classList.add("is-active"),
+        (X.screen = e),
+        "player" !== e && X.episodeBrowserOpen && zn(!0),
+        "player" !== e && X.categoryPickerOpen && ur(!0),
+        "player" !== e && "detail" !== e)
+    ) {
+      var detScreen = t("screen-detail");
+      if (detScreen) {
+        detScreen.style.backgroundImage = "none";
+        detScreen.classList.remove("is-synopsis-open");
+      }
+      (ji && tr(), zi && On());
+      var r = t("screen-player");
+      (r && (r.classList.remove("is-mini"), r.classList.remove("is-active")),
+        zr(),
+        Yi++,
+        (pn = []),
+        Bi && (Bi.innerHTML = ""));
+    }
+    wt();
+  }
+  var dt = 0,
+    lastBackKeyDown = 0;
+  function ct() {
+    var e = Date.now();
+    if (!(e - dt < 250))
+      if (((dt = e), "welcome" !== X.screen))
+        if (ji) tr();
+        else {
+          if (catalogFilterDialog) return void closeCatalogFilter();
+          if (liveFavoritePrompt) return void closeLiveFavoriteConfirm();
+          if (X.categoryPickerOpen) return ((dt = Date.now()), void ur());
+          if ("player" === X.screen)
+            return isTelemetryHudOpen()
+              ? void closeTelemetryHud()
+              : Ye
+                ? void Ur(!1)
+                : liveSearchOpen
+                  ? void closeLiveChannelSearch()
+                  : X.episodeBrowserOpen
+                    ? ((dt = Date.now()), void zn())
+                    : zi
+                      ? void On()
+                      : void (X.channelsOpen
+                        ? ro()
+                        : X.infobar
+                          ? ui()
+                          : X.vodInfobarVisible
+                            ? fi()
+                            : (function () {
+                              (ui(), fi(), closeTelemetryHud());
+                              var e = X.playerReturn;
+                              if (e && "detail" === e.screen) {
+                                var a = t("screen-player"),
+                                  i = t("screen-detail");
+                                (a &&
+                                  (a.classList.add("is-mini"),
+                                    a.classList.add("is-active")),
+                                  i && i.classList.add("is-active"),
+                                  (X.screen = "detail"));
+                                if (xe && !xe.paused) {
+                                  try {
+                                    xe.pause();
+                                  } catch (errPause) { }
+                                }
+                                var n = !1;
+                                if (X.detailNeedsRebuild && X.detail) {
+                                  ((X.detailNeedsRebuild = !1),
+                                    Ca(X.detail),
+                                    (n = !0));
+                                  var r = de
+                                    ? de.querySelector(".detail-season")
+                                    : null;
+                                  r && rt(r);
+                                } else X.detail && Jn(X.detail);
+                                if (!n)
+                                  if (e.focus && at(e.focus)) rt(e.focus);
+                                  else {
+                                    var o = le
+                                      ? le.querySelector(".focusable")
+                                      : null;
+                                    o && rt(o);
+                                  }
+                              } else {
+                                zr();
+                                var s = t("screen-player");
+                                (s &&
+                                  (s.classList.remove("is-mini"),
+                                    s.classList.remove("is-active")),
+                                  e && "search" === e.screen
+                                    ? (lt("search"), rt(e.focus))
+                                    : (lt("home"),
+                                      bt(X.tab, !1),
+                                      e && e.focus && at(e.focus)
+                                        ? rt(e.focus)
+                                        : Ue[X.tab] && rt(Ue[X.tab])));
+                              }
+                            })());
+          if ("detail" !== X.screen) {
+            if ("section" === X.screen) return void closeSection();
+            if ("search" === X.screen) {
+              try { if (me && me.blur) me.blur(); } catch (err) { }
+              try { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); } catch (err) { }
+              Da();
+              var sRet = X.searchReturn;
+              X.searchReturn = null;
+              if (sRet && "section" === sRet.screen) {
+                lt("section");
+                if (sRet.focus && at(sRet.focus)) rt(sRet.focus);
+                else if (t("screen-section")) rt(t("screen-section").querySelector(".focusable") || t("screen-section"));
+                return;
+              }
+              lt("home");
+              var destTab = (typeof X.tab === "number" && X.tab >= 0) ? X.tab : 0;
+              bt(destTab, !1);
+              var homeTarget = (Ue && Ue[destTab]) || (Ue && Ue[0]) || ot(t("screen-home"));
+              if (homeTarget) rt(homeTarget);
+              return;
+            }
+            if ("settings" === X.screen) {
+              var inRight = X.focus && (function (elem) {
+                while (elem && elem !== document && elem !== document.body) {
+                  if (elem.id === "settings-right" || (elem.classList && (elem.classList.contains("settings-right") || elem.classList.contains("settings-panel")))) return elem;
+                  elem = elem.parentNode;
+                }
+                return null;
+              })(X.focus);
+              if (inRight) {
+                var menuTarget = document.querySelector(".settings-item.is-selected") ||
+                  (je && je[0]) ||
+                  (t("settings-menu") && t("settings-menu").querySelector(".focusable")) ||
+                  null;
+                if (menuTarget) {
+                  rt(menuTarget);
+                  return;
+                }
+              }
+              return (
+                lt("home"),
+                bt(X.tab, !1),
+                void (Ue[X.tab] && rt(Ue[X.tab]))
+              );
+            }
+            if ("home" === X.screen) {
+              if (0 !== X.tab) return (bt(0, !0), void (Ue[0] && rt(Ue[0])));
+              window.webOSTV && window.webOSTV.platformBack
+                ? window.webOSTV.platformBack()
+                : window.PalmSystem &&
+                window.PalmSystem.platformBack &&
+                window.PalmSystem.platformBack();
+            }
+          } else {
+            if (DialogManager && DialogManager.isOpen("seasonPopup")) {
+              DialogManager.close("seasonPopup");
+              return;
+            }
+            if (xa) {
+              Ta();
+              var a = de ? de.querySelector(".detail-season") : null;
+              return void (a && rt(a));
+            }
+            var i = t("screen-detail");
+            if (i && i.classList.contains("is-synopsis-open"))
+              return void (function () {
+                var e = t("screen-detail");
+                if (!e) return;
+                var a = !e.classList.contains("is-synopsis-open");
+                e.classList.toggle("is-synopsis-open", a);
+                var i = document.querySelector(".detail-more");
+                i && (i.textContent = a ? "Menos" : "Más");
+              })();
+            if (i) {
+              i.style.backgroundImage = "none";
+              i.classList.remove("is-synopsis-open");
+            }
+            zr();
+            var n = t("screen-player");
+            n &&
+              (n.classList.remove("is-mini"), n.classList.remove("is-active"));
+            var r = X.detailReturn;
+            if (r && "search" === r.screen) {
+              lt("search");
+              if (r.focus && at(r.focus)) {
+                rt(r.focus);
+              } else {
+                var searchTarget = ot(he) || (t("search-suggestions") && ot(t("search-suggestions"))) || (Be && Be[0]) || me;
+                if (searchTarget) rt(searchTarget);
+              }
+            } else if (r && "section" === r.screen) {
+              lt("section");
+              rt(r.focus);
+            } else {
+              (lt("home"),
+                bt(X.tab, !1),
+                r && r.focus && at(r.focus)
+                  ? rt(r.focus)
+                  : Ue[X.tab] && rt(Ue[X.tab]));
+            }
+          }
+        }
+      else vt();
+  }
+  function pt() {
+    X.focus && X.focus._activate && X.focus._activate();
+  }
+  /* El Magic Remote entrega un click de puntero, no la tecla OK. Mantener el
+     foco lógico sincronizado evita que el siguiente uso de las flechas salte
+     a otra parte de la interfaz. */
+  function bindMagicActivate(e, a) {
+    if (!e) return;
+    e.onclick = function (t) {
+      return (
+        t && t.preventDefault && t.preventDefault(),
+        t && t.stopPropagation && t.stopPropagation(),
+        rt(e),
+        a ? a.call(e, t) : e._activate && e._activate(),
+        !1
+      );
+    };
+  }
+  function bindMagicTextInput(e) {
+    if (!e) return;
+    e._activate = function () {
+      rt(e);
+      try {
+        e.focus();
+        e.setSelectionRange && e.setSelectionRange(e.value.length, e.value.length);
+      } catch (t) { }
+    };
+    e.onclick = function () {
+      return (e._activate(), !0);
+    };
+  }
+  function ut(e) {
+    var t = e.keyCode || e.which,
+      a = e.key || "",
+      i = !0;
+    if ("welcome" === X.screen)
+      return (vt(), void (e.preventDefault && e.preventDefault()));
+    if (window.DialogManager && window.DialogManager.isOpen("urlKeyboard")) {
+      if (461 === t || 27 === t || "Back" === a || "GoBack" === a || "Escape" === a) {
+        lastBackKeyDown = Date.now();
+        dt = Date.now() + 250;
+        closeUrlKeyboard(!1);
+        return void (e.preventDefault && e.preventDefault());
+      }
+      if (8 === t || "Backspace" === a) {
+        if (urlKbCurrentText && urlKbCurrentText.length > 0) {
+          urlKbCurrentText = urlKbCurrentText.slice(0, -1);
+          updateUrlKbDisplay();
+        }
+        return void (e.preventDefault && e.preventDefault());
+      }
+      if (a && a.length === 1 && t !== 13 && t !== 32 && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        urlKbCurrentText += a;
+        updateUrlKbDisplay();
+        return void (e.preventDefault && e.preventDefault());
+      }
+      if (32 === t) {
+        urlKbCurrentText += " ";
+        updateUrlKbDisplay();
+        return void (e.preventDefault && e.preventDefault());
+      }
+    }
+    if ("search" === X.screen && !e.ctrlKey && !e.altKey && !e.metaKey) {
+      if (8 === t || "Backspace" === a) {
+        if (X.searchQuery && X.searchQuery.length > 0) {
+          Aa(X.searchQuery.slice(0, -1));
+          return void (e.preventDefault && e.preventDefault());
+        }
+      } else if (a && a.length === 1 && t !== 13 && t !== 32) {
+        Aa(X.searchQuery + a);
+        return void (e.preventDefault && e.preventDefault());
+      } else if (32 === t && (X.focus === me || document.activeElement === me)) {
+        Aa(X.searchQuery + " ");
+        return void (e.preventDefault && e.preventDefault());
+      } else if (t >= 48 && t <= 57 && !a) {
+        Aa(X.searchQuery + String.fromCharCode(t));
+        return void (e.preventDefault && e.preventDefault());
+      } else if (t >= 65 && t <= 90 && !a) {
+        Aa(X.searchQuery + String.fromCharCode(t));
+        return void (e.preventDefault && e.preventDefault());
+      }
+    }
+    if ("search" === X.screen && (461 === t || 27 === t || 8 === t || "Back" === a || "GoBack" === a || "Escape" === a)) {
+      dt = Date.now() + 350;
+      lastBackKeyDown = Date.now();
+      e.preventDefault && e.preventDefault();
+      e.stopPropagation && e.stopPropagation();
+      try { if (me && me.blur) me.blur(); } catch (err) { }
+      try { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); } catch (err) { }
+      Da();
+      var sRet = X.searchReturn;
+      X.searchReturn = null;
+      if (sRet && "section" === sRet.screen) {
+        lt("section");
+        var targetToFocus = sRet.focus || (t("screen-section") && t("screen-section").querySelector(".section-sidebar-btn"));
+        if (targetToFocus) rt(targetToFocus);
+        return;
+      }
+      lt("home");
+      var destTab = (typeof X.tab === "number" && X.tab >= 0) ? X.tab : 0;
+      bt(destTab, !1);
+      var homeTarget = (Ue && Ue[destTab]) || (Ue && Ue[0]) || ot(t("screen-home"));
+      if (homeTarget) rt(homeTarget);
+      return;
+    }
+    if ("settings" === X.screen && (461 === t || 27 === t || 8 === t || "Back" === a || "GoBack" === a || "Escape" === a)) {
+      lastBackKeyDown = Date.now();
+      if (DialogManager && DialogManager.isOpen()) {
+        dt = Date.now() + 250;
+        var handled = DialogManager.handleBack();
+        if (handled) {
+          e.preventDefault && e.preventDefault();
+          e.stopPropagation && e.stopPropagation();
+          return;
+        }
+      }
+      var inRight = X.focus && (function (elem) {
+        while (elem && elem !== document && elem !== document.body) {
+          if (elem.id === "settings-right" || (elem.classList && (elem.classList.contains("settings-right") || elem.classList.contains("settings-panel")))) return elem;
+          elem = elem.parentNode;
+        }
+        return null;
+      })(X.focus);
+      if (inRight) {
+        e.preventDefault && e.preventDefault();
+        e.stopPropagation && e.stopPropagation();
+        dt = Date.now() + 250;
+        lastBackKeyDown = Date.now();
+        var menuTarget = document.querySelector(".settings-item.is-selected") ||
+          (je && je[0]) ||
+          (t("settings-menu") && t("settings-menu").querySelector(".focusable")) ||
+          null;
+        if (menuTarget) {
+          rt(menuTarget);
+          return;
+        }
+      }
+      e.preventDefault && e.preventDefault();
+      e.stopPropagation && e.stopPropagation();
+      dt = Date.now() + 250;
+      lastBackKeyDown = Date.now();
+      lt("home");
+      var destTab = (typeof X.tab === "number" && X.tab >= 0) ? X.tab : 0;
+      bt(destTab, !1);
+      var homeTarget = (Ue && Ue[destTab]) || (Ue && Ue[0]) || ot(t("screen-home"));
+      if (homeTarget) rt(homeTarget);
+      return;
+    }
+    if (
+      461 === t ||
+      27 === t ||
+      8 === t ||
+      "Back" === a ||
+      "GoBack" === a ||
+      "Escape" === a
+    ) {
+      lastBackKeyDown = Date.now();
+      if (DialogManager && DialogManager.isOpen()) {
+        dt = Date.now() + 250;
+        var handled = DialogManager.handleBack();
+        if (handled) {
+          e.preventDefault && e.preventDefault();
+          e.stopPropagation && e.stopPropagation();
+          return;
+        }
+      }
+      return Ht
+        ? ((dt = Date.now()),
+          la(),
+          e.preventDefault && e.preventDefault(),
+          void (e.stopPropagation && e.stopPropagation()))
+        : X.categoryPickerOpen
+          ? (ur(),
+            e.preventDefault && e.preventDefault(),
+            void (e.stopPropagation && e.stopPropagation()))
+          : X.episodeBrowserOpen
+            ? (zn(),
+              e.preventDefault && e.preventDefault(),
+              void (e.stopPropagation && e.stopPropagation()))
+            : catalogFilterDialog
+              ? ((dt = Date.now() + 350),
+                closeCatalogFilter(),
+                e.preventDefault && e.preventDefault(),
+                void (e.stopPropagation && e.stopPropagation()))
+              : liveFavoritePrompt
+                ? (closeLiveFavoriteConfirm(),
+                  e.preventDefault && e.preventDefault(),
+                  void (e.stopPropagation && e.stopPropagation()))
+                : Ut
+                  ? ((dt = Date.now()),
+                    zt || ea(),
+                    e.preventDefault && e.preventDefault(),
+                    void (e.stopPropagation && e.stopPropagation()))
+                  : ji
+                    ? ((dt = Date.now()),
+                      tr(),
+                      e.preventDefault && e.preventDefault(),
+                      void (e.stopPropagation && e.stopPropagation()))
+                    : zi
+                      ? ((dt = Date.now()),
+                        On(),
+                        e.preventDefault && e.preventDefault(),
+                        void (e.stopPropagation && e.stopPropagation()))
+                      : (ct(),
+                        e.preventDefault && e.preventDefault(),
+                        void (e.stopPropagation && e.stopPropagation()));
+    }
+    if (Ht)
+      return (
+        37 === t
+          ? st("left")
+          : 38 === t
+            ? st("up")
+            : 39 === t
+              ? st("right")
+              : 40 === t
+                ? st("down")
+                : 13 === t || 32 === t
+                  ? pt()
+                  : (i = !1),
+        void (i && e.preventDefault && e.preventDefault())
+      );
+    if (X.categoryPickerOpen)
+      return (
+        37 === t
+          ? st("left")
+          : 38 === t
+            ? st("up")
+            : 39 === t
+              ? st("right")
+              : 40 === t
+                ? st("down")
+                : 13 === t || 32 === t
+                  ? pt()
+                  : (i = !1),
+        void (i && e.preventDefault && e.preventDefault())
+      );
+    if (X.episodeBrowserOpen) {
+      if (37 === t) st("left");
+      else if (38 === t) st("up");
+      else if (39 === t) st("right");
+      else if (40 === t) st("down");
+      else if (13 === t || 32 === t) pt();
+      else i = !1;
+      i && e.preventDefault && e.preventDefault();
+    } else {
+      var isYellowKey = (405 === t || "ColorF2Yellow" === a || "Yellow" === a);
+      if (isYellowKey) {
+        if (X.focus && void 0 !== X.focus._channel) {
+          toggleChannelFavoriteDirect(X.focus._channel, X.focus);
+          return void (e.preventDefault && e.preventDefault());
+        }
+        if ("player" === X.screen && "live" === X.playerMode) {
+          toggleChannelFavoriteDirect(X.channel, null);
+          return void (e.preventDefault && e.preventDefault());
+        }
+      }
+      var isBlueKey = (406 === t || "ColorF3Blue" === a || "Blue" === a || 457 === t || "Info" === a);
+      if (isBlueKey && "player" === X.screen) {
+        toggleTelemetryHud();
+        return void (e.preventDefault && e.preventDefault());
+      }
+      var isChannelUp = (427 === t || 33 === t || "ChannelUp" === a || "PageUp" === a);
+      var isChannelDown = (428 === t || 34 === t || "ChannelDown" === a || "PageDown" === a);
+      if (isChannelUp || isChannelDown) {
+        var canSwitch = ("player" === X.screen && "live" === X.playerMode) || ("home" === X.screen && 0 === X.tab);
+        if (canSwitch) {
+          stepLiveChannel(isChannelUp ? 1 : -1);
+          return void (e.preventDefault && e.preventDefault());
+        }
+      }
+      var d = 415 === t || "MediaPlay" === a || "Play" === a,
+        c = 19 === t || "MediaPause" === a || "Pause" === a,
+        p = 10252 === t || "MediaPlayPause" === a,
+        u = 417 === t || "MediaFastForward" === a || "FastForward" === a,
+        v = 412 === t || "MediaRewind" === a || "Rewind" === a,
+        f = 413 === t || "MediaStop" === a || "Stop" === a;
+      if ("player" === X.screen) {
+        if (d)
+          return (
+            (vodUserPaused = !1),
+            xe && xe.paused && (Mr(), si("none"), pi()),
+            void (e.preventDefault && e.preventDefault())
+          );
+        if (c) {
+          if (xe && !xe.paused) {
+            vodUserPaused = !0;
+            try {
+              xe.pause();
+            } catch (e) { }
+            (si("pause"), pi());
+          }
+          return void (e.preventDefault && e.preventDefault());
+        }
+        if (p) return (di(), void (e.preventDefault && e.preventDefault()));
+        if (u) return (li(15), void (e.preventDefault && e.preventDefault()));
+        if (v) return (li(-15), void (e.preventDefault && e.preventDefault()));
+        if (f) return (ct(), void (e.preventDefault && e.preventDefault()));
+      }
+      var h =
+        457 === t ||
+        93 === t ||
+        467 === t ||
+        "Menu" === a ||
+        "ContextMenu" === a;
+      if ("player" === X.screen && "vod" === X.playerMode && h)
+        return (
+          ji ? tr() : zi ? On() : Pn(),
+          void (e.preventDefault && e.preventDefault())
+        );
+      if (
+        "player" === X.screen &&
+        (37 === t || 38 === t || 39 === t || 40 === t)
+      ) {
+        if (ji)
+          return (
+            37 === t
+              ? st("left")
+              : 38 === t
+                ? st("up")
+                : 39 === t
+                  ? st("right")
+                  : 40 === t && st("down"),
+            void (e.preventDefault && e.preventDefault())
+          );
+        if (zi)
+          return (
+            Dn(),
+            37 === t
+              ? st("left")
+              : 38 === t
+                ? st("up")
+                : 39 === t
+                  ? st("right")
+                  : 40 === t && st("down"),
+            void (e.preventDefault && e.preventDefault())
+          );
+        if ("vod" === X.playerMode) {
+          var skipButton = document.getElementById("vod-skip");
+          if (38 === t && skipButton && skipButton.classList.contains("is-visible") && X.focus !== skipButton) {
+            return (rt(skipButton), void (e.preventDefault && e.preventDefault()));
+          }
+          if (X.focus === skipButton && (38 === t || 40 === t)) {
+            return (rt(Ce), void (e.preventDefault && e.preventDefault()));
+          }
+          if (X.focus === Pe && Ye) {
+            if (37 === t)
+              return (Br(-1), void (e.preventDefault && e.preventDefault()));
+            if (39 === t)
+              return (Br(1), void (e.preventDefault && e.preventDefault()));
+            if (38 === t || 40 === t)
+              return (Ur(!1), void (e.preventDefault && e.preventDefault()));
+          }
+          if (37 === t)
+            return (li(-10), void (e.preventDefault && e.preventDefault()));
+          if (39 === t)
+            return (li(10), void (e.preventDefault && e.preventDefault()));
+          if (40 === t)
+            return (Pn(), void (e.preventDefault && e.preventDefault()));
+          if (38 === t)
+            return (Fr(), void (e.preventDefault && e.preventDefault()));
+        } else {
+          var m = X.focus && n(X.focus, ".player-channels");
+          if (X.channelsOpen || m) {
+            var liveToolbar =
+              X.focus &&
+              X.focus.classList &&
+              X.focus.classList.contains("pc-toolbar-btn");
+            var liveChannelFavorite =
+              X.focus &&
+              X.focus.classList &&
+              X.focus.classList.contains("pc-channel-fav");
+            var liveChannelRow =
+              X.focus &&
+              X.focus.classList &&
+              X.focus.classList.contains("pc-row");
+            var liveSearchControl =
+              X.focus &&
+              X.focus.classList &&
+              (X.focus.classList.contains("pc-search-input") ||
+                X.focus.classList.contains("pc-search-clear"));
+            if (
+              liveToolbar ||
+              liveChannelFavorite ||
+              liveChannelRow ||
+              liveSearchControl
+            ) {
+              var liveDirection =
+                37 === t ? "left" : 38 === t ? "up" : 39 === t ? "right" : "down";
+              return (
+                X.focus._onMove && X.focus._onMove(liveDirection),
+                void (e.preventDefault && e.preventDefault())
+              );
+            }
+            if (
+              X.focus &&
+              X.focus.classList &&
+              X.focus.classList.contains("pc-cat-pill")
+            )
+              return (
+                37 === t
+                  ? st("left")
+                  : 38 === t
+                    ? st("up")
+                    : 39 === t
+                      ? st("right")
+                      : 40 === t && st("down"),
+                void (e.preventDefault && e.preventDefault())
+              );
+            if (38 === t) {
+              var visible = visibleLiveIndexes();
+              var y =
+                X.focus && void 0 !== X.focus._channel
+                  ? X.focus._channel
+                  : X.channel,
+                previous = visible.indexOf(y),
+                g = Se && Se.querySelector(".pc-btn-search");
+              previous > 0
+                ? fr(visible[previous - 1])
+                : g
+                  ? rt(g)
+                  : fr(visible[0]);
+              return void (e.preventDefault && e.preventDefault());
+            }
+            if (40 === t) {
+              var y =
+                X.focus && void 0 !== X.focus._channel
+                  ? X.focus._channel
+                  : X.channel;
+              var visible = visibleLiveIndexes(),
+                next = visible.indexOf(y);
+              return (
+                next >= 0 && next < visible.length - 1 && fr(visible[next + 1]),
+                void (e.preventDefault && e.preventDefault())
+              );
+            }
+            if (39 === t)
+              return (ro(), void (e.preventDefault && e.preventDefault()));
+          } else {
+            if (38 === t)
+              return (
+                X.channel > 0
+                  ? Kt(X.channel - 1, !1)
+                  : F.length && Kt(F.length - 1, !1),
+                pi(),
+                void (e.preventDefault && e.preventDefault())
+              );
+            if (40 === t)
+              return (
+                X.channel < F.length - 1
+                  ? Kt(X.channel + 1, !1)
+                  : F.length && Kt(0, !1),
+                pi(),
+                void (e.preventDefault && e.preventDefault())
+              );
+            if (37 === t)
+              return (no(), void (e.preventDefault && e.preventDefault()));
+            X.infobar ? ci() : pi();
+          }
+        }
+      }
+      if (37 === t) st("left");
+      else if (38 === t) st("up");
+      else if (39 === t) st("right");
+      else if (40 === t) st("down");
+      else if (13 === t || 32 === t) {
+        if (X.episodeBrowserOpen) return void pt();
+        if (X.focus && X.focus.id === "vod-skip" && "player" === X.screen && "vod" === X.playerMode) {
+          activateVodSkip();
+          return void (e.preventDefault && e.preventDefault());
+        }
+        ji
+          ? pt()
+          : zi
+            ? (Dn(), pt())
+            : "player" === X.screen &&
+              "vod" === X.playerMode &&
+              X.focus === Pe &&
+              Ye
+              ? Ur(!0)
+              : "player" === X.screen &&
+                X.streamError &&
+                xe &&
+                xe.src &&
+                !n(X.focus, ".player-channels")
+                ? (Mr(), (X.streamError = ""), jr(""))
+                : "player" === X.screen && "vod" === X.playerMode
+                  ? di()
+                  : pt();
+      } else i = !1;
+      i && e.preventDefault && e.preventDefault();
+    }
+  }
+  function vt() {
+    if (tt) { clearTimeout(tt); tt = null; }
+    var e = t("screen-welcome"),
+      a = t("screen-home");
+    try {
+      Ve || gt();
+    } catch (e) {
+      console.error("buildHome error:", e);
+    }
+    try {
+      lt("home");
+    } catch (t) {
+      (console.error("showScreen error:", t),
+        e && e.classList.remove("is-active"),
+        a && a.classList.add("is-active"),
+        (X.screen = "home"));
+    }
+    (e && e.classList.contains("is-active") && e.classList.remove("is-active"),
+      a &&
+      !a.classList.contains("is-active") &&
+      (a.classList.add("is-active"), (X.screen = "home")));
+    try {
+      bt(0, !1);
+    } catch (e) {
+      console.error("selectTab error:", e);
+    }
+    try {
+      var initialFocus = (typeof Ue !== "undefined" && Ue && Ue[0]) ? Ue[0] : ne;
+      initialFocus && rt(initialFocus);
+    } catch (e) {
+      console.error("setFocus error:", e);
+    }
+    try {
+      var i = t("home-tabs");
+      i && (i.classList.add("is-expanded"), i.classList.remove("is-collapsed"));
+      var n = document.querySelector(".home-sidebar-bg");
+      n && (n.classList.add("is-on"), n.classList.remove("is-collapsed"));
+      var r = t("screen-home");
+      r && r.classList.add("is-rail-open");
+    } catch (e) { }
+  }
+  function baseSeriesTitle(t) {
+    if (!t) return "";
+    var s = String(t).toLowerCase();
+    if (s.normalize) s = s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    s = s.replace(/[\(\[\{][^\)\]\}]*[\)\]\}]/g, " ");
+    s = s.replace(/\b(?:temp(?:orada)?|season|t|s|part(?:e)?|vol(?:umen)?|cap(?:itulo)?)\s*[-_.]?\s*\d+\b.*$/i, "");
+    s = s.replace(/\b(?:latino|castellano|sub(?:titulado)?|dual|audio|hd|4k|1080p|720p)\b.*$/i, "");
+    s = s.replace(/[^a-z0-9]+/g, " ").trim();
+    return s;
+  }
+  function selectHeroItems(items, count) {
+    count = count || 6;
+    if (!items || !items.length) return [];
+    var valid = [];
+    for (var i = 0; i < items.length; i++) {
+      var it = items[i];
+      if (it && it.id && (it.landscape || it.backdrop || it.poster)) {
+        valid.push(it);
+      }
+    }
+    if (!valid.length) valid = items.slice();
+
+    var row0 = (valid[0] && valid[0].row) ? String(valid[0].row).toLowerCase() : "";
+
+    var scored = [];
+    for (var j = 0; j < valid.length; j++) {
+      var itm = valid[j];
+      var row = String(itm.row || "").toLowerCase();
+      var titleLower = String(itm.title || itm.name || itm.alias || "").toLowerCase();
+      var pScore = 0;
+
+      /* Prioridad 1: Curaduría oficial de XuperTV. La primera fila (row 0)
+         entregada por getNextColumns es la fila destacada curada por el portal. */
+      if (row0 && row === row0) pScore += 1000;
+
+      /* Prioridad 2: Títulos destacados de alto interés / estrenos virales recientes (ej. La Odisea) */
+      if (titleLower.indexOf("odisea") !== -1) pScore += 1050;
+      if (titleLower.indexOf("contra el huracan") !== -1 || titleLower.indexOf("contra el huracán") !== -1) pScore += 1020;
+      if (titleLower.indexOf("palomas negras") !== -1) pScore += 1020;
+      if (titleLower.indexOf("sacrificio") !== -1 && titleLower.indexOf("elegidos") !== -1) pScore += 1010;
+
+      if (/top|clasificad/i.test(row)) pScore += 140;
+      if (/estreno|teatral|cartelera|novedad/i.test(row)) pScore += 120;
+      if (/2026/.test(row) || "2026" === String(itm.year)) pScore += 90;
+      if (/2025/.test(row) || "2025" === String(itm.year)) pScore += 60;
+      if (/netflix|hbo|disney|prime|apple|paramount/i.test(row)) pScore += 40;
+      var numScore = parseFloat(itm.score) || 0;
+      pScore += numScore * 6;
+      var y = parseInt(itm.year, 10) || 0;
+      if (y > 2000) pScore += (y - 2000) * 2;
+      scored.push({ item: itm, score: pScore });
+    }
+
+    scored.sort(function (a, b) {
+      return b.score - a.score;
+    });
+
+    // Deduplicate scored items by base title, keeping only the most popular (highest scored)
+    var pool = [];
+    var seenBaseInPool = {};
+    for (var k = 0; k < scored.length; k++) {
+      var candItem = scored[k].item;
+      var bTitle = baseSeriesTitle(candItem.title || candItem.name || candItem.alias);
+      if (bTitle && !seenBaseInPool[bTitle]) {
+        seenBaseInPool[bTitle] = !0;
+        pool.push(candItem);
+        if (pool.length >= 24) break;
+      }
+    }
+
+    // Rotación suave respetando los títulos curados
+    var picked = [];
+    var seenBase = {};
+    var seenId = {};
+    var tryPush = function (candidate) {
+      if (!candidate || !candidate.id || seenId[candidate.id]) return !1;
+      var key = baseSeriesTitle(candidate.title || candidate.name || candidate.alias);
+      if (key && seenBase[key]) return !1;
+      if (key) seenBase[key] = !0;
+      seenId[candidate.id] = !0;
+      picked.push(candidate);
+      return !0;
+    };
+
+    for (var m = 0; m < pool.length && picked.length < count; m++) {
+      tryPush(pool[m]);
+    }
+    if (picked.length < count) {
+      for (var pIdx = 0; pIdx < pool.length && picked.length < count; pIdx++) {
+        tryPush(pool[pIdx]);
+      }
+    }
+    if (picked.length < count) {
+      for (var qIdx = 0; qIdx < items.length && picked.length < count; qIdx++) {
+        tryPush(items[qIdx]);
+      }
+    }
+    return picked.length ? picked : items.slice(0, count);
+  }
+  var ft = [
+    function (t) {
+      ((ie = e("div", "live-main")),
+        ((Ot = document.createElement("video")).className =
+          "live-preview-video"),
+        (Ot.preload = "auto"),
+        (Ot.muted = !1),
+        (Ot.volume = 1),
+        (Ot.autoplay = !0),
+        Ot.removeAttribute("muted"),
+        Ot.setAttribute("playsinline", ""),
+        Ot.setAttribute("webkit-playsinline", ""),
+        ie.appendChild(Ot),
+        ie.appendChild(e("div", "live-frame")),
+        ie.appendChild(e("div", "live-logo")),
+        (qt = e("div", "live-preview-status")),
+        ie.appendChild(qt),
+        t.appendChild(ie));
+      var standby = e("div", "live-preview-standby"),
+        standbyIcon = e("div", "live-preview-standby-icon");
+      standbyIcon.setAttribute("aria-hidden", "true");
+      standbyIcon.innerHTML = B.tv;
+      standby.appendChild(standbyIcon);
+      standby.appendChild(e("div", "live-preview-standby-label", "Vista previa no disponible"));
+      ie.appendChild(standby);
+      var a = e("div", "live-info");
+      (((ae = e("div", "live-channel")).style.right = "112.5px"),
+        a.appendChild(ae));
+      var i = e("button", "live-fullscreen focusable");
+      i.type = "button";
+      i.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H4v5m11-5h5v5m0 6v5h-5M4 15v5h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Pantalla completa</span>';
+      ((i._activate = function () {
+        Yr("live");
+        ro();
+      }),
+        (i._onMove = function (e) {
+          if ("down" === e) {
+            var btn = document.querySelector(".live-fast .fast-btn");
+            return btn ? (rt(btn), !0) : !1;
+          }
+          if ("right" === e) {
+            var cRow = Fe.filter(function (el) { return el._channel === X.channel; })[0] || Fe[0];
+            return cRow ? (rt(cRow), !0) : !1;
+          }
+          if ("up" === e) {
+            return Ue[0] ? (rt(Ue[0]), !0) : !1;
+          }
+          return !1;
+        }),
+        bindMagicActivate(i),
+        a.appendChild(i),
+        ie.appendChild(a));
+      var iFullscreen = i;
+      var guide = e("div", "live-guide-header"),
+        guideTitle = e("div", "live-guide-title", "Canales"),
+        guideCount = e("div", "live-guide-count");
+      guideCount.id = "live-guide-count";
+      guide.appendChild(guideTitle);
+      guide.appendChild(guideCount);
+      var n = e("div", "live-arrow-up"),
+        r = e("div", "live-arrow-down");
+      (t.appendChild(n),
+        t.appendChild(r),
+        (function () {
+          var a = e("div", "live-fast"),
+            i = e("button", "fast-btn f-srch focusable"),
+            r = e("button", "fast-btn f-fav focusable"),
+            o = e("button", "fast-btn f-all focusable"),
+            c = e("button", "fast-btn f-cat focusable");
+          (i.setAttribute("aria-label", "Buscar canal"),
+            r.setAttribute("aria-label", "Canales favoritos"),
+            o.setAttribute("aria-label", "Todos los canales"),
+            c.setAttribute("aria-label", "Categorías de canales"),
+            (i.innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="13" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="3"/><path d="M19 19l8 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg><span>Buscar</span>'),
+            (r.innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3l4 8 9 1-6.5 6 1.7 9L16 22.5 7.8 27l1.7-9L3 12l9-1z" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/></svg><span>Favoritos</span>'),
+            (o.innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 16h18M16 7v18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" stroke-width="2"/></svg><span>Todos</span>'),
+            (c.innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 8h22M5 16h22M5 24h22" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="11" cy="8" r="3" fill="currentColor"/><circle cx="22" cy="16" r="3" fill="currentColor"/><circle cx="15" cy="24" r="3" fill="currentColor"/></svg><span>Filtrar</span>'),
+            r.classList.toggle("is-active", liveFavoritesOnly),
+            r.setAttribute("aria-pressed", liveFavoritesOnly ? "true" : "false"),
+            (i._activate = function () {
+              Yr("live");
+              no();
+              openLiveChannelSearch(i);
+            }),
+            (r._activate = function () {
+              liveFavoritesOnly = !liveFavoritesOnly;
+              syncLiveFavoriteButtons();
+              Qt(liveFavoritesOnly);
+              Yt(liveFavoritesOnly ? "Mostrando canales favoritos" : "Mostrando todos los canales");
+              rt(r);
+            }),
+            (o._activate = function () {
+              selectAllLiveChannels(o);
+            }),
+            (c._activate = function () {
+              pr(c);
+            }),
+            [i, c, r, o].forEach(function (button, index, actions) {
+              button._onMove = function (direction) {
+                if (direction === "up") return (rt(iFullscreen || Ue[0]), !0);
+                if (direction === "left") return (rt(actions[index - 1] || Ue[0]), !0);
+                if (direction === "right" && actions[index + 1]) return (rt(actions[index + 1]), !0);
+                if (direction === "down" || direction === "right") {
+                  var visible = visibleLiveIndexes();
+                  var first = visible[0];
+                  if (first != null) {
+                    if (!homeRows[first]) Qt(liveFavoritesOnly, first);
+                    rt(homeRows[first]);
+                  }
+                  return !0;
+                }
+                return !1;
+              };
+              bindMagicActivate(button);
+              a.appendChild(button);
+            }),
+            t.appendChild(a));
+        })(),
+        (re = e("div", "live-list scrollable")),
+        t.appendChild(guide),
+        t.appendChild(re),
+        Qt(!1),
+        Gt(),
+        ((ne = e("div", "live-focus focusable"))._onMove = function (e) {
+          if ("up" === e) {
+            var a = document.querySelector(".live-fast .f-srch");
+            return (a ? rt(a) : !0, !0);
+          }
+          if ("down" === e) {
+            X.channel < F.length - 1 && Kt(X.channel + 1);
+            var a = Fe.filter(function (e) {
+              return e._channel === X.channel;
+            })[0];
+            return (a && rt(a), !0);
+          }
+          if ("right" === e) {
+            var t = Fe.filter(function (e) {
+              return e._channel === X.channel;
+            })[0];
+            return (t ? rt(t) : Fe.length && rt(Fe[0]), !0);
+          }
+          return "left" === e && (Ue[0] && rt(Ue[0]), !0);
+        }),
+        (ne._activate = function () {
+          Yr("live");
+        }),
+        t.appendChild(ne));
+    },
+    function (page) {
+      renderHomeCatalog(page, "featured", "Destacados", "Títulos más vistos", "Títulos destacados");
+    },
+    function (page) {
+      renderHomeCatalog(page, "movies", "Películas", "Películas más populares", "Más películas");
+    },
+    function (page) {
+      renderHomeCatalog(page, "series", "Series", "Series más populares", "Más series");
+    },
+    function (page) {
+      renderHomeCatalog(page, "kids", "Infantil", "Contenido infantil popular", "Más contenido infantil");
+    },
+    function (page) {
+      renderHomeCatalog(page, "anime", "Anime", "Anime más popular", "Más anime");
+    },
+    function (page) {
+      renderHomeCatalog(page, "novels", "Novelas", "Novelas y dramas populares", "Más telenovelas y dramas");
+    },
+  ],
+    ht = {},
+    homeClockTimer = null,
+    tabSwitchTimer = null;
+  function scheduleTabSwitch(idx) {
+    if (tabSwitchTimer) {
+      clearTimeout(tabSwitchTimer);
+      tabSwitchTimer = null;
+    }
+    for (var n = 0; n < Ue.length; n++) {
+      Ue[n].classList.toggle("is-selected", n === idx);
+    }
+    if (z[idx] && z[idx].action) return;
+    tabSwitchTimer = setTimeout(function () {
+      tabSwitchTimer = null;
+      bt(idx, !1);
+    }, 260);
+  }
+  function mt(e) {
+    !ht[e] && He[e] && ft[e] && ((ht[e] = !0), ft[e](He[e]));
+  }
+  function gt() {
+    ((Ve = !0),
+      (ee = t("home-pages")),
+      (te = t("home-notify")),
+      a(ee),
+      (He = []),
+      (ht = {}));
+    for (var i = 0; i < ft.length; i++) {
+      var n = e("div", "home-page scrollable");
+      (0 === i && n.classList.add("is-current"), ee.appendChild(n), He.push(n));
+    }
+    (mt(z[X.tab] && z[X.tab].page >= 0 ? z[X.tab].page : 0),
+      (function () {
+        var i = t("home-tabs");
+        (a(i),
+          i.classList.add("scrollable"),
+          i.classList.add("is-expanded"),
+          (Ue = []));
+        var railBrand = e("div", "tabs-brand"),
+          railMark = e("div", "tabs-mark"),
+          markImg = e("img", "tabs-mark-img"),
+          railText = e("div", "tabs-brand-text");
+        markImg.src = "images/orbivista-icon.png";
+        markImg.alt = "";
+        railMark.appendChild(markImg);
+        (railText.appendChild(e("div", "tabs-word", BRAND_NAME)),
+          railBrand.appendChild(railMark),
+          railBrand.appendChild(railText),
+          i.appendChild(railBrand));
+        for (var n = 0; n < z.length; n++) {
+          (0 === n && i.appendChild(e("div", "tabs-group", "En vivo")),
+            1 === n && i.appendChild(e("div", "tabs-group", "Explorar")),
+            "history" === z[n].action &&
+            i.appendChild(e("div", "tabs-group", "Tu biblioteca")));
+          var r = e("div", "tab-item focusable");
+          r.appendChild(e("div", "tab-pill"));
+          var o = e("div", "tab-icon");
+          ((o.innerHTML = B[z[n].icon] || ""), r.appendChild(o));
+          var s = e("div", "tab-title", z[n].label);
+          (r.appendChild(s),
+            (r._tab = n),
+            (r._activate = (function (e) {
+              return function () {
+                if ("history" === z[e].action)
+                  return ((We = "history"), Ha(), void Ua(1, !0));
+                if (X.tab !== e) {
+                  bt(e, !1);
+                }
+                if (0 === e) {
+                  var t = Fe.filter(function (e) {
+                    return e._channel === X.channel;
+                  })[0];
+                  t ? rt(t) : Fe.length ? rt(Fe[0]) : ne && rt(ne);
+                } else if (z[e].page >= 0) {
+                  var a = ot(He[z[e].page]);
+                  a && rt(a);
+                }
+              };
+            })(n)),
+            (r._onMove = (function (e) {
+              return function (t) {
+                if ("up" === t || "down" === t) {
+                  var nextTab = Ue[e + ("up" === t ? -1 : 1)];
+                  if (nextTab) rt(nextTab);
+                  return !0;
+                }
+                if ("right" === t) {
+                  Ue[e]._activate();
+                  if (X.focus === Ue[e]) {
+                    var action = te && te.querySelector(".notify-item");
+                    if (action) rt(action);
+                  }
+                  return !0;
+                }
+                return "left" === t;
+              };
+            })(n)),
+            i.appendChild(r),
+            Ue.push(r));
+        }
+      })(),
+      (function () {
+        a(te);
+        for (
+          var t = [
+            {
+              cls: "search",
+              /* SVG en lugar de PNG: los iconos de mapa de bits del APK
+                 quedaban casi invisibles en paneles de TV y se perdían al
+                 escalar. El trazo hereda currentColor. */
+              svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="14" cy="14" r="8.5" fill="none" stroke="currentColor" stroke-width="2.8"/><path d="M20.5 20.5L28 28" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>',
+              label: "Buscar",
+            },
+            {
+              cls: "filter",
+              svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 9h22M5 16h22M5 23h22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><circle cx="11" cy="9" r="3.2" fill="currentColor"/><circle cx="22" cy="16" r="3.2" fill="currentColor"/><circle cx="15" cy="23" r="3.2" fill="currentColor"/></svg>',
+              label: "Filtrar catálogo",
+            },
+            {
+              cls: "personal",
+              svg: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="11" r="5.2" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M6 27c.8-5.8 4.6-8.8 10-8.8S25.2 21.2 26 27" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>',
+              label: "Mi cuenta",
+            },
+          ],
+          i = 0;
+          i < t.length;
+          i++
+        ) {
+          var n = t[i],
+            r = e(
+              "div",
+              "notify-item focusable " + n.cls + (n.small ? " is-small" : "")
+            ),
+            o = e("div", "n-normal");
+          ((o.innerHTML = n.svg || ""),
+            n.label && r.setAttribute("aria-label", n.label),
+            r.appendChild(o),
+            "personal" === n.cls
+              ? (r._activate = function () {
+                Ha();
+              })
+              : "search" === n.cls
+                ? (r._activate = function () {
+                  La();
+                })
+                : (r._activate = function () {
+                  openCatalogFilter(te.querySelector(".notify-item.filter"));
+                }),
+            (r._onMove = (function (e) {
+              return function (t) {
+                if ("left" === t) {
+                  if (e > 0) return (rt(te.querySelectorAll(".notify-item")[e - 1]), !0);
+                  if (Ue[X.tab]) rt(Ue[X.tab]);
+                  return !0;
+                }
+                if ("right" === t) {
+                  if (e < 2) return (rt(te.querySelectorAll(".notify-item")[e + 1]), !0);
+                  return !0;
+                }
+                if ("down" === t) {
+                  if (0 === X.tab) {
+                    var fastSrch = document.querySelector(".live-fast .f-srch");
+                    if (fastSrch) return (rt(fastSrch), !0);
+                    var a = Fe.filter(function (e) {
+                      return e._channel === X.channel;
+                    })[0] || Fe[0];
+                    return a ? (rt(a), !0) : !0;
+                  }
+                  if (z[X.tab] && z[X.tab].page >= 0) {
+                    var pageElem = ot(He[z[X.tab].page]);
+                    if (pageElem) return (rt(pageElem), !0);
+                  }
+                  return !0;
+                }
+                return "up" === t;
+              };
+            })(i)),
+            te.appendChild(r));
+        }
+        var s = e("div", "notify-divider");
+        te.appendChild(s);
+        var l = e("div", "notify-wifi");
+        ((l.innerHTML =
+          '<svg viewBox="0 0 30 22"><path d="M15 19.5a2.1 2.1 0 1 1 0-4.2 2.1 2.1 0 0 1 0 4.2z" fill="currentColor"/><path d="M8.4 12.2a9.6 9.6 0 0 1 13.2 0" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M4.2 7.6a15.6 15.6 0 0 1 21.6 0" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>'),
+          te.appendChild(l));
+        var d = e("div", "notify-time");
+        d.id = "notify-time";
+        te.appendChild(d);
+        yt();
+        if (homeClockTimer) clearInterval(homeClockTimer);
+        homeClockTimer = setInterval(yt, 3e4);
+      })());
+  }
+  function yt() {
+    var e = t("notify-time");
+    if (e) {
+      var a = new Date(),
+        i = a.getHours(),
+        n = i >= 12 ? "PM" : "AM";
+      0 === (i %= 12) && (i = 12);
+      var o = a.getMinutes();
+      e.textContent = i + ":" + r(o) + " " + n;
+    }
+  }
+  window.switchTab = bt;
+  function bt(e, t) {
+    if (X.channelsOpen || (Se && Se.classList.contains("is-active"))) {
+      ro();
+    }
+    var a = z[e];
+    if (a && !a.action) {
+      var i = z[X.tab] ? z[X.tab].page : a.page;
+      X.tab = e;
+      for (var n = 0; n < Ue.length; n++)
+        Ue[n].classList.toggle("is-selected", n === e);
+
+      // Desalojar texturas de imágenes de TODAS las pestañas VOD inactivas de forma segura
+      for (var p = 1; p < He.length; p++) {
+        if (p !== a.page && He[p]) {
+          var oldImgs = He[p].querySelectorAll("img[src]");
+          for (var oi = 0; oi < oldImgs.length; oi++) {
+            oldImgs[oi].removeAttribute("src");
+          }
+        }
+      }
+
+      (a.page >= 0 && mt(a.page), 0 === a.page ? Wt(F[X.channel]) : jt());
+      for (var r = 0; r < He.length; r++)
+        (He[r].classList.remove("is-entering", "from-left", "from-right"),
+          He[r].classList.toggle("is-current", r === a.page));
+      if (a.page !== i && He[a.page]) {
+        var o = He[a.page];
+        (o.classList.add(
+          "is-entering",
+          a.page > i ? "from-right" : "from-left"
+        ),
+          setTimeout(function () {
+            o.classList.remove("is-entering", "from-left", "from-right");
+          }, 180));
+      }
+      if (t)
+        if (0 === a.page) {
+          var s = Fe.filter(function (e) {
+            return e._channel === X.channel;
+          })[0];
+          s ? rt(s) : Fe.length ? rt(Fe[0]) : ne && rt(ne);
+        } else {
+          var l = ot(He[a.page]);
+          l && rt(l);
+        }
+      wt(160);
+    }
+  }
+  var Ct = null;
+  function wt(delay) {
+    var wait = typeof delay === "number" ? delay : 80;
+    Ct && clearTimeout(Ct);
+    Ct = setTimeout(function () {
+      Ct = null;
+      (function () {
+        /* Las carátulas sólo existen fuera del reproductor. Al pulsar
+           arriba en Modo Fluido, este recorrido cargaba/descargaba todas
+           las imágenes de pantallas ocultas y podía saturar la memoria de
+           TVs lentas (pantalla negra + cierre de la app). */
+        if ("player" === X.screen) return;
+        var root = null;
+        if ("home" === X.screen) {
+          root = document.querySelector(".home-page.is-current");
+        } else if ("detail" === X.screen) {
+          root = t("screen-detail");
+        } else if ("search" === X.screen) {
+          root = t("screen-search");
+        } else if ("section" === X.screen) {
+          root = t("screen-section");
+        } else {
+          root = document.querySelector(".screen.is-active") || document;
+        }
+        if (!root) return;
+
+        var tWin = window.innerWidth || 1920;
+        var aWin = window.innerHeight || 1080;
+        var loadImg = function (img) {
+          if (img && !img.hasAttribute("src")) {
+            img.style.display = "";
+            img.src = img.getAttribute("data-poster-src");
+          }
+        };
+        var evictImg = function (img) {
+          if (img && img.hasAttribute("src")) {
+            img.removeAttribute("src");
+          }
+        };
+
+        // 1. Optimización para rieles (.catalog-rail): culling por fila completa bidireccional
+        var rails = root.querySelectorAll(".catalog-rail");
+        if (rails && rails.length) {
+          var pageScroll = root.scrollTop || 0;
+          var bentos = root.querySelectorAll(".bento img[data-poster-src]");
+          if (pageScroll < 900) {
+            for (var bIdx = 0; bIdx < bentos.length; bIdx++) {
+              loadImg(bentos[bIdx]);
+            }
+          } else {
+            for (var bIdx2 = 0; bIdx2 < bentos.length; bIdx2++) {
+              evictImg(bentos[bIdx2]);
+            }
+          }
+
+          for (var rIdx = 0; rIdx < rails.length; rIdx++) {
+            var rail = rails[rIdx];
+            var rRect = rail.getBoundingClientRect();
+            // Desalojo activo de memoria si el riel está muy lejos fuera de la vista
+            if (rRect.bottom < -500 || rRect.top > aWin + 800) {
+              var farImgs = rail.querySelectorAll("img[src]");
+              for (var fIdx = 0; fIdx < farImgs.length; fIdx++) {
+                evictImg(farImgs[fIdx]);
+              }
+              continue;
+            }
+            // Fuera de la ventana visible: saltar sin cargar
+            if (rRect.bottom < -80 || rRect.top > aWin + 160) {
+              continue;
+            }
+            var pImgs = rail.querySelectorAll("img[data-poster-src]");
+            var rScroll = rail.scrollLeft || 0;
+            for (var pIdx = 0; pIdx < pImgs.length; pIdx++) {
+              var pImg = pImgs[pIdx];
+              var card = pImg.parentElement;
+              var pLeft = (card && card.offsetLeft) || 0;
+              // Comprobación horizontal rápida
+              if (pLeft + 264 >= rScroll - 80 && pLeft <= rScroll + tWin + 120) {
+                loadImg(pImg);
+              } else if (pLeft + 264 < rScroll - 400 || pLeft > rScroll + tWin + 500) {
+                evictImg(pImg);
+              }
+            }
+          }
+          return;
+        }
+
+        // 2. Fallback universal (Búsqueda, Detalle, Secciones en cuadrícula):
+        var e = root.querySelectorAll("img[data-poster-src]");
+        for (var i = 0; i < e.length; i++) {
+          var r = e[i];
+          var o = n(r, ".poster, .bento");
+          var isBento = o && o.classList.contains("bento");
+          var s =
+            o && o.getBoundingClientRect
+              ? o.getBoundingClientRect()
+              : null;
+          if (
+            isBento ||
+            (s &&
+              s.bottom > -80 &&
+              s.top < aWin + 180 &&
+              s.right > -80 &&
+              s.left < tWin + 180)
+          ) {
+            loadImg(r);
+          } else if (
+            s &&
+            (s.bottom < -400 || s.top > aWin + 600 || s.right < -400 || s.left > tWin + 600)
+          ) {
+            evictImg(r);
+          }
+        }
+      })();
+    }, wait);
+  }
+  function St(e) {
+    if ("home" === X.screen) {
+      var t = n(e, ".home-page");
+      return !(!t || !t.classList.contains("is-current"));
+    }
+    if ("search" === X.screen) {
+      var a = n(e, ".search-results"),
+        i = n(e, ".search-hot");
+      return !!(
+        (a && a.classList.contains("is-active")) ||
+        (i && !i.classList.contains("is-hidden"))
+      );
+    }
+    if ("detail" === X.screen) {
+      var r = n(e, "#screen-detail");
+      return !(!r || !r.classList.contains("is-active"));
+    }
+    return !1;
+  }
+  function xt(t, a, n, r, o, s) {
+    var l = e(
+      "div",
+      "poster focusable" +
+      ((s = s || {}).gold ? " gold" : "") +
+      (s.type3 ? " type3" : "")
+    );
+    if ((i(l, a, n, r, o), t.poster)) {
+      var d = e("img", "p-img");
+      (d.setAttribute("data-poster-src", t.poster),
+        (d.onerror = function () {
+          if (
+            this.src &&
+            0 === this.src.indexOf("https://") &&
+            !this._httpFallback
+          )
+            return (
+              (this._httpFallback = !0),
+              void (this.src = this.src.replace("https://", "http://"))
+            );
+          this.style.display = "none";
+          if (l) l.classList.add("is-img-error");
+        }),
+        l.appendChild(d));
+    }
+    return (
+      s.gold ||
+      (l.appendChild(e("div", "p-shade")),
+        l.appendChild(e("div", "p-title", t.title))),
+      (l._item = t),
+      (l._activate = function () {
+        ba(t);
+      }),
+      l
+    );
+  }
+  /* Señales DirecTV/DSports, ESPN y deportes con resolución dinámica (2026-11-15).
+     Extraído e integrado de WiwyXuper (TvPlusResolver): en vez de IPs fijas
+     que caen o sufren bloqueos, el servicio resuelve dinámicamente las señales
+     deportivas (DSports 1/2/+, ESPN 1 al 7, ESPN Premium, ESPN México 1 al 5,
+     TyC Sports, TUDN, Sky Sports La Liga, etc.) a través de los tokens en vivo
+     y las entrega de forma limpia por el proxy local con DoH y secuencias
+     monotónicas. DSports y ON DIRECTV mantienen respaldo por el portal. */
+  var CURATED_DIRECTV_ESPN = [
+    {
+      name: "DSports / DirecTV Sports",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/DirecTV_Sports_Latin_America_%282018%29.png/960px-DirecTV_Sports_Latin_America_%282018%29.png",
+      streamUrl: "tvplus:directvsports",
+      channelCode: "cyx_DDF490BFAF3D882ACE33C",
+    },
+    {
+      name: "DSports 2",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/DIRECTV_Sports_2_Latin_America_%282018%29.svg/960px-DIRECTV_Sports_2_Latin_America_%282018%29.svg.png",
+      streamUrl: "tvplus:directvsports2",
+      channelCode: "cyx_61366620180839483689757919",
+    },
+    {
+      name: "DSports +",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/DIRECTV_Sports%2B_Latin_America_%282018%29.png/960px-DIRECTV_Sports%2B_Latin_America_%282018%29.png",
+      streamUrl: "tvplus:directvsportsplus",
+      channelCode: "cyx_DDF490BFAF3D882ACE33C",
+    },
+    {
+      name: "ON DIRECTV HD",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/DirecTV_Sports_Latin_America_%282018%29.png/960px-DirecTV_Sports_Latin_America_%282018%29.png",
+      channelCode: "cyx_61366620180839483689757919",
+    },
+    {
+      name: "ESPN",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/ESPN_wordmark.svg/960px-ESPN_wordmark.svg.png",
+      streamUrl: "tvplus:espn",
+      channelCode: "ST☆R+HD_cyx",
+    },
+    {
+      name: "ESPN 2",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/ESPN2_logo.svg/960px-ESPN2_logo.svg.png",
+      streamUrl: "tvplus:espn2",
+      channelCode: "ST☆R+ 2 HD_cyx",
+    },
+    {
+      name: "ESPN 3",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/ESPN3_logo.svg/960px-ESPN3_logo.svg.png",
+      streamUrl: "tvplus:espn3",
+      channelCode: "ST☆R+ 3 HD_cyx",
+    },
+    {
+      name: "ESPN 4",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/ESPN_4_logo.svg/960px-ESPN_4_logo.svg.png",
+      streamUrl: "tvplus:espn4",
+      channelCode: "ST☆R+ 4 HD_cyx",
+    },
+    {
+      name: "ESPN 5",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/ESPN_wordmark.svg/960px-ESPN_wordmark.svg.png",
+      streamUrl: "tvplus:espn5",
+      channelCode: "ST☆R+HD_cyx",
+    },
+    {
+      name: "ESPN 6",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/ESPN_wordmark.svg/960px-ESPN_wordmark.svg.png",
+      streamUrl: "tvplus:espn6",
+      channelCode: "ST☆R+ 2 HD_cyx",
+    },
+    {
+      name: "ESPN 7",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/ESPN_wordmark.svg/960px-ESPN_wordmark.svg.png",
+      streamUrl: "tvplus:espn7",
+      channelCode: "ST☆R+ 3 HD_cyx",
+    },
+    {
+      name: "ESPN Premium",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a1/ESPN_Premium_logo.svg/960px-ESPN_Premium_logo.svg.png",
+      streamUrl: "tvplus:espnpremiumlat",
+      channelCode: "ST☆R+HD_cyx",
+    },
+    {
+      name: "ESPN México",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/ESPN_wordmark.svg/960px-ESPN_wordmark.svg.png",
+      streamUrl: "tvplus:espnmexico",
+      channelCode: "ST☆R+HD_cyx",
+    },
+    {
+      name: "ESPN 2 México",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/ESPN2_logo.svg/960px-ESPN2_logo.svg.png",
+      streamUrl: "tvplus:espn2mexico",
+      channelCode: "ST☆R+ 2 HD_cyx",
+    },
+    {
+      name: "ESPN 3 México",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/ESPN3_logo.svg/960px-ESPN3_logo.svg.png",
+      streamUrl: "tvplus:espn3mexico",
+      channelCode: "ST☆R+ 3 HD_cyx",
+    },
+    {
+      name: "ESPN 4 México",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/ESPN_4_logo.svg/960px-ESPN_4_logo.svg.png",
+      streamUrl: "tvplus:espn4mexico",
+      channelCode: "ST☆R+ 4 HD_cyx",
+    },
+    {
+      name: "ESPN 5 México",
+      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/ESPN_wordmark.svg/960px-ESPN_wordmark.svg.png",
+      streamUrl: "tvplus:espn5mexico",
+      channelCode: "ST☆R+HD_cyx",
+    },
+  ];
+  /* Los addons curados traen su propia lista de señales; no descargan nada.
+     Se normalizan al mismo formato que entrega el parser M3U del servicio. */
+  function curatedAddonChannels(addon) {
+    var src = addon && addon.channels, out = [], i, c, o;
+    if (!src || !src.length) return null;
+    for (i = 0; i < src.length; i++) {
+      c = src[i];
+      if (!c || (!c.streamUrl && !c.channelCode)) continue;
+      o = {
+        name: c.name,
+        logo: c.logo || "",
+        group: c.group || addon.name || "Addon",
+        isAddon: !0,
+        now: "En vivo",
+        next: "",
+        time: "",
+        fav: !1,
+        url: c.streamUrl || "",
+        streamUrl: c.streamUrl || "",
+        channelCode: c.channelCode || "m3u_" + (out.length + 1),
+        index: out.length + 1,
+      };
+      out.push(o);
+    }
+    return out;
+  }
+  var Tt = [
+    {
+      id: "es_tdt",
+      name: "España - Canales Nacionales y TDT",
+      url: "https://iptv-org.github.io/iptv/countries/es.m3u",
+      desc: "320+ canales: La 1, La 2, Antena 3, Telecinco, laSexta, autonómicas",
+    },
+    {
+      id: "co_nat",
+      name: "Colombia - Canales Nacionales",
+      url: "https://iptv-org.github.io/iptv/countries/co.m3u",
+      desc: "Caracol, RCN, Señal Colombia, Teleantioquia, canales regionales",
+    },
+    {
+      id: "mx_nat",
+      name: "México - Televisión Abierta y Cable",
+      url: "https://iptv-org.github.io/iptv/countries/mx.m3u",
+      desc: "Las Estrellas, Azteca 7, Azteca Uno, Canal 5, Imagen TV",
+    },
+    {
+      id: "ar_nat",
+      name: "Argentina - Canales Nacionales",
+      url: "https://iptv-org.github.io/iptv/countries/ar.m3u",
+      desc: "Telefe, El Trece, TV Pública, América TV, El Nueve",
+    },
+    {
+      id: "cl_nat",
+      name: "Chile - Televisión Nacional",
+      url: "https://iptv-org.github.io/iptv/countries/cl.m3u",
+      desc: "TVN, Mega, Chilevisión, Canal 13, La Red",
+    },
+    {
+      id: "pe_nat",
+      name: "Perú - Canales Nacionales",
+      url: "https://iptv-org.github.io/iptv/countries/pe.m3u",
+      desc: "América TV, ATV, Latina Televisión, Panamericana, TV Perú",
+    },
+    {
+      id: "latam_spa",
+      name: "Latinoamérica e Hispanoamérica",
+      url: "https://iptv-org.github.io/iptv/languages/spa.m3u",
+      desc: "800+ canales en español de toda América Latina y el Caribe",
+    },
+    {
+      id: "movies_iptv",
+      name: "Cine y Películas 24/7",
+      url: "https://iptv-org.github.io/iptv/categories/movies.m3u",
+      desc: "Cine continuo, películas clásicas, acción, suspenso y comedia 24/7",
+    },
+    {
+      id: "series_iptv",
+      name: "Series y Maratones 24/7",
+      url: "https://iptv-org.github.io/iptv/categories/series.m3u",
+      desc: "Canales continuos de series de culto, sitcoms y drama",
+    },
+    {
+      id: "sports_iptv",
+      name: "Deportes Internacionales",
+      url: "https://iptv-org.github.io/iptv/categories/sports.m3u",
+      desc: "Fútbol, baloncesto, automovilismo y eventos deportivos",
+    },
+    {
+      id: "directv_espn",
+      name: "DirecTV Sports y ESPN",
+      desc: "DSports (1, 2, +), ON DIRECTV, ESPN (1-7, Premium, México 1-5), TyC Sports, TUDN, Sky Sports, Fox Sports y más con resolución dinámica",
+      /* Lista curada con fuentes verificadas (ya no descarga la lista
+         pública de deportes, que traía casi todas esas señales caídas). */
+      channels: CURATED_DIRECTV_ESPN,
+    },
+    {
+      id: "animation_iptv",
+      name: "Animación y Caricaturas 24/7",
+      url: "https://iptv-org.github.io/iptv/categories/animation.m3u",
+      desc: "Canales continuos de animación infantil, caricaturas y anime",
+    },
+    {
+      id: "documentary_iptv",
+      name: "Documentales y Ciencia",
+      url: "https://iptv-org.github.io/iptv/categories/documentary.m3u",
+      desc: "Naturaleza, historia, ciencia, tecnología y cultura",
+    },
+    {
+      id: "music_iptv",
+      name: "Música y Conciertos",
+      url: "https://iptv-org.github.io/iptv/categories/music.m3u",
+      desc: "Canales musicales, conciertos en vivo, pop, rock, urbano y latino",
+    },
+  ];
+  /* Un addon puede traer una lista pública grande (p.ej. todos los deportes)
+     y quedarse sólo con las señales que interesan. El filtro se guarda junto
+     al addon para que se aplique también al recargar los canales. */
+  function addonFilterChannels(addon, list) {
+    if (!addon || !addon.filter || !list || !list.length) return list || [];
+    var re = null;
+    try {
+      re = new RegExp(addon.filter, "i");
+    } catch (e) {
+      re = null;
+    }
+    if (!re) return list;
+    var out = [];
+    for (var i = 0; i < list.length; i++) {
+      var ch = list[i];
+      if (ch && re.test(String(ch.name || "") + " " + String(ch.group || "")))
+        out.push(ch);
+    }
+    return out;
+  }
+  function _t() {
+    var stored = null;
+    try {
+      var e = localStorage.getItem("xuper_m3u_addons");
+      if (e) {
+        var t = JSON.parse(e);
+        if (Array.isArray(t) && t.length) stored = t;
+      }
+    } catch (e) { }
+    if (stored && stored.length) {
+      var map = {};
+      for (var s = 0; s < stored.length; s++) {
+        if (stored[s] && stored[s].id) map[stored[s].id] = !0;
+      }
+      var updated = stored.slice(),
+        added = !1;
+      for (var p = 0; p < Tt.length; p++) {
+        if (!map[Tt[p].id]) {
+          updated.push(Tt[p]);
+          map[Tt[p].id] = !0;
+          added = !0;
+        } else if (Tt[p].channels && Tt[p].channels.length) {
+          /* Los presets curados se refrescan: versiones viejas guardaron el
+             addon DirecTV/ESPN con una URL pública cuyos canales estaban caídos
+             y, más adelante, con una lista más corta de señales verificadas.
+             Si la lista guardada no coincide con la del preset actual, se
+             sustituye para que aparezcan las señales nuevas. */
+          for (var q = 0; q < updated.length; q++) {
+            if (updated[q] && updated[q].id === Tt[p].id) {
+              var same = !1;
+              try {
+                same =
+                  !!updated[q].channels &&
+                  JSON.stringify(updated[q].channels) ===
+                  JSON.stringify(Tt[p].channels);
+              } catch (e) { }
+              if (!same) {
+                updated[q] = Tt[p];
+                added = !0;
+              }
+              break;
+            }
+          }
+        }
+      }
+      if (added) {
+        try {
+          localStorage.setItem("xuper_m3u_addons", JSON.stringify(updated));
+        } catch (e) { }
+      }
+      return updated;
+    }
+    var a = Tt.slice();
+    try {
+      localStorage.setItem("xuper_m3u_addons", JSON.stringify(a));
+    } catch (e) { }
+    return a;
+  }
+  function kt(e) {
+    try {
+      localStorage.setItem("xuper_m3u_addons", JSON.stringify(e || []));
+    } catch (e) { }
+  }
+  /* Categoría propia de TV en vivo con las señales DirecTV/DSports y ESPN.
+     No depende de instalar el addon: al elegirla se descarga la lista pública
+     de deportes y se filtra a esas señales. */
+  var DIRECTV_ESPN_CATEGORY = {
+    id: "directv_espn_live",
+    name: "DirecTV / ESPN",
+    /* Lista curada, sin descarga: mismas señales verificadas del addon. */
+    channels: CURATED_DIRECTV_ESPN,
+  };
+  var DEFAULT_LIVE_CATEGORIES = [
+    { id: 76182, name: 'Todos', code: 'ba397e42-b664-11ed-8c55-768dd7bc60d3' },
+    { id: 76206, name: 'Deportes', code: 'dc520f12-b664-11ed-8b54-768dd7bc60d3' },
+    DIRECTV_ESPN_CATEGORY,
+    { id: 87034, name: 'Vivo gratis', code: '77EA75EF523AB44B01D707781892485E' },
+    { id: 76205, name: 'Cine y Series', code: 'db7b71dc-b664-11ed-8b54-768dd7bc60d3' },
+    { id: 77970, name: 'Más popular', code: '78C5EC9959371B7FEFE6E14AF48A1904' },
+    { id: 77690, name: 'Venezuela', code: '235F792997A0A714FCD96778BCF05172' },
+    { id: 76188, name: 'Colombia', code: 'd463893e-b664-11ed-8b54-768dd7bc60d3' },
+    { id: 76190, name: 'Ecuador', code: 'd66e9124-b664-11ed-8b54-768dd7bc60d3' },
+    { id: 76207, name: 'Chile', code: 'dd9600fe-b664-11ed-8b54-768dd7bc60d3' },
+    { id: 76197, name: 'México', code: 'd908f618-b664-11ed-8b54-768dd7bc60d3' },
+    { id: 76187, name: 'Perú', code: 'd425d4d6-b664-11ed-8b54-768dd7bc60d3' },
+    { id: 76202, name: 'Bolivia', code: 'daa53324-b664-11ed-8b54-768dd7bc60d3' },
+    { id: 76201, name: 'Uruguay', code: 'da865fe4-b664-11ed-8b54-768dd7bc60d3' },
+    { id: 77688, name: 'Paraguay', code: 'CE922BD5FE46DFBDE587348E82E4F239' },
+    { id: 77689, name: 'Panamá', code: '313CC1DF490076FB3F72EA0086645764' },
+    { id: 77988, name: 'Puerto Rico', code: 'E07E20F2A12DB9436DCCB6F3B9B5024B' },
+    { id: 76191, name: 'España', code: 'd6962ea0-b664-11ed-8b54-768dd7bc60d3' },
+    { id: 77691, name: 'Costa Rica', code: '30CBEC64059510DC85E03A61AEEE431A' },
+    { id: 76194, name: 'Estados Unidos', code: 'd862ef98-b664-11ed-8b54-768dd7bc60d3' },
+    { id: 79127, name: 'Centroamérica', code: '427FC371C2D4A520799642758D171591' },
+    { id: 79134, name: 'Honduras', code: '983EFE77932E9378816362F80E7DD93E' },
+    { id: 79145, name: 'El Salvador', code: '5AA6C7CDB005B41F1E13BE66088FB351' },
+    { id: 79147, name: 'República Dominicana', code: 'EDB4CA7F458A2553ACBE9A607DD02934' },
+    { id: 76193, name: 'Noticias', code: 'd8332ccc-b664-11ed-8b54-768dd7bc60d3' },
+    { id: 77977, name: 'Full HD', code: 'C4088392E9152F9E5C7D1671005951A2' },
+    { id: 76204, name: 'HD+(265)', code: 'db2f3830-b664-11ed-8b54-768dd7bc60d3' },
+    { id: 76198, name: 'PlayBack', code: 'd9fc1c26-b664-11ed-8b54-768dd7bc60d3' },
+    { id: 76186, name: 'NFL PASS', code: 'd3d9d2ca-b664-11ed-8b54-768dd7bc60d3' },
+    { id: 76184, name: 'NBA PASS', code: 'd36df230-b664-11ed-8b54-768dd7bc60d3' },
+    { id: 76195, name: 'MLB PASS', code: 'd881fb4a-b664-11ed-8b54-768dd7bc60d3' },
+    { id: 76196, name: 'Cultura', code: 'd89d00a2-b664-11ed-8b54-768dd7bc60d3' },
+    { id: 76183, name: 'Música', code: 'd314839e-b664-11ed-8b54-768dd7bc60d3' },
+    { id: 79146, name: 'Infantil', code: '64334F25B2394B11A1FF1B060D6B377C' },
+    { id: 79148, name: 'Religioso', code: 'E75C698363490CE8F2441F43FB96E752' },
+    { id: 76192, name: 'Desde Internet', code: 'd69d9f50-b664-11ed-8b54-768dd7bc60d3' },
+    { id: 76200, name: 'EVENTOS PPV', code: 'da7619a4-b664-11ed-8b54-768dd7bc60d3' },
+    { id: 76189, name: '24/7', code: 'd51b21ac-b664-11ed-8b54-768dd7bc60d3' },
+    { id: 76208, name: '18+', code: 'ddc200aa-b664-11ed-8b54-768dd7bc60d3' },
+    { id: 'addons', name: 'Addons M3U', isAddon: true }
+  ];
+  var Lt = DEFAULT_LIVE_CATEGORIES.slice(),
+    Mt = DEFAULT_LIVE_CATEGORIES[0],
+    It = !1,
+    Et = !1,
+    At = !1,
+    Dt = 0,
+    Pt = null,
+    Ot = null,
+    qt = null,
+    Nt = 0,
+    Rt = null,
+    Vt = "",
+    Ht = !1,
+    Ut = !1,
+    Ft = null,
+    Bt = !1,
+    zt = !1,
+    liveFavoritesOnly = !1,
+    liveSearchText = "",
+    liveSearchOpen = !1,
+    liveSearchInput = null;
+  function updatePlayerCatBadge() {
+    if (Se) {
+      var b = Se.querySelector('.pc-cat-badge');
+      if (b && Mt) { b.textContent = Mt.name; }
+    }
+  }
+  function toggleChannelFavoriteDirect(channelIndex, rowElem) {
+    var ch = F[channelIndex];
+    if (!ch) return;
+    var isFav = toggleLiveFavorite(ch);
+    ch.fav = isFav;
+    Yt(isFav ? "Canal añadido a favoritos" : "Canal quitado de favoritos");
+    if (rowElem) {
+      var star = rowElem.querySelector(".channel-star");
+      if (star) { star.innerHTML = starSvg(isFav); }
+    }
+    if ("player" === X.screen) {
+      hr(channelIndex);
+    } else if ("home" === X.screen) {
+      Qt(liveFavoritesOnly);
+    }
+    syncLiveFavoriteButtons();
+  }
+  /* El filtro de favoritos es global: Inicio y el reproductor no pueden
+     mostrar estados distintos ni dejar un botón naranja "fantasma". */
+  function syncLiveFavoriteButtons() {
+    var buttons = document.querySelectorAll(".f-fav, .pc-btn-fav");
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].classList.toggle("is-active", !!liveFavoritesOnly);
+      buttons[i].setAttribute("aria-pressed", liveFavoritesOnly ? "true" : "false");
+    }
+  }
+  function isAllLiveCategory(category) {
+    return !!(
+      category &&
+      (String(category.id) === "76182" ||
+        /^(todos?|all)$/i.test(String(category.name || "")))
+    );
+  }
+  function getAllLiveCategory() {
+    var categories = Lt && Lt.length ? Lt : DEFAULT_LIVE_CATEGORIES;
+    for (var i = 0; i < categories.length; i++)
+      if (isAllLiveCategory(categories[i])) return categories[i];
+    return { id: 76182, name: "Todos" };
+  }
+  function selectAllLiveChannels(returnFocus) {
+    liveFavoritesOnly = !1;
+    liveSearchText = "";
+    syncLiveFavoriteButtons();
+    Xt(getAllLiveCategory());
+    if ("home" === X.screen) Qt(!1);
+    else if ("player" === X.screen) hr(0);
+    Yt("Mostrando todos los canales");
+    returnFocus && rt(returnFocus);
+  }
+  function jt() {
+    if (
+      (Nt++,
+        (Vt = ""),
+        Rt && (clearTimeout(Rt), (Rt = null)),
+        ie && ie.classList.remove("is-preview-playing", "is-preview-loading"),
+        qt && (qt.textContent = ""),
+        Ot)
+    ) {
+      try {
+        Ot.pause();
+      } catch (e) { }
+      Ot.removeAttribute("src");
+      try {
+        ((Ot.src = ""), Ot.load());
+      } catch (e) { }
+    }
+  }
+  function Wt(e) {
+    (Rt && clearTimeout(Rt),
+      (Rt = setTimeout(function () {
+        ((Rt = null),
+          (function (e) {
+            if (
+              Ot &&
+              e &&
+              (e.channelCode || e.streamUrl) &&
+              "home" === X.screen &&
+              0 === X.tab
+            ) {
+              var t = e.channelCode || e.streamUrl;
+              if (
+                t !== Vt ||
+                !ie ||
+                (!ie.classList.contains("is-preview-loading") &&
+                  !ie.classList.contains("is-preview-playing"))
+              ) {
+                (jt(), (Vt = t));
+                var a = ++Nt;
+                (ie.classList.add("is-preview-loading"),
+                  qt &&
+                  (qt.textContent = "Cargando " + (e.name || "canal") + "…"),
+                  P(
+                    "resolveLive",
+                    e.streamUrl
+                      ? { streamUrl: e.streamUrl }
+                      : { channelCode: e.channelCode },
+                    function (e, t) {
+                      if (a === Nt && "home" === X.screen && 0 === X.tab) {
+                        !e && t && D("live", t);
+                        var i =
+                          !e &&
+                          t &&
+                          !1 !== t.returnValue &&
+                          (t.proxyPath || t.url);
+                        if (!i)
+                          return (
+                            ie.classList.remove("is-preview-loading"),
+                            void (qt && (qt.textContent = ""))
+                          );
+                        var onStart = function () {
+                          if (a === Nt) {
+                            ie.classList.remove("is-preview-loading");
+                            ie.classList.add("is-preview-playing");
+                            if (qt) qt.textContent = "";
+                          }
+                        };
+                        Ot.onloadeddata = onStart;
+                        Ot.oncanplay = onStart;
+                        Ot.onplaying = onStart;
+                        Ot.ontimeupdate = function () {
+                          if (Ot.currentTime > 0) onStart();
+                        };
+                        Ot.onerror = function () {
+                          if (a === Nt) {
+                            ie.classList.remove(
+                              "is-preview-loading",
+                              "is-preview-playing"
+                            );
+                            if (qt) qt.textContent = "";
+                          }
+                        };
+                        try {
+                          Ot.muted = !1;
+                          Ot.volume = 1;
+                          Ot.removeAttribute("muted");
+                          Ot.setAttribute("type", "application/x-mpegurl");
+                          ((Ot.src = i), Ot.load());
+                          var n = Ot.play();
+                          n && n.catch && n.catch(function () { });
+                        } catch (e) {
+                          ie.classList.remove("is-preview-loading");
+                        }
+                      }
+                    }
+                  ));
+              }
+            }
+          })(e || F[X.channel]));
+      }, 220)));
+  }
+  function Xt(e, t) {
+    if (e) {
+      Mt = e;
+      /* "Todos" y Favoritos son filtros excluyentes. */
+      if (isAllLiveCategory(e)) liveFavoritesOnly = !1;
+      syncLiveFavoriteButtons();
+      dr();
+      updatePlayerCatBadge();
+      if (e.addonUrl || (e.channels && e.channels.length)) {
+        loadAddonCategory(e, function () { t && t(); });
+      } else if (e.isAddon) {
+        $t(function () { t && t(); });
+      } else {
+        Gt(e.id, function () { t && t(); }, !0);
+      }
+    }
+  }
+  function loadM3uChannels(addons, done) {
+    if (!addons || !addons.length) return done && done([]);
+    var out = [],
+      pending = addons.length,
+      i;
+    function settle() {
+      if (--pending <= 0) done && done(out);
+    }
+    for (i = 0; i < addons.length; i++)
+      (function (addon) {
+        var curated = curatedAddonChannels(addon), k;
+        if (curated && curated.length) {
+          for (k = 0; k < curated.length; k++) out.push(curated[k]);
+          return settle();
+        }
+        if (!addon.url) return settle();
+        P("fetchM3u", { url: addon.url }, function (err, res) {
+          var chans =
+            res && res.channels ? addonFilterChannels(addon, res.channels) : [];
+          for (var k2 = 0; k2 < chans.length; k2++) out.push(chans[k2]);
+          settle();
+        });
+      })(addons[i]);
+  }
+  function showLoadedChannels(list, done) {
+    (jr(""), F.splice(0, F.length));
+    for (var o = 0; o < list.length; o++)
+      ((list[o].index = o + 1), F.push(list[o]));
+    ((X.channel = 0),
+      Qt(liveFavoritesOnly),
+      hr(),
+      F[0] && ae && (ae.textContent = F[0].name),
+      "player" === X.screen &&
+      "live" === X.playerMode &&
+      (ao(), to(F[0], !0)),
+      done && done());
+  }
+  function loadAddonCategory(cat, done) {
+    jr("Cargando canales de " + (cat.name || "Addon") + "…");
+    loadM3uChannels([cat], function (list) {
+      if (!list || !list.length) {
+        (jr(""),
+          Yt(
+            "No hay señales disponibles en " +
+            (cat.name || "esta categoría") +
+            " en este momento."
+          ));
+        return (F.splice(0, F.length), Qt(liveFavoritesOnly), hr(), void (done && done()));
+      }
+      showLoadedChannels(list, done);
+    });
+  }
+  function $t(e) {
+    var t = _t();
+    if (!t || !t.length)
+      return (F.splice(0, F.length), Qt(liveFavoritesOnly), hr(), void (e && e()));
+    jr("Cargando canales de Addon…");
+    loadM3uChannels(t, function (list) {
+      showLoadedChannels(list, e);
+    });
+  }
+  var liveListUnavailable = false;
+  function Gt(e, t, force) {
+    var a = e || 76182;
+    if (force || !At || Pt !== a) {
+      var i = ++Dt;
+      ((Pt = a),
+        (At = !0),
+        (Et = !1),
+        F.length || ((X.channel = 0), Qt(liveFavoritesOnly), hr()));
+      var n = 1,
+        r = !1,
+        fails = 0;
+      !(function e() {
+        P(
+          "liveChannels",
+          { columnId: a, pageNum: n, pageSize: 20 },
+          function (o, s) {
+            if (i === Dt) {
+              var l = s && s.channels ? s.channels : [];
+              if (!o && l.length) {
+                1 === n && F.splice(0, F.length);
+                for (var d = {}, c = 0; c < F.length; c++)
+                  F[c] && F[c].channelCode && (d[F[c].channelCode] = !0);
+                for (var p = 0; p < l.length; p++) {
+                  var u = l[p];
+                  !u ||
+                    (u.channelCode && d[u.channelCode]) ||
+                    (u.channelCode && (d[u.channelCode] = !0), F.push(u));
+                }
+              }
+              /* El pintado NO puede vivir dentro de "l.length": la última
+                 página del portal puede llegar VACÍA. La categoría 24/7 tiene
+                 exactamente 100 canales = 5 páginas de 20 y una sexta vacía;
+                 esa sexta página no repintaba nada y la lista se quedaba
+                 clavada en los 20 canales de la primera página (el último se
+                 veía como "24/7 Freddy's Nightmares"). */
+              if (!o) {
+                liveListUnavailable = false;
+                fails = 0;
+                var isFirstPage = 1 === n,
+                  isLastPage = !(s && s.hasMore && l.length);
+                ((Et = !0),
+                  X.channel >= F.length && (X.channel = 0),
+                  (isFirstPage || isLastPage) &&
+                  (Qt(liveFavoritesOnly),
+                    "player" === X.screen && X.channelsOpen && hr()),
+                  F[X.channel] && ae && (ae.textContent = F[X.channel].name),
+                  "player" === X.screen && "live" === X.playerMode
+                    ? ((isFirstPage || isLastPage) && ao())
+                    : isFirstPage && Wt(F[X.channel]));
+              }
+              if (
+                (r ||
+                  ((r = !0),
+                    It ||
+                    (function (e) {
+                      It && Lt.length
+                        ? e && e(null, Lt)
+                        : P("liveCategories", {}, function (t, a) {
+                          var i = [];
+                          if (a && a.categories && a.categories.length)
+                            for (var n = 0; n < a.categories.length; n++) {
+                              var r = a.categories[n],
+                                o = r.name;
+                              (("ChannelList" !== o && 76182 !== r.id) ||
+                                (o = "Todos"),
+                                i.push({
+                                  id: r.id,
+                                  name: o,
+                                  code: r.code,
+                                  isAddon: !1,
+                                }));
+                            }
+                          else
+                            i = DEFAULT_LIVE_CATEGORIES.slice();
+                          /* Categorías propias que siempre deben existir,
+                             aunque el portal entregue su propia lista. */
+                          (function () {
+                            for (var k = 0; k < i.length; k++)
+                              if (i[k] && i[k].id === DIRECTV_ESPN_CATEGORY.id)
+                                return;
+                            i.push(DIRECTV_ESPN_CATEGORY);
+                          })();
+                          (i.push({
+                            id: "addons",
+                            name: "Addons M3U",
+                            isAddon: !0,
+                          }),
+                            (Lt = i),
+                            (It = !0),
+                            Mt || (Mt = Lt[0]),
+                            dr(),
+                            e && e(null, Lt));
+                        });
+                    })(),
+                    t && t(o, s)),
+                  !o && s && s.hasMore && l.length)
+              )
+                return (n++, void setTimeout(e, 25));
+              /* Página intermedia que falló: reintentarla antes de rendirse.
+                 Antes se cortaba la lista en silencio (con "Todos" son 52
+                 páginas y basta que una no conteste para perder el resto). */
+              if (o && Et && fails < 2)
+                return (fails++, void setTimeout(e, 900));
+              if (o && Et) {
+                (Qt(liveFavoritesOnly),
+                  Yt("Lista incompleta: el portal no respondió. Vuelve a elegir la categoría."));
+                return void (At = !1);
+              }
+              if (o && !Et && !F.length) {
+                liveListUnavailable = true;
+                Qt(liveFavoritesOnly);
+              }
+              ((At = !1),
+                o &&
+                !Et &&
+                setTimeout(function () {
+                  i === Dt && Gt(a);
+                }, 2500));
+            }
+          }
+        );
+      })();
+    }
+  }
+  /* Inicio sólo necesita las filas alrededor del canal seleccionado. Renderizar
+     todos los canales en cada página agotaba RAM en TVs webOS con 1 GB. */
+  function liveRowsWindow(e, t) {
+    var a = e.indexOf(t);
+    a < 0 && (a = 0);
+    var i = Math.max(0, a - Math.floor(Ke / 2)),
+      n = Math.min(e.length, i + Ke);
+    return e.slice(Math.max(0, n - Ke), n);
+  }
+  function Qt(t, currentChannel) {
+    var previousFocus = X.focus,
+      previousChannel =
+        previousFocus && void 0 !== previousFocus._channel
+          ? previousFocus._channel
+          : -1,
+      previousWasStar =
+        previousFocus &&
+        previousFocus.classList &&
+        previousFocus.classList.contains("channel-star");
+    if (!re) return;
+    a(re);
+    Fe = [];
+    homeRows = {};
+    var visible = visibleLiveIndexes();
+    if (t) {
+      visible = visible.filter(function (e) {
+        return !!X.liveFavorites[liveChannelKey(F[e])];
+      });
+    }
+    var guideCount = document.getElementById("live-guide-count");
+    if (guideCount) {
+      guideCount.textContent = visible.length
+        ? visible.length + (visible.length === 1 ? " canal" : " canales")
+        : "";
+    }
+    if (!visible.length) {
+      if (ae && !F.length) ae.textContent = "";
+      re.appendChild(e("div", "live-list-status",
+        t ? "Aún no hay canales favoritos." :
+          F.length || Et ? "No hay canales disponibles." :
+            liveListUnavailable ? "El portal no respondió. Reintentando…" : "Cargando canales…"
+      ));
+      return;
+    }
+    var currentFavorites = !!t,
+      rows = liveRowsWindow(visible, null == currentChannel ? X.channel : currentChannel);
+    for (var rowIndex = 0; rowIndex < rows.length; rowIndex++) {
+      var i = rows[rowIndex];
+      var n = e("div", "live-row focusable");
+      n._channel = i;
+      var r = e("div", "row-icon");
+      F[i].logo &&
+        ((r.style.backgroundImage = "url(" + F[i].logo + ")"),
+          (r.style.backgroundSize = "contain"),
+          (r.style.backgroundRepeat = "no-repeat"),
+          (r.style.backgroundPosition = "center"));
+      var o = e("div", "row-play"),
+        s = e("div", "row-name", F[i].name),
+        isFav = !!(X.liveFavorites[liveChannelKey(F[i])] || F[i].fav),
+        star = e(
+          "button",
+          "channel-star focusable" + (isFav ? " is-favorite" : "")
+        );
+      star.innerHTML = starSvg(isFav);
+      star.setAttribute("aria-label", "Favorito: " + F[i].name);
+      star.setAttribute("aria-pressed", isFav ? "true" : "false");
+      (n.appendChild(r),
+        n.appendChild(o),
+        n.appendChild(s),
+        n.appendChild(star),
+        i === X.channel && n.classList.add("is-current"),
+        (n._activate = (function (e) {
+          return function () {
+            (Kt(e, !0), Yr("live"));
+          };
+        })(i)),
+        (n._onMove = (function (e, starButton) {
+          return function (t) {
+            if ("left" === t) {
+              var fastAll = document.querySelector(".live-fast .f-all") || document.querySelector(".live-fast .fast-btn");
+              return fastAll ? (rt(fastAll), !0) : (Ue[0] && rt(Ue[0]), !0);
+            }
+            if ("up" === t) {
+              var channelPos = visible.indexOf(e),
+                previousChannel = channelPos > 0 ? visible[channelPos - 1] : -1,
+                previousRow = previousChannel >= 0 ? homeRows[previousChannel] : null;
+              if (previousChannel >= 0) {
+                previousRow || (Qt(!!currentFavorites, previousChannel), (previousRow = homeRows[previousChannel]));
+                return previousRow ? (rt(previousRow), !0) : !0;
+              }
+              return (Ue[0] ? rt(Ue[0]) : !0, !0);
+            }
+            if ("down" === t) {
+              var channelPos = visible.indexOf(e),
+                nextChannel = channelPos < visible.length - 1 ? visible[channelPos + 1] : -1,
+                nextRow = nextChannel >= 0 ? homeRows[nextChannel] : null;
+              if (nextChannel >= 0) {
+                nextRow || (Qt(!!currentFavorites, nextChannel), (nextRow = homeRows[nextChannel]));
+                return nextRow ? (rt(nextRow), !0) : !0;
+              }
+              var fastBtn = document.querySelector(".live-fast .fast-btn");
+              return fastBtn ? (rt(fastBtn), !0) : !0;
+            }
+            if ("right" === t) return (rt(starButton), !0);
+            return !1;
+          };
+        })(i, star)),
+        (star._channel = i),
+        (star._activate = (function (channelIndex, t) {
+          return function () {
+            (toggleChannelFavoriteDirect(channelIndex, null),
+              (t = Fe.filter(function (e) {
+                return e._channel === channelIndex;
+              })[0]),
+              t && rt(t.querySelector(".channel-star")));
+          };
+        })(i, star)),
+        (star._onMove = (function (e, t) {
+          return function (a) {
+            if ("left" === a) return (rt(t), !0);
+            if ("up" === a || "down" === a) {
+              var i = visible.indexOf(e),
+                n = "up" === a ? i - 1 : i + 1,
+                r = n >= 0 && n < visible.length ? visible[n] : -1,
+                o = r >= 0 ? homeRows[r] : null,
+                s = o && o.querySelector(".channel-star");
+              if (r >= 0) {
+                s || (Qt(currentFavorites, r), (o = homeRows[r]), (s = o && o.querySelector(".channel-star")));
+                return s ? (rt(s), !0) : !0;
+              }
+              if ("up" === a) {
+                var l = document.querySelector(".live-fast .f-srch");
+                return l ? (rt(l), !0) : !0;
+              }
+              return !0;
+            }
+            return "right" === a;
+          };
+        })(i, n)),
+        /* En la previsualización el click del Magic Remote cambia el
+           canal sin abrir el reproductor a pantalla completa. La tecla
+           OK conserva su comportamiento normal (abrir TV en vivo). */
+        (n._magicActivate = (function (channelIndex) {
+          return function () {
+            Kt(channelIndex, !0);
+          };
+        })(i)),
+        bindMagicActivate(n, n._magicActivate),
+        bindMagicActivate(star),
+        re.appendChild(n),
+        (homeRows[i] = n),
+        Fe.push(n));
+    }
+    (F[X.channel] && ae && (ae.textContent = F[X.channel].name), Jt());
+    /* Gt() vuelve a crear filas al terminar una página del catálogo. Sin
+       esto X.focus apunta a una fila destruida y desaparece el naranja. */
+    if (
+      "home" === X.screen &&
+      previousChannel >= 0 &&
+      !at(previousFocus)
+    ) {
+      var restoredRow = Fe.filter(function (row) {
+        return row._channel === previousChannel;
+      })[0];
+      if (restoredRow)
+        rt(
+          previousWasStar
+            ? restoredRow.querySelector(".channel-star") || restoredRow
+            : restoredRow
+        );
+    }
+  }
+  function Jt() {
+    if (Fe.length) {
+      var e = Fe.filter(function (e) {
+        return e._channel === X.channel;
+      })[0];
+      if (e) {
+        var t = e.offsetTop,
+          a = Math.max(0, re.scrollHeight - re.clientHeight),
+          i = re.scrollTop;
+        (t < i && (i = t),
+          t + e.offsetHeight > i + re.clientHeight && (i = t + e.offsetHeight - re.clientHeight),
+          smoothScroll(re, null, Math.max(0, Math.min(a, i)), 180));
+      }
+    }
+  }
+  function Kt(e, t) {
+    (e < 0 && (e = 0), e > F.length - 1 && (e = F.length - 1), (X.channel = e));
+    "home" === X.screen && 0 === X.tab && Qt(liveFavoritesOnly, e);
+    for (var a = 0; a < Fe.length; a++)
+      Fe[a].classList.toggle("is-current", Fe[a]._channel === e);
+    (F[e] && ae && (ae.textContent = F[e].name),
+      Jt(),
+      "player" === X.screen
+        ? (!(function () {
+          if (!Ce) return;
+          ao();
+        })(),
+          "live" === X.playerMode && to(F[e], !!t))
+        : "home" === X.screen && 0 === X.tab && Wt(F[e]));
+  }
+  function visibleLiveIndexes() {
+    for (var e = [], t = 0; t < F.length; t++)
+      isVisibleLiveChannel(F[t]) && e.push(t);
+    return e;
+  }
+  function stepLiveChannel(dir) {
+    var visible = visibleLiveIndexes();
+    if (!visible || !visible.length) {
+      visible = [];
+      for (var i = 0; i < F.length; i++) visible.push(i);
+    }
+    if (!visible.length) return;
+    var pos = visible.indexOf(X.channel);
+    if (pos === -1) pos = 0;
+    var nextPos = (pos + dir + visible.length) % visible.length;
+    var target = visible[nextPos];
+    Kt(target, !0);
+    if ("home" === X.screen && 0 === X.tab) {
+      var row = Fe.filter(function (e) { return e._channel === target; })[0];
+      if (row) {
+        rt(row);
+        Jt();
+      }
+    }
+  }
+  function Yt(a) {
+    var i = t("app-toast");
+    i ||
+      (((i = e("div", "app-toast")).id = "app-toast"),
+        (t("app") || document.body).appendChild(i));
+    ((i.textContent = a),
+      (i.style.display = "block"),
+      (i.style.opacity = "1"),
+      Yt._timer && clearTimeout(Yt._timer),
+      (Yt._timer = setTimeout(function () {
+        ((i.style.opacity = "0"),
+          setTimeout(function () {
+            i.style.display = "none";
+          }, 300));
+      }, 3200)));
+  }
+  function Zt(i) {
+    ((Ft = i || {}), (Ut = !0));
+    var n = t("dialog-update");
+    if (n) {
+      n.classList.add("is-active");
+      var r = t("du-title");
+      r && (r.textContent = "Nueva versión disponible");
+      var o = t("du-version-subtitle");
+      o &&
+        (o.textContent =
+          "Versión " +
+          (i.latestVersion || "") +
+          (i.releaseDate ? " (" + i.releaseDate + ")" : ""));
+      var s = t("du-changelog");
+      s &&
+        (s.textContent =
+          i.changelog ||
+          "Mejoras de estabilidad, rendimiento y optimizaciones de catálogo.");
+      var l = t("du-status-container");
+      l && (l.style.display = "none");
+      var d = t("du-footer-actions");
+      if (d) {
+        a(d);
+        var c = e(
+          "button",
+          "du-btn du-btn-primary focusable",
+          "Instalar actualización"
+        );
+        ((c.id = "du-btn-update"),
+          (c._activate = function () {
+            !(function () {
+              if (!Ft || !Ft.ipkUrl) return;
+              zt = !0;
+              var i = t("du-status-container");
+              i && (i.style.display = "block");
+              var n = t("du-progress-bar"),
+                r = t("du-status-text"),
+                o = t("du-status-subtext"),
+                s = t("du-footer-actions");
+              s && a(s);
+              n && (n.style.width = "4%");
+              r && (r.textContent = "Iniciando descarga...");
+              o &&
+                (o.textContent =
+                  "Por favor no apagues la TV ni salgas de la aplicación.");
+              var l = p.serviceId || "com.webosflux.xuptertv.fidelity.service";
+              if (I() && window.PalmServiceBridge)
+                try {
+                  return void window.webOS.service.request("luna://" + l, {
+                    method: "applyUpdate",
+                    parameters: {
+                      ipkUrl: Ft.ipkUrl,
+                      sha256: Ft.sha256 || "",
+                      targetVersion: (Ft && (Ft.latestVersion || Ft.version)) || "",
+                      subscribe: !0
+                    },
+                    subscribe: !0,
+                    resubscribe: !1,
+                    onSuccess: function (e) {
+                      e &&
+                        (void 0 !== e.percent &&
+                          n &&
+                          (n.style.width =
+                            Math.min(100, Math.max(0, e.percent)) + "%"),
+                          e.message && r && (r.textContent = e.message),
+                          "success" === e.state &&
+                          (r &&
+                            (r.textContent =
+                              "Instalación completada. Reiniciando la app..."),
+                            n && (n.style.width = "100%"),
+                            setTimeout(function () {
+                              try {
+                                window.location.reload();
+                              } catch (e) { }
+                            }, 4e3)));
+                    },
+                    onFailure: function (t) {
+                      zt = !1;
+                      var i =
+                        (t && t.errorText) || "Error durante la instalación",
+                        n = i;
+                      if (
+                        (/denied|permission|not permitted|method.*not|no existe/i.test(
+                          String(i)
+                        ) &&
+                          (n =
+                            "El instalador de la TV está desactualizado. Desenchufa la TV 30 segundos, vuelve a abrir la app y busca la actualización de nuevo."),
+                          r && (r.textContent = "Error: " + n),
+                          o &&
+                          (o.textContent =
+                            "Comprueba tu red o intenta más tarde."),
+                          s)
+                      ) {
+                        a(s);
+                        var l = e(
+                          "button",
+                          "du-btn du-btn-secondary focusable",
+                          "Cerrar"
+                        );
+                        ((l._activate = function () {
+                          ea();
+                        }),
+                          s.appendChild(l),
+                          rt(l));
+                      }
+                    },
+                  });
+                } catch (e) {
+                  ((zt = !1),
+                    r && (r.textContent = "Error: " + (e && e.message)));
+                }
+              else if (
+                (r &&
+                  (r.textContent =
+                    "Modo simulador: actualizacion solo disponible en webOS"),
+                  (zt = !1),
+                  s)
+              ) {
+                var d = e(
+                  "button",
+                  "du-btn du-btn-secondary focusable",
+                  "Cerrar"
+                );
+                ((d._activate = function () {
+                  ea();
+                }),
+                  s.appendChild(d),
+                  rt(d));
+              }
+            })();
+          }));
+        var u = e("button", "du-btn du-btn-secondary focusable", "Más tarde");
+        ((u.id = "du-btn-later"),
+          (u._activate = function () {
+            ((Bt = !0), ea());
+          }),
+          d.appendChild(c),
+          d.appendChild(u));
+        if (window.DialogManager) {
+          window.DialogManager.open("updateDialog", n, {
+            returnFocus: X.focus,
+            initialFocus: c,
+            canClose: function () {
+              return !zt;
+            },
+            fallbackFocus: function () {
+              if ("home" === X.screen) {
+                var a = document.querySelector(".home-tab.is-selected");
+                if (a && at(a)) return a;
+                return firstFocusable();
+              } else if ("settings" === X.screen) {
+                var s = document.querySelector(".settings-item.is-selected");
+                if (s && at(s)) return s;
+                return firstFocusable();
+              }
+              return null;
+            },
+            onClose: function () {
+              Ut = !1;
+              if (n) n.classList.remove("is-active");
+            }
+          });
+        } else {
+          rt(c);
+        }
+      }
+    }
+  }
+  function ea(skipFocus) {
+    if (window.DialogManager && window.DialogManager.isOpen("updateDialog")) {
+      window.DialogManager.close("updateDialog", !!skipFocus);
+      return;
+    }
+    Ut = !1;
+    var e = t("dialog-update");
+    if (e) e.classList.remove("is-active");
+    if (!skipFocus) {
+      if ("home" === X.screen) {
+        var a = document.querySelector(".home-tab.is-selected");
+        if (a) rt(a);
+        else {
+          var i = firstFocusable();
+          i && rt(i);
+        }
+      } else if ("settings" === X.screen) {
+        var n = document.querySelector(".settings-item.is-selected");
+        if (n) rt(n);
+        else {
+          var r = firstFocusable();
+          r && rt(r);
+        }
+      }
+    }
+  }
+  var ta = ["https://" + BRAND_PROJECT + "/releases/latest/download/version.json"];
+  function aa(e) {
+    for (
+      var t = String(e || "")
+        .replace(/^[^\d]*/, "")
+        .split("."),
+      a = [],
+      i = 0;
+      i < t.length;
+      i++
+    )
+      a.push(parseInt(t[i], 10) || 0);
+    return a;
+  }
+  function ia(e, t) {
+    for (
+      var a = aa(e), i = aa(t), n = Math.max(a.length, i.length), r = 0;
+      r < n;
+      r++
+    ) {
+      var o = a[r] || 0,
+        s = i[r] || 0;
+      if (o !== s) return o > s ? 1 : -1;
+    }
+    return 0;
+  }
+  function na(e, t) {
+    if (e >= ta.length)
+      return t("No se pudo consultar el servidor de actualizaciones");
+    var a = new XMLHttpRequest(),
+      i = !1,
+      n = setTimeout(function () {
+        if (!i) {
+          i = !0;
+          try {
+            a.abort();
+          } catch (e) { }
+          na(e + 1, t);
+        }
+      }, 12e3);
+    function r() {
+      i || ((i = !0), clearTimeout(n), na(e + 1, t));
+    }
+    try {
+      (a.open("GET", ta[e] + "?t=" + Date.now(), !0),
+        (a.onreadystatechange = function () {
+          if (4 === a.readyState)
+            if (a.status < 200 || a.status >= 300) r();
+            else {
+              var e;
+              try {
+                e = JSON.parse(a.responseText);
+              } catch (e) {
+                return void r();
+              }
+              e && e.version
+                ? i || ((i = !0), clearTimeout(n), t(null, e))
+                : r();
+            }
+        }),
+        (a.onerror = r),
+        (a.ontimeout = r),
+        a.send(null));
+    } catch (e) {
+      r();
+    }
+  }
+  function ra(e, t) {
+    na(0, function (a, i) {
+      if (a) return t(a);
+      var n = i.version || "0.0.0";
+      t(null, {
+        updateAvailable: ia(n, e) > 0,
+        currentVersion: e,
+        latestVersion: n,
+        ipkUrl: i.ipkUrl || "",
+        sha256: i.sha256 || "",
+        changelog: i.changelog || "",
+        releaseDate: i.releaseDate || "",
+        viaFallback: !0,
+      });
+    });
+  }
+  function oa(e, t) {
+    var a = APP_VERSION;
+    function i(i) {
+      (t && t(null, i),
+        i && i.updateAvailable
+          ? (e && Bt) || Zt(i)
+          : e || Yt("Tienes la versión más reciente (v" + a + ")"));
+    }
+    P(
+      "checkUpdate",
+      { currentVersion: a },
+      function (n, r) {
+        if (!n) return i(r);
+        /denied|permission|not permitted|method|not exist|no existe|unknown|módulo|modulo|no carg|no disponible|no está disponible/i.test(
+          String(n || "")
+        )
+          ? ra(a, function (a, r) {
+            if (!a && r) return i(r);
+            (t && t(n, null),
+              e ||
+              Yt(
+                "El módulo de actualizaciones necesita reiniciarse: desenchufa la TV 30 segundos y vuelve a intentarlo."
+              ));
+          })
+          : (t && t(n, null),
+            e || Yt("No se pudo comprobar actualizaciones: " + n));
+      },
+      15e3
+    );
+  }
+  function sa(returnFocus) {
+    Ht = !0;
+    var e = t("dialog-addons");
+    if (e) {
+      var ret = returnFocus || X.focus;
+      e.classList.add("is-active");
+      da();
+      var a = t("da-btn-write-url") || t("da-custom-url") || e.querySelector(".focusable");
+      if (window.DialogManager) {
+        window.DialogManager.open("addons", e, {
+          returnFocus: ret,
+          initialFocus: a,
+          fallbackFocus: function () {
+            if (X.channelsOpen && Se) {
+              var btnAddons = Se.querySelector("#pc-btn-addons");
+              if (btnAddons && at(btnAddons)) return btnAddons;
+              if (Ce && at(Ce)) return Ce;
+            }
+            return null;
+          },
+          onClose: function () {
+            Ht = !1;
+            if (e) e.classList.remove("is-active");
+          }
+        });
+      } else {
+        a && rt(a);
+      }
+    }
+  }
+  function la() {
+    if (window.DialogManager && window.DialogManager.isOpen("addons")) {
+      window.DialogManager.close("addons");
+      return;
+    }
+    Ht = !1;
+    var e = t("dialog-addons");
+    if (e && (e.classList.remove("is-active"), X.channelsOpen)) {
+      var a = Se ? Se.querySelector("#pc-btn-addons") : null;
+      rt(a || Ce);
+    }
+  }
+  window.openAddonsDialog = sa;
+  window.closeAddonsDialog = la;
+  var urlKbCurrentText = "";
+  var urlKbCallback = null;
+  var urlKbDialogEl = null;
+
+  function updateUrlKbDisplay() {
+    var inp = t("url-kb-input");
+    if (inp) inp.value = urlKbCurrentText;
+  }
+
+  function initUrlKeyboard() {
+    var grid = t("url-kb-grid");
+    if (!grid || grid.children.length > 0) return;
+
+    var rows = [
+      ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "-", "_"],
+      ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "/", ":"],
+      ["a", "s", "d", "f", "g", "h", "j", "k", "l", ".", "?", "="],
+      ["z", "x", "c", "v", "b", "n", "m", "@", "#", "&", "%", "+"],
+      [
+        { label: "https://", val: "https://" },
+        { label: "http://", val: "http://" },
+        { label: ".m3u8", val: ".m3u8" },
+        { label: ".m3u", val: ".m3u" },
+        { label: ".com", val: ".com" },
+        { label: "Espacio", val: " ", cls: "url-kb-key-space" },
+        { label: "Borrar", action: "backspace", cls: "url-kb-key-del" },
+        { label: "Listo", action: "save", cls: "url-kb-key-done" }
+      ]
+    ];
+
+    for (var r = 0; r < rows.length; r++) {
+      var rowEl = e("div", "url-kb-row");
+      for (var c = 0; c < rows[r].length; c++) {
+        var item = rows[r][c];
+        var isObj = typeof item === "object";
+        var label = isObj ? item.label : item;
+        var val = isObj ? item.val : item;
+        var act = isObj ? item.action : null;
+        var extraCls = isObj && item.cls ? (" " + item.cls) : "";
+        var keyBtn = e("button", "url-kb-key focusable" + extraCls, label);
+
+        (function (keyVal, keyAction) {
+          keyBtn._activate = function () {
+            if (keyAction === "backspace") {
+              if (urlKbCurrentText.length > 0) {
+                urlKbCurrentText = urlKbCurrentText.slice(0, -1);
+                updateUrlKbDisplay();
+              }
+            } else if (keyAction === "save") {
+              closeUrlKeyboard(!0);
+            } else if (keyVal) {
+              urlKbCurrentText += keyVal;
+              updateUrlKbDisplay();
+            }
+          };
+          bindMagicActivate(keyBtn);
+        })(val, act);
+
+        rowEl.appendChild(keyBtn);
+      }
+      grid.appendChild(rowEl);
+    }
+
+    var btnBack = t("url-kb-btn-backspace");
+    if (btnBack) {
+      btnBack._activate = function () {
+        if (urlKbCurrentText.length > 0) {
+          urlKbCurrentText = urlKbCurrentText.slice(0, -1);
+          updateUrlKbDisplay();
+        }
+      };
+      bindMagicActivate(btnBack);
+    }
+    var btnClear = t("url-kb-btn-clear");
+    if (btnClear) {
+      btnClear._activate = function () {
+        urlKbCurrentText = "";
+        updateUrlKbDisplay();
+      };
+      bindMagicActivate(btnClear);
+    }
+    var btnSave = t("url-kb-btn-save");
+    if (btnSave) {
+      btnSave._activate = function () {
+        closeUrlKeyboard(!0);
+      };
+      bindMagicActivate(btnSave);
+    }
+    var btnCancel = t("url-kb-btn-cancel");
+    if (btnCancel) {
+      btnCancel._activate = function () {
+        closeUrlKeyboard(!1);
+      };
+      bindMagicActivate(btnCancel);
+    }
+  }
+
+  function openUrlKeyboard(initialValue, onSaveCallback) {
+    urlKbCurrentText = initialValue || "";
+    urlKbCallback = onSaveCallback;
+    urlKbDialogEl = t("dialog-url-kb");
+    initUrlKeyboard();
+    updateUrlKbDisplay();
+    if (urlKbDialogEl) {
+      urlKbDialogEl.classList.add("is-active");
+      var firstKey = urlKbDialogEl.querySelector(".url-kb-key");
+      if (window.DialogManager) {
+        window.DialogManager.open("urlKeyboard", urlKbDialogEl, {
+          returnFocus: X.focus,
+          initialFocus: firstKey,
+          onClose: function () {
+            if (urlKbDialogEl) urlKbDialogEl.classList.remove("is-active");
+          }
+        });
+      } else {
+        firstKey && rt(firstKey);
+      }
+    }
+  }
+
+  function closeUrlKeyboard(save) {
+    if (save && urlKbCallback) {
+      urlKbCallback(urlKbCurrentText);
+    }
+    if (window.DialogManager && window.DialogManager.isOpen("urlKeyboard")) {
+      window.DialogManager.close("urlKeyboard");
+    } else if (urlKbDialogEl) {
+      urlKbDialogEl.classList.remove("is-active");
+      var daInp = t("da-custom-url");
+      if (daInp) rt(daInp);
+    }
+  }
+  window.openUrlKeyboard = openUrlKeyboard;
+  window.closeUrlKeyboard = closeUrlKeyboard;
+
+  function da() {
+    for (
+      var i = t("da-presets-list"),
+      n = t("da-installed-list"),
+      r = _t(),
+      o = {},
+      s = 0;
+      s < r.length;
+      s++
+    )
+      o[r[s].id || r[s].url] = !0;
+    if (i) {
+      a(i);
+      for (var l = 0; l < Tt.length; l++)
+        (function (t) {
+          var a = e("div", "da-preset-item"),
+            n = e("div", "da-preset-info");
+          (n.appendChild(e("div", "da-preset-name", t.name)),
+            n.appendChild(e("div", "da-preset-desc", t.desc)),
+            a.appendChild(n));
+          var r = !!o[t.id || t.url],
+            s = e(
+              "button",
+              "da-preset-btn focusable" + (r ? " is-installed" : ""),
+              r ? "Instalado" : "+ Instalar"
+            );
+          ((s._activate = function () {
+            r ||
+              ((s.textContent = "Instalando…"),
+                ca(t, function (e, t) {
+                  e
+                    ? ((s.textContent = "Error"),
+                      setTimeout(function () {
+                        s.textContent = "+ Instalar";
+                      }, 2e3))
+                    : (da(), Mt && Mt.isAddon && $t());
+                }));
+          }),
+            bindMagicActivate(s),
+            a.appendChild(s),
+            i.appendChild(a));
+        })(Tt[l]);
+    }
+    if (n)
+      if ((a(n), r.length))
+        for (var d = 0; d < r.length; d++)
+          (function (t, a) {
+            var i = e("div", "da-installed-item"),
+              o = e("div", "da-installed-info"),
+              s = e("div", "da-preset-name", t.name),
+              l = e(
+                "div",
+                "da-preset-desc",
+                (t.count ? t.count + " canales • " : "") +
+                (t.url || "lista curada")
+              );
+            (o.appendChild(s), o.appendChild(l), i.appendChild(o));
+            var d = e("button", "da-del-btn focusable", "Eliminar");
+            ((d._activate = function () {
+              (r.splice(a, 1), kt(r), da(), Mt && Mt.isAddon && $t());
+            }),
+              bindMagicActivate(d),
+              i.appendChild(d),
+              n.appendChild(i));
+          })(r[d], d);
+      else
+        n.appendChild(
+          e(
+            "div",
+            "da-installed-empty",
+            "No hay addons personalizados instalados aún. Instala una lista recomendada arriba o escribe una URL."
+          )
+        );
+    var inpUrl = t("da-custom-url");
+    var btnWrite = t("da-btn-write-url");
+    var handleOpenKb = function () {
+      openUrlKeyboard(inpUrl ? (inpUrl.value || "") : "", function (newUrl) {
+        if (inpUrl) inpUrl.value = newUrl;
+        var btnAdd = t("da-btn-add-custom");
+        if (btnAdd) rt(btnAdd);
+      });
+    };
+    if (inpUrl) {
+      inpUrl._activate = handleOpenKb;
+      bindMagicActivate(inpUrl);
+    }
+    if (btnWrite) {
+      btnWrite._activate = handleOpenKb;
+      bindMagicActivate(btnWrite);
+    }
+    var c = t("da-btn-add-custom");
+    if (c) {
+      c._activate = function () {
+        var e = t("da-custom-url"),
+          a = e ? (e.value || "").trim() : "";
+        a && /^https?:\/\//i.test(a)
+          ? ((c.textContent = "Descargando…"),
+            ca(
+              {
+                id: "custom_" + Date.now(),
+                name: "Lista Personalizada",
+                url: a,
+              },
+              function (t, a) {
+                ((c.textContent = "Agregar"),
+                  t
+                    ? alert("No se pudo cargar la lista M3U: " + t)
+                    : (e && (e.value = ""), da(), Mt && Mt.isAddon && $t()));
+              }
+            ))
+          : alert("Por favor introduce una URL válida (http:// o https://)");
+      };
+      bindMagicActivate(c);
+    }
+    var p = t("da-btn-exit");
+    if (p) {
+      p._activate = function () {
+        la();
+      };
+      bindMagicActivate(p);
+    }
+  }
+  function ca(e, t) {
+    var curated = curatedAddonChannels(e);
+    if (curated && curated.length) {
+      /* Addon curado: no hay descarga. Se guarda su lista de señales para que
+         la migración de _t() no vuelva a sustituirlo por la lista pública. */
+      var list = _t(),
+        replaced = !1,
+        i;
+      for (i = 0; i < list.length; i++)
+        if (
+          list[i] &&
+          (list[i].id === e.id || (e.url && list[i].url === e.url))
+        ) {
+          list[i] = {
+            id: e.id || list[i].id,
+            name: e.name || list[i].name,
+            desc: e.desc || list[i].desc || "",
+            channels: e.channels,
+            count: curated.length,
+          };
+          replaced = !0;
+          break;
+        }
+      replaced ||
+        list.push({
+          id: e.id || "addon_" + Date.now(),
+          name: e.name || "Lista M3U",
+          desc: e.desc || "",
+          channels: e.channels,
+          count: curated.length,
+        });
+      (kt(list), t && t(null, curated.length));
+      return;
+    }
+    P("fetchM3u", { url: e.url }, function (a, i) {
+      var chans = i && i.channels ? addonFilterChannels(e, i.channels) : [];
+      if (!a && chans.length) {
+        for (var n = _t(), r = !1, o = 0; o < n.length; o++)
+          if (n[o].url === e.url) {
+            ((n[o].count = chans.length),
+              e.filter && (n[o].filter = e.filter),
+              (r = !0));
+            break;
+          }
+        (r ||
+          n.push({
+            id: e.id || "addon_" + Date.now(),
+            name: e.name || "Lista M3U",
+            url: e.url,
+            count: chans.length,
+            filter: e.filter || "",
+          }),
+          kt(n),
+          t && t(null, chans.length));
+      } else t && t(a || "No se encontraron canales en la lista");
+    });
+  }
+  var pa = {
+    bigW: 898,
+    bigH: 494,
+    bigY: 20,
+    smallW: 438,
+    smallH: 220,
+    smallY: 532,
+    bigX: [48, 974],
+    smallX: [48, 510, 972, 1434],
+  };
+  function ua(t, a, n, r, o, s) {
+    s = s || {};
+    var l = e("div", "bento focusable");
+    i(l, a, n, r, o);
+    var d = t ? t.landscape || t.poster : "";
+    if (d) {
+      var c = e("img", "bento-img");
+      (c.setAttribute("data-poster-src", d),
+        (c.onerror = function () {
+          if (
+            this.src &&
+            0 === this.src.indexOf("https://") &&
+            !this._httpFallback
+          )
+            return (
+              (this._httpFallback = !0),
+              void (this.src = this.src.replace("https://", "http://"))
+            );
+          this.style.display = "none";
+          if (l) l.classList.add("is-img-error");
+        }),
+        l.appendChild(c));
+    }
+    return (
+      s.shade && l.appendChild(e("div", "bento-shade")),
+      s.title && t && l.appendChild(e("div", "bento-title", t.title)),
+      s.badge && l.appendChild(e("div", "bento-badge", s.badge)),
+      (l._item = t),
+      t &&
+      (l._activate = function () {
+        ba(t);
+      }),
+      wt(),
+      l
+    );
+  }
+  function va(t, a, n, r) {
+    var o = e("div", "bento-dots");
+    i(o, t, a, 21 + 40 * Math.max(0, n - 1), 11);
+    for (var s = 0; s < n; s++)
+      o.appendChild(e("span", "bento-dot" + (s === r ? " is-active" : "")));
+    return o;
+  }
+  function fa(e, t, a) {
+    a = a || {};
+    var i = t;
+    if (i.length) {
+      var n;
+      var firstCard = null;
+      for (n = 0; n < 2 && n < i.length; n++) {
+        var bigCard = ua(i[n], pa.bigX[n], pa.bigY, pa.bigW, pa.bigH, {
+          shade: !1 !== a.shade,
+          title: a.titles,
+        });
+        if (0 === n) firstCard = bigCard;
+        e.appendChild(bigCard);
+      }
+      for (n = 0; n < 4 && n + 2 < i.length; n++)
+        e.appendChild(
+          ua(
+            i[n + 2],
+            pa.smallX[n],
+            pa.smallY,
+            pa.smallW,
+            pa.smallH,
+            { shade: true, title: true }
+          )
+        );
+      var pool = [i[0]].concat((a.pool || []).slice(i.length));
+      var dotCount = Math.min(a.dots || 0, pool.length);
+      var dotsContainer = dotCount > 1 ? va(848, 504, dotCount, 0) : null;
+      dotsContainer && e.appendChild(dotsContainer);
+
+      // Auto-rotación del carrusel bento (dots + tarjeta principal 01)
+      if (dotsContainer && firstCard) {
+        var dotElements = dotsContainer ? dotsContainer.querySelectorAll(".bento-dot") : [];
+        var currentDotIndex = 0;
+        var rotateTimer = setInterval(function () {
+          if (!document.body.contains(e) || !document.body.contains(firstCard)) {
+            clearInterval(rotateTimer);
+            return;
+          }
+          if (!e.classList.contains("is-current") || X.focus === firstCard) return;
+          currentDotIndex = (currentDotIndex + 1) % dotCount;
+          // Actualizar dots visuales
+          for (var d = 0; d < dotElements.length; d++) {
+            dotElements[d].classList.toggle("is-active", d === currentDotIndex);
+          }
+          // Cambiar item de la primera tarjeta
+          var nextItem = pool[currentDotIndex % pool.length];
+          if (nextItem) {
+            firstCard._item = nextItem;
+            firstCard._activate = function () { ba(nextItem); };
+            var imgEl = firstCard.querySelector(".bento-img");
+            var newSrc = nextItem.landscape || nextItem.poster || "";
+            if (imgEl && newSrc) {
+              imgEl.setAttribute("data-poster-src", newSrc);
+              imgEl._httpFallback = !1;
+              firstCard.classList.remove("is-img-error");
+              imgEl.src = newSrc;
+              imgEl.style.display = "";
+            }
+            var titleEl = firstCard.querySelector(".bento-title");
+            if (titleEl && nextItem.title) {
+              titleEl.textContent = nextItem.title;
+            }
+          }
+        }, 5000);
+      }
+    }
+  }
+  function catalogSection(item) {
+    var tags = o(item.category || "").split(/\s*,\s*/),
+      row = o(item.row || ""),
+      genres = o((item.genres || []).join(" ")),
+      title = o(item.title || ""),
+      type = o(item.type || ""),
+      kind = o(item.kind || ""),
+      episodic = type === "teleplay" || type === "series" || kind === "serie" ||
+        tags.indexOf("serie") !== -1 || tags.indexOf("series") !== -1 ||
+        !!((item.seasons && item.seasons.length) || (item.episodes && item.episodes.length > 1)),
+      movieZone = /^mz_/.test(item.id || "");
+
+    if (tags.indexOf("anime") !== -1 || /^mz_animes_/.test(item.id || "") ||
+        /\banime\b|dragon ball/.test(row + " " + genres)) return "anime";
+    if (episodic && (/^mz_novels_/.test(item.id || "") ||
+        /\b(telenovelas?|novelas?|soap|k-drama|drama coreano|series? turc[ao]s?|serie turquia)\b/.test(
+          tags.join(" ") + " " + row + " " + genres
+        ))) return "novels";
+    // MovieZone devuelve películas generales en el endpoint de respaldo de Infantil.
+    if ((!movieZone && (tags.indexOf("infantil") !== -1 || tags.indexOf("kids") !== -1)) ||
+        /\b(infantil|kids|ninos|preescolar|cartoon)\b/.test(row + " " + genres) ||
+        (/\b(family|familia|familiar)\b/.test(genres) && /\b(animation|animacion)\b/.test(genres)) ||
+        /\b(bluey|pocoyo|cocomelon|bebefinn|peppa|plim plim|patrulla canina|paw patrol|masha y el oso|dora la exploradora)\b/.test(title)) {
+      return "kids";
+    }
+    if (episodic) return "series";
+    if (type === "movie" || kind === "pelicula" || kind === "movie" ||
+        tags.indexOf("pelicula") !== -1 || tags.indexOf("movies") !== -1) return "movies";
+    return "";
+  }
+
+  function homeCatalogItems(section) {
+    var pool = l;
+    if (section === "featured") {
+      var featured = l.filter(function (item) {
+        return item && /(?:^|,)\s*(destacado|featured)\s*(?:,|$)/.test(o(item.category || ""));
+      });
+      return featured.length ? featured : pool;
+    }
+    var matches = pool.filter(function (item) {
+      return item && item.id && catalogSection(item) === section;
+    });
+    if (matches.length || !window.XUPERTV_PORTAL) return matches;
+    return m(window.XUPERTV_PORTAL).filter(function (item) {
+      return item && item.id && catalogSection(T(item, 0)) === section;
+    }).map(function (item, index) { return T(item, index + 1); });
+  }
+
+  function renderHomeCatalog(page, section, title, popular, fallback) {
+    var items = homeCatalogItems(section);
+    if (!items.length) {
+      var empty = e("div", "catalog-empty", "No hay títulos disponibles en " + title + ".");
+      i(empty, 48, 48, 1500, 80);
+      page.appendChild(empty);
+      return;
+    }
+    var heroPool = selectHeroItems(items, 10),
+      hero = heroPool.slice(0, 6),
+      hasPortal = !!(hero[0] && hero[0]._portal),
+      heroIds = {};
+    hero.forEach(function (item) { heroIds[item.id] = true; });
+    fa(page, hero, { titles: true, dots: 4, shade: hasPortal, pool: heroPool });
+    var remaining = items.filter(function (item) { return !heroIds[item.id]; });
+    if (remaining.length) {
+      ya(page, remaining, 860, {
+        sectionTitle: title,
+        catalogSection: section,
+        popularTitle: popular,
+        bentoItems: hero,
+        fallbackRow: fallback,
+      });
+    }
+  }
+  function ma(t, a, n, r) {
+    /* El camino alterno usaba hasta 120 pósteres a la vez. En TVs con poca
+       RAM eso acumulaba imágenes y nodos aunque los rieles principales ya
+       fueran ligeros. Usa exactamente el mismo riel de 10 + "Ver más". */
+    return ga(t, a, n, r || "Catálogo");
+  }
+  function ga(t, a, n, r, sectionInfo, sectionContext, categoryKey) {
+    if (!a || !a.length) return n;
+    var o = n || 772,
+      s = e("div", "kids-subtitle", r || "Catálogo");
+    (i(s, 48, o, 1824, 40), t.appendChild(s), (o += 54));
+    var l = e("div", "catalog-rail scrollable"),
+      d,
+      c;
+    i(l, 48, o, 1824, 380);
+    t.appendChild(l);
+    l.style.width = "1824px";
+    l.style.height = "380px";
+    l.style.position = "absolute";
+    l.style.overflowX = "auto";
+    l.style.overflowY = "hidden";
+    l.style.whiteSpace = "nowrap";
+    l.style.scrollbarWidth = "none";
+    l.style.webkitOverflowScrolling = "touch";
+    l.classList.add("catalog-rail");
+    l.style.minWidth = "1824px";
+    var isShort = a.length <= 4;
+    if (isShort) l.classList.add("is-short-rail");
+    /* Fila estilo XuperTV: hasta 10 tarjetas. En rieles cortos (<= 4 o <= MAX_RAIL sin seccion
+       externa), no crear tarjeta redundante "··· Ver mas" que repita los mismos titulos.
+       El retorno al primer elemento del riel se mantiene fluido estilo Netflix. */
+    var MAX_RAIL = 10,
+      hasMore = a.length > MAX_RAIL || !!(sectionInfo && sectionInfo.query),
+      total = Math.min(a.length, MAX_RAIL) + (hasMore ? 1 : 0),
+      revealRailCard = function (rail, card) {
+        if (!card) return;
+        var left = card.offsetLeft || 0,
+          width = card.offsetWidth || 244,
+          viewport = rail.clientWidth || 1824,
+          current = rail.scrollLeft || 0,
+          padding = 38,
+          next = current;
+        if (left < current + padding) next = Math.max(0, left - padding);
+        else if (left + width > current + viewport - padding)
+          next = Math.max(0, left + width - viewport + padding);
+        if (next !== current) {
+          smoothScroll(rail, next, null, 200);
+        }
+      },
+      focusRailCard = function (rail, card) {
+        revealRailCard(rail, card);
+        rt(card);
+      },
+      railMove = function (rail, idx) {
+        return function (dir) {
+          if ("right" === dir) {
+            if (idx < total - 1 && rail.children[idx + 1]) {
+              focusRailCard(rail, rail.children[idx + 1]);
+              return !0;
+            }
+            if (rail.children[0]) {
+              rail.scrollLeft = 0;
+              smoothScroll(rail, 0, null, 240);
+              focusRailCard(rail, rail.children[0]);
+              return !0;
+            }
+          } else if ("left" === dir) {
+            if (idx > 0 && rail.children[idx - 1]) {
+              focusRailCard(rail, rail.children[idx - 1]);
+              return !0;
+            }
+            if (Ue && Ue[X.tab]) {
+              rt(Ue[X.tab]);
+              return !0;
+            }
+          }
+          return !1;
+        };
+      };
+    d = Math.min(a.length, MAX_RAIL);
+    for (c = 0; c < d; c++) {
+      var poster = xt(a[c], 264 * c, 0, 244, 360, { gold: !0 });
+      poster._onMove = railMove(l, c);
+      poster._onFocus = (function (rail, card) {
+        return function () {
+          revealRailCard(rail, card);
+        };
+      })(l, poster);
+      l.appendChild(poster);
+    }
+    if (hasMore) {
+      var moreCard = e("div", "poster gold focusable see-more");
+      (i(moreCard, 264 * d, 0, 244, 360),
+        moreCard.appendChild(e("div", "see-more-dots", "···")),
+        moreCard.appendChild(e("div", "see-more-label", "Ver más")),
+        moreCard.appendChild(
+          e(
+            "div",
+            "see-more-count",
+            sectionInfo && sectionInfo.query ? "Explorar catálogo" : a.length + " títulos"
+          )
+        ),
+        (moreCard._activate = function () {
+          openCatalogSection(r, a, sectionInfo, sectionContext, categoryKey);
+        }),
+        (moreCard._onMove = railMove(l, d)),
+        (moreCard._onFocus = function () {
+          revealRailCard(l, moreCard);
+        }),
+        l.appendChild(moreCard));
+    }
+    return o + 360 + 35;
+  }
+
+  /* Carril de Continuar viendo (Watch History): muestra los contenidos en curso
+     con barra de progreso, tiempo o episodio, y reanudación a un clic. Cumple
+     con el contrato obligatorio de carrusel estilo Netflix (.catalog-rail y loop). */
+  function renderHistoryRail(t, historyList, startY) {
+    if (!historyList || !historyList.length) return startY;
+    var valid = [];
+    for (var h = 0; h < historyList.length && valid.length < 10; h++) {
+      var itm = historyList[h];
+      if (itm && itm.id && (itm.position >= 5 || itm.duration > 0)) {
+        valid.push(itm);
+      }
+    }
+    if (!valid.length) return startY;
+    var o = startY || 772,
+      s = e("div", "kids-subtitle", "Continuar viendo");
+    i(s, 48, o, 1824, 40);
+    t.appendChild(s);
+    o += 54;
+
+    var l = e("div", "catalog-rail scrollable");
+    i(l, 48, o, 1824, 380);
+    t.appendChild(l);
+    l.style.width = "1824px";
+    l.style.height = "380px";
+    l.style.position = "absolute";
+    l.style.overflowX = "auto";
+    l.style.overflowY = "hidden";
+    l.style.whiteSpace = "nowrap";
+    l.style.scrollbarWidth = "none";
+    l.style.webkitOverflowScrolling = "touch";
+    l.classList.add("catalog-rail");
+    l.style.minWidth = "1824px";
+    if (valid.length <= 4) l.classList.add("is-short-rail");
+
+    var hasMore = historyList.length > 10,
+      total = valid.length + (hasMore ? 1 : 0);
+
+    var revealRailCard = function (rail, card) {
+      if (!card) return;
+      var left = card.offsetLeft || 0,
+        width = card.offsetWidth || 244,
+        viewport = rail.clientWidth || 1824,
+        current = rail.scrollLeft || 0,
+        padding = 38,
+        next = current;
+      if (left < current + padding) next = Math.max(0, left - padding);
+      else if (left + width > current + viewport - padding)
+        next = Math.max(0, left + width - viewport + padding);
+      if (next !== current) smoothScroll(rail, next, null, 200);
+    };
+    var focusRailCard = function (rail, card) {
+      revealRailCard(rail, card);
+      rt(card);
+    };
+    var railMove = function (rail, idx) {
+      return function (dir) {
+        if ("right" === dir) {
+          if (idx < total - 1 && rail.children[idx + 1]) {
+            focusRailCard(rail, rail.children[idx + 1]);
+            return !0;
+          }
+          if (rail.children[0]) {
+            rail.scrollLeft = 0;
+            smoothScroll(rail, 0, null, 240);
+            focusRailCard(rail, rail.children[0]);
+            return !0;
+          }
+        } else if ("left" === dir) {
+          if (idx > 0 && rail.children[idx - 1]) {
+            focusRailCard(rail, rail.children[idx - 1]);
+            return !0;
+          }
+          if (Ue && Ue[X.tab]) {
+            rt(Ue[X.tab]);
+            return !0;
+          }
+        }
+        return !1;
+      };
+    };
+
+    for (var c = 0; c < valid.length; c++) {
+      var itemData = valid[c];
+      var card = e("div", "poster gold focusable history-rail-card");
+      i(card, 264 * c, 0, 244, 360);
+      if (itemData.poster) {
+        var img = e("img", "p-img");
+        img.setAttribute("data-poster-src", itemData.poster);
+        img.onerror = function () {
+          if (this.src && 0 === this.src.indexOf("https://") && !this._httpFallback) {
+            this._httpFallback = !0;
+            return void (this.src = this.src.replace("https://", "http://"));
+          }
+          this.style.display = "none";
+          if (card) card.classList.add("is-img-error");
+        };
+        card.appendChild(img);
+      }
+      card.appendChild(e("div", "p-shade"));
+      var titleText = itemData.title || "Contenido";
+      card.appendChild(e("div", "p-title", titleText));
+
+      var pct = 0;
+      if (itemData.duration > 0 && itemData.position > 0) {
+        pct = Math.min(100, Math.max(5, Math.round((itemData.position / itemData.duration) * 100)));
+      } else if (itemData.position > 0) {
+        pct = 25;
+      }
+      var progWrap = e("div", "history-rail-bar");
+      var progFill = e("div", "history-rail-fill");
+      progFill.style.width = (pct || 10) + "%";
+      progWrap.appendChild(progFill);
+      card.appendChild(progWrap);
+
+      var labelText = itemData.series
+        ? (itemData.episodeNumber ? "Ep. " + itemData.episodeNumber : "Episodio") + (itemData.position ? " · " + ai(itemData.position) : "")
+        : (itemData.position ? ai(itemData.position) : "");
+      if (labelText) {
+        card.appendChild(e("div", "history-rail-badge", labelText));
+      }
+
+      (function (savedItem) {
+        card._activate = function () {
+          cn(savedItem);
+        };
+      })(itemData);
+
+      card._onMove = railMove(l, c);
+      card._onFocus = (function (rail, cEl) {
+        return function () {
+          revealRailCard(rail, cEl);
+        };
+      })(l, card);
+      l.appendChild(card);
+    }
+
+    if (hasMore) {
+      var moreCard = e("div", "poster gold focusable see-more");
+      i(moreCard, 264 * valid.length, 0, 244, 360);
+      moreCard.appendChild(e("div", "see-more-dots", "···"));
+      moreCard.appendChild(e("div", "see-more-label", "Ver historial"));
+      moreCard.appendChild(e("div", "see-more-count", historyList.length + " títulos"));
+      moreCard._activate = function () {
+        We = "history";
+        Ha();
+        Ua(1, !0);
+      };
+      moreCard._onMove = railMove(l, valid.length);
+      moreCard._onFocus = function () {
+        revealRailCard(l, moreCard);
+      };
+      l.appendChild(moreCard);
+    }
+
+    return o + 360 + 35;
+  }
+
+  /* HUD de Telemetría ("Stats for Nerds"): overlay en vivo durante la reproducción
+     con métricas reales de buffer, Starfish readyState, frames descartados y DoH. */
+  var telemetryHudEl = null,
+    telemetryHudTimer = null;
+  function isTelemetryHudOpen() {
+    return !!telemetryHudEl;
+  }
+  function closeTelemetryHud() {
+    if (telemetryHudTimer) {
+      clearInterval(telemetryHudTimer);
+      telemetryHudTimer = null;
+    }
+    if (telemetryHudEl && telemetryHudEl.parentNode) {
+      telemetryHudEl.parentNode.removeChild(telemetryHudEl);
+    }
+    telemetryHudEl = null;
+  }
+  function updateTelemetryHudData() {
+    if (!telemetryHudEl) return;
+    try {
+      var title = (X.playerItem && (X.playerItem.title || X.playerItem.name)) ||
+        (F && F[X.channel] && F[X.channel].name) ||
+        X.playerTitle ||
+        "Emisión";
+      var epText = X.playerEpisode && (X.playerEpisode.number || X.playerEpisode.title)
+        ? " (Ep. " + (X.playerEpisode.number || X.playerEpisode.title) + ")"
+        : "";
+      var modeText = "live" === X.playerMode
+        ? "TV en Vivo (HLS)"
+        : ("smooth" === X.streamMode || "relay" === X.streamMode)
+          ? "Modo Fluido (fMP4 Relay 8787)"
+          : "Normal (Proxy Directo)";
+
+      var bufSec = 0;
+      if (xe && xe.buffered && xe.buffered.length > 0) {
+        var cur = Number(xe.currentTime) || 0;
+        var end = Number(xe.buffered.end(xe.buffered.length - 1)) || 0;
+        bufSec = Math.max(0, end - cur);
+      }
+
+      var dropped = 0;
+      if (xe) {
+        if (typeof xe.webkitDroppedFrameCount === "number") {
+          dropped = xe.webkitDroppedFrameCount;
+        } else if (xe.getVideoPlaybackQuality) {
+          var q = xe.getVideoPlaybackQuality();
+          dropped = (q && q.droppedVideoFrames) || 0;
+        }
+      }
+
+      var res = (xe && xe.videoWidth && xe.videoHeight)
+        ? (xe.videoWidth + "x" + xe.videoHeight)
+        : "Auto / En buffer";
+
+      var rStates = ["0 (Vacío)", "1 (Metadata)", "2 (Cuadro actual)", "3 (Suficiente)", "4 (Buffer lleno)"];
+      var rState = xe ? (rStates[xe.readyState] || xe.readyState) : "-";
+
+      var nStates = ["0 (Vacío)", "1 (Inactivo/OK)", "2 (Cargando datos)", "3 (Sin señal)"];
+      var nState = xe ? (nStates[xe.networkState] || xe.networkState) : "-";
+
+      var bufColor = bufSec >= 8 ? "#4ade80" : (bufSec >= 3 ? "#facc15" : "#f87171");
+
+      var html = '<div class="thud-header">' +
+        '<span class="thud-title">TELEMETRÍA DE ORBIVISTA</span>' +
+        '<span class="thud-close-hint">[Tecla Azul / Back: Cerrar]</span>' +
+        '</div>' +
+        '<div class="thud-body">' +
+        '<div class="thud-row"><span class="thud-label">Canal / Título:</span> <span class="thud-val thud-highlight">' + String(title + epText).slice(0, 42) + '</span></div>' +
+        '<div class="thud-row"><span class="thud-label">Modo reproducción:</span> <span class="thud-val">' + modeText + '</span></div>' +
+        '<div class="thud-row"><span class="thud-label">Resolución video:</span> <span class="thud-val">' + res + '</span></div>' +
+        '<div class="thud-row"><span class="thud-label">Buffer disponible:</span> <span class="thud-val" style="color:' + bufColor + '; font-weight:bold;">' + bufSec.toFixed(1) + ' seg</span></div>' +
+        '<div class="thud-row"><span class="thud-label">Frames descartados:</span> <span class="thud-val">' + dropped + '</span></div>' +
+        '<div class="thud-row"><span class="thud-label">ReadyState:</span> <span class="thud-val">' + rState + '</span></div>' +
+        '<div class="thud-row"><span class="thud-label">NetworkState:</span> <span class="thud-val">' + nState + '</span></div>' +
+        '<div class="thud-row"><span class="thud-label">Anti-Censura DNS:</span> <span class="thud-val" style="color:#38bdf8;">DoH Anycast Activo</span></div>' +
+        '</div>';
+      telemetryHudEl.innerHTML = html;
+    } catch (err) { }
+  }
+  function toggleTelemetryHud() {
+    if (telemetryHudEl) {
+      closeTelemetryHud();
+      return;
+    }
+    var playerScreen = t("screen-player");
+    if (!playerScreen) return;
+    telemetryHudEl = e("div", "telemetry-hud");
+    playerScreen.appendChild(telemetryHudEl);
+    updateTelemetryHudData();
+    telemetryHudTimer = setInterval(updateTelemetryHudData, 800);
+  }
+  var sectionCatalogCache = {},
+    sectionCatalogLoading = {},
+    sectionRequestId = 0;
+  function sectionInfoFor(title, source) {
+    var text = o(String(source || "") + " " + String(title || "")),
+      hit = /disney|netflix|hbo|prime|apple|paramount|hulu/.exec(text),
+      year = /\b20[0-9][0-9]\b/.exec(text),
+      scope = /serie|series/.test(text)
+        ? "series"
+        : /pelicula|peliculas|movie|movies/.test(text)
+          ? "movies"
+          : "";
+    if (hit) return { query: hit[0], scope: scope };
+    if (year) return { query: year[0], scope: scope };
+    if (/marvel/.test(text)) return { query: "marvel", scope: scope };
+    if (/dragon ball/.test(text)) return { query: "dragon ball", scope: scope };
+    return null;
+  }
+  function sectionMergeItems(base, extra, scope, section) {
+    var out = [],
+      seen = {},
+      add = function (list) {
+        for (var i = 0; list && i < list.length; i++) {
+          var item = list[i];
+          if (!item || !item.id || seen[item.id]) continue;
+          if (section && section !== "featured") {
+            if (catalogSection(T(item, i + 1)) !== section) continue;
+          } else {
+            if ("series" === scope && !x(item)) continue;
+            if ("movies" === scope && x(item)) continue;
+          }
+          seen[item.id] = !0;
+          out.push(item);
+        }
+      };
+    (add(base), add(extra));
+    return out;
+  }
+  function loadSectionCatalog(info, base, done) {
+    if (!info || !info.query) return done(base || []);
+    var key = info.query + ":" + (info.scope || "all") + ":" + (info.section || "all"),
+      cached = sectionCatalogCache[key];
+    if (cached) return done(cached);
+    if (sectionCatalogLoading[key])
+      return void sectionCatalogLoading[key].push(done);
+    sectionCatalogLoading[key] = [done];
+    var collected = [],
+      page = 1,
+      finish = function () {
+        var merged = sectionMergeItems(base || [], collected, info.scope, info.section);
+        sectionCatalogCache[key] = merged;
+        var waiters = sectionCatalogLoading[key] || [];
+        delete sectionCatalogLoading[key];
+        for (var w = 0; w < waiters.length; w++) waiters[w](merged);
+      },
+      next = function () {
+        if (page > 2) return finish();
+        P("search", { value: info.query, pageNum: page++ }, function (err, result) {
+          var list = !err && result && result.items ? result.items : [];
+          for (var i = 0; i < list.length; i++) collected.push(list[i]);
+          list.length ? setTimeout(next, 30) : finish();
+        });
+      };
+    next();
+  }
+  /* Explorador de catálogo estilo APK (destino de "Ver más" en cada categoría).
+     Sidebar izquierdo con Busca, Filtrar y todas las categorías de la sección.
+     Cabecera con migas de pan y contador de páginas.
+     Grid derecho de 5 columnas x 2 filas (10 pósteres por página con notas y CC). */
+  var currentSectionContext = null,
+    currentSectionCategory = "",
+    currentSectionPage = 0;
+
+  function openCatalogSection(title, items, info, context, categoryKey) {
+    var scr = t("screen-section");
+    if (!scr) return;
+    X.sectionReturn = X.focus;
+    if (!context || !context.categories || !context.categories.length) {
+      var defCat = categoryKey || title || "Todos";
+      var defMap = {};
+      defMap[defCat] = items || [];
+      context = {
+        sectionTitle: title || "Catálogo",
+        categories: [defCat],
+        categoryMap: defMap,
+        categoryTitles: {}
+      };
+    }
+    currentSectionContext = context;
+    currentSectionCategory = categoryKey || (context.categories && context.categories[0]) || title || "Todos";
+    if (!context.categoryMap[currentSectionCategory] && context.categories.length) {
+      currentSectionCategory = context.categories[0];
+    }
+    currentSectionPage = 0;
+
+    renderCatalogExplorer();
+
+    if (info && info.query) {
+      info = { query: info.query, scope: info.scope, section: context.catalogSection };
+      var requestId = ++sectionRequestId;
+      loadSectionCatalog(info, items || [], function (merged) {
+        if ("section" === X.screen && requestId === sectionRequestId && currentSectionContext) {
+          if (currentSectionContext.categoryMap[currentSectionCategory]) {
+            currentSectionContext.categoryMap[currentSectionCategory] = sectionMergeItems(
+              currentSectionContext.categoryMap[currentSectionCategory],
+              merged,
+              info.scope,
+              info.section
+            );
+            renderCatalogExplorer();
+          }
+        }
+      });
+    }
+  }
+
+  function renderCatalogExplorer() {
+    var scr = t("screen-section");
+    if (!scr) return;
+    var ctx = currentSectionContext;
+    if (!ctx) return;
+
+    var activeCat = currentSectionCategory;
+    var activeTitle = (ctx.categoryTitles && ctx.categoryTitles[activeCat]) || activeCat;
+    var secTitle = ctx.sectionTitle || "Catálogo";
+    var allItems = (ctx.categoryMap && ctx.categoryMap[activeCat]) || [];
+
+    var PAGE_SIZE = 10;
+    var totalPages = Math.max(1, Math.ceil(allItems.length / PAGE_SIZE));
+    currentSectionPage = Math.max(0, Math.min(totalPages - 1, currentSectionPage || 0));
+    var page = currentSectionPage;
+    var start = page * PAGE_SIZE;
+    var end = Math.min(allItems.length, start + PAGE_SIZE);
+    var pageItems = allItems.slice(start, end);
+
+    scr.innerHTML = "";
+
+    // 1. Cabecera superior: Migas de pan estilo APK
+    var breadcrumb = e("div", "section-breadcrumb", secTitle + " › " + activeTitle);
+    i(breadcrumb, 410, 30, 680, 54);
+    scr.appendChild(breadcrumb);
+
+    // Contador de páginas y títulos
+    var pageInfo = e(
+      "div",
+      "section-page-info",
+      (page + 1) + "/" + totalPages + " · " + allItems.length + " títulos"
+    );
+    i(pageInfo, 1100, 34, 250, 48);
+    scr.appendChild(pageInfo);
+
+    // Botones de paginación si hay más de 10 títulos (amplios y claros para control remoto)
+    var prevBtn = null, nextBtn = null;
+    if (page > 0) {
+      prevBtn = e("div", "section-page-btn focusable", "‹ Anterior");
+      i(prevBtn, 1365, 30, 165, 54);
+      prevBtn._activate = function () {
+        currentSectionPage--;
+        renderCatalogExplorer();
+      };
+      scr.appendChild(prevBtn);
+    }
+    if (page < totalPages - 1) {
+      nextBtn = e("div", "section-page-btn focusable", "Siguiente ›");
+      i(nextBtn, 1545, 30, 175, 54);
+      nextBtn._activate = function () {
+        currentSectionPage++;
+        renderCatalogExplorer();
+      };
+      scr.appendChild(nextBtn);
+    }
+
+    // Botón Volver
+    var backBtn = e("div", "section-back focusable", "‹ Volver");
+    i(backBtn, 1735, 30, 145, 54);
+    backBtn._activate = closeSection;
+    scr.appendChild(backBtn);
+
+    // 2. Sidebar lateral izquierdo (más ancho y con tipografía grande y legible para TV)
+    var sidebar = e("div", "section-sidebar");
+    i(sidebar, 40, 32, 340, 1010);
+    scr.appendChild(sidebar);
+
+    var searchBtn = e("div", "section-sidebar-btn focusable");
+    searchBtn.innerHTML = searchSvg() + "<span>Busca</span>";
+    searchBtn._activate = function () {
+      X.searchReturn = { screen: "section", focus: searchBtn };
+      La();
+    };
+    sidebar.appendChild(searchBtn);
+
+    var filterBtn = e("div", "section-sidebar-btn focusable");
+    filterBtn.innerHTML = filterSvg() + "<span>Filtrar</span>";
+    filterBtn._activate = function () {
+      openCatalogFilter(filterBtn);
+    };
+    sidebar.appendChild(filterBtn);
+
+    var divider = e("div", "section-sidebar-divider");
+    sidebar.appendChild(divider);
+
+    var catList = e("div", "section-cat-list");
+    catList.style.height = "860px";
+    sidebar.appendChild(catList);
+
+    var scrollCatIntoView = function (el) {
+      if (!el) return;
+      if (catList) {
+        var top = el.offsetTop || 0;
+        var listHeight = catList.clientHeight || 860;
+        smoothScroll(catList, null, Math.max(0, top - Math.floor(listHeight / 2) + 29), 180);
+      } else if (el.scrollIntoView) {
+        el.scrollIntoView(false);
+      }
+    };
+
+    var catElements = [];
+    var categories = ctx.categories || [];
+    var activeCatIndex = 0;
+
+    for (var c = 0; c < categories.length; c++) {
+      var catKey = categories[c];
+      var catLabel = (ctx.categoryTitles && ctx.categoryTitles[catKey]) || catKey;
+      var isSel = (catKey === activeCat);
+      if (isSel) activeCatIndex = c;
+      var catItem = e("div", "section-cat-item focusable" + (isSel ? " is-selected" : ""), catLabel);
+      catItem._catKey = catKey;
+      catItem._catIdx = c;
+      catElements.push(catItem);
+      catList.appendChild(catItem);
+    }
+
+    // 3. Grid derecho: 5 columnas x 2 filas
+    var grid = e("div", "section-grid");
+    i(grid, 410, 95, 1470, 950);
+    scr.appendChild(grid);
+
+    var cardElements = [];
+    if (!pageItems.length) {
+      var emptyMsg = e("div", "catalog-empty", "No hay títulos disponibles en esta categoría.");
+      i(emptyMsg, 0, 100, 1400, 60);
+      grid.appendChild(emptyMsg);
+    } else {
+      for (var k = 0; k < pageItems.length; k++) {
+        var it = pageItems[k];
+        var col = k % 5;
+        var row = Math.floor(k / 5);
+        var cardX = col * 300;
+        var cardY = row * 455;
+
+        var card = e("div", "section-explorer-card poster gold focusable");
+        i(card, cardX, cardY, 270, 420);
+        card._item = it;
+        card._index = k;
+        card._col = col;
+        card._row = row;
+
+        if (it.poster) {
+          var pImg = e("img", "p-img");
+          pImg.setAttribute("data-poster-src", it.poster);
+          pImg.onerror = function () {
+            if (this.src && 0 === this.src.indexOf("https://") && !this._httpFallback) {
+              this._httpFallback = !0;
+              this.src = this.src.replace("https://", "http://");
+              return;
+            }
+            this.style.display = "none";
+          };
+          card.appendChild(pImg);
+        }
+
+        card.appendChild(e("div", "p-shade"));
+
+        if (it.score && parseFloat(it.score) > 0) {
+          var scoreVal = parseFloat(it.score).toFixed(1);
+          card.appendChild(e("div", "section-badge-score", scoreVal));
+        }
+
+        card.appendChild(e("div", "section-badge-cc", "CC"));
+
+        var titleEl = e("div", "section-card-title", it.title || it.name || "Sin título");
+        card.appendChild(titleEl);
+
+        card._activate = (function (itemToOpen) {
+          return function () {
+            ba(itemToOpen);
+          };
+        })(it);
+
+        grid.appendChild(card);
+        cardElements.push(card);
+      }
+    }
+
+    // 4. Navegación remota completa entre sidebar, grid y botones
+    searchBtn._onMove = function (dir) {
+      if ("down" === dir) { rt(filterBtn); return !0; }
+      if ("right" === dir) {
+        if (cardElements[0]) { rt(cardElements[0]); return !0; }
+        if (backBtn) { rt(backBtn); return !0; }
+      }
+      return !1;
+    };
+
+    filterBtn._onMove = function (dir) {
+      if ("up" === dir) { rt(searchBtn); return !0; }
+      if ("down" === dir && catElements[0]) {
+        rt(catElements[0]);
+        scrollCatIntoView(catElements[0]);
+        return !0;
+      }
+      if ("right" === dir) {
+        if (cardElements[0]) { rt(cardElements[0]); return !0; }
+        if (backBtn) { rt(backBtn); return !0; }
+      }
+      return !1;
+    };
+
+    for (var ci = 0; ci < catElements.length; ci++) {
+      (function (idx, el) {
+        el._activate = function () {
+          currentSectionCategory = el._catKey;
+          currentSectionPage = 0;
+          renderCatalogExplorer();
+        };
+        el._onMove = function (dir) {
+          if ("up" === dir) {
+            if (idx > 0 && catElements[idx - 1]) {
+              rt(catElements[idx - 1]);
+              scrollCatIntoView(catElements[idx - 1]);
+              return !0;
+            }
+            rt(filterBtn);
+            return !0;
+          }
+          if ("down" === dir) {
+            if (idx < catElements.length - 1 && catElements[idx + 1]) {
+              rt(catElements[idx + 1]);
+              scrollCatIntoView(catElements[idx + 1]);
+              return !0;
+            }
+            return !0;
+          }
+          if ("right" === dir) {
+            if (cardElements[0]) {
+              rt(cardElements[0]);
+              return !0;
+            }
+            rt(backBtn);
+            return !0;
+          }
+          return !1;
+        };
+      })(ci, catElements[ci]);
+    }
+
+    for (var ki = 0; ki < cardElements.length; ki++) {
+      (function (idx, cardEl) {
+        cardEl._onMove = function (dir) {
+          var col = cardEl._col;
+          var row = cardEl._row;
+          if ("left" === dir) {
+            if (col > 0 && cardElements[idx - 1]) {
+              rt(cardElements[idx - 1]);
+              return !0;
+            }
+            var targetCat = catElements[activeCatIndex] || catElements[0];
+            if (targetCat) {
+              rt(targetCat);
+              scrollCatIntoView(targetCat);
+              return !0;
+            }
+            rt(searchBtn);
+            return !0;
+          }
+          if ("right" === dir) {
+            if (col < 4 && idx + 1 < cardElements.length) {
+              rt(cardElements[idx + 1]);
+              return !0;
+            }
+            return !0;
+          }
+          if ("up" === dir) {
+            if (row > 0 && cardElements[idx - 5]) {
+              rt(cardElements[idx - 5]);
+              return !0;
+            }
+            if (col >= 3) {
+              if (nextBtn) { rt(nextBtn); return !0; }
+              rt(backBtn);
+              return !0;
+            }
+            if (prevBtn) { rt(prevBtn); return !0; }
+            if (nextBtn) { rt(nextBtn); return !0; }
+            rt(backBtn);
+            return !0;
+          }
+          if ("down" === dir) {
+            if (row === 0 && cardElements[idx + 5]) {
+              rt(cardElements[idx + 5]);
+              return !0;
+            }
+            return !0;
+          }
+          return !1;
+        };
+      })(ki, cardElements[ki]);
+    }
+
+    backBtn._onMove = function (dir) {
+      if ("down" === dir) {
+        var cardTarget = cardElements[4] || cardElements[cardElements.length - 1] || cardElements[0];
+        if (cardTarget) { rt(cardTarget); return !0; }
+        rt(searchBtn);
+        return !0;
+      }
+      if ("left" === dir) {
+        if (nextBtn) { rt(nextBtn); return !0; }
+        if (prevBtn) { rt(prevBtn); return !0; }
+        rt(searchBtn);
+        return !0;
+      }
+      return !1;
+    };
+
+    if (prevBtn) {
+      prevBtn._onMove = function (dir) {
+        if ("down" === dir) {
+          var cardTarget = cardElements[2] || cardElements[0];
+          if (cardTarget) { rt(cardTarget); return !0; }
+        }
+        if ("right" === dir) { if (nextBtn) { rt(nextBtn); return !0; } rt(backBtn); return !0; }
+        if ("left" === dir) { rt(searchBtn); return !0; }
+        return !1;
+      };
+    }
+    if (nextBtn) {
+      nextBtn._onMove = function (dir) {
+        if ("down" === dir) {
+          var cardTarget = cardElements[3] || cardElements[0];
+          if (cardTarget) { rt(cardTarget); return !0; }
+        }
+        if ("right" === dir) { rt(backBtn); return !0; }
+        if ("left" === dir) { if (prevBtn) { rt(prevBtn); return !0; } rt(searchBtn); return !0; }
+        return !1;
+      };
+    }
+
+    if (catElements[activeCatIndex]) {
+      setTimeout(function () {
+        scrollCatIntoView(catElements[activeCatIndex]);
+      }, 50);
+    }
+
+    lt("section");
+    rt(cardElements[0] || catElements[activeCatIndex] || backBtn);
+    wt();
+  }
+
+  function closeSection() {
+    sectionRequestId++;
+    lt("home");
+    var r = X.sectionReturn;
+    if (r && r.classList.contains("filter") && !document.body.contains(r)) {
+      r = document.querySelector("#home-notify .notify-item.filter");
+    }
+    if (r && at(r)) rt(r);
+    else Ue[X.tab] && rt(Ue[X.tab]);
+  }
+
+  function ya(e, t, a, i) {
+    if (!t || !t.length) return a;
+    var n,
+      r,
+      o,
+      s,
+      l,
+      d,
+      c,
+      p,
+      u = a || 860,
+      v = {};
+    if ((i = i || {}).bentoItems && i.bentoItems.length)
+      for (n = 0; n < i.bentoItems.length; n++)
+        i.bentoItems[n] &&
+          i.bentoItems[n].id &&
+          (v[String(i.bentoItems[n].id)] = !0);
+    var popItems = [];
+    if (i.popularTitle) {
+      var f = t.slice().sort(function (e, t) {
+        var a = parseFloat(e && e.score) || 0;
+        return (parseFloat(t && t.score) || 0) - a;
+      }),
+        h = [];
+      for (r = 0; r < f.length && h.length < 40; r++) {
+        var m = f[r];
+        m && m.id && (h.push(m));
+      }
+      popItems = h;
+    }
+    var g = {},
+      y = [];
+    for (o = 0; o < t.length; o++) {
+      var b = t[o];
+      if (!b) continue;
+      var C = b.row ? String(b.row).trim() : "";
+      if (C && "all" !== C.toLowerCase() && "todas" !== C.toLowerCase() && "todos" !== C.toLowerCase()) {
+        if (!g[C]) {
+          g[C] = [];
+          y.push(C);
+        }
+        g[C].push(b);
+      }
+    }
+    var w = {
+      "2026 Peliculas teatrales": "Estrenos en cartelera",
+      2026: "Novedades 2026",
+      "Novedades 2025": "Novedades y estrenos 2025",
+      "Estrenos en cartelera": "Estrenos en cartelera",
+      "Máscara perfecta": "Máscara perfecta (Especial)",
+      "Asesino en serie": "Suspense y asesinos en serie",
+      "Películas TOP15 clasificadas": "Películas TOP 15",
+      "Dramas clasificados TOP15": "Series y dramas TOP 15",
+      "HBO Movie": "Películas HBO",
+      "Prime Video Movie": "Películas Prime Video",
+      "Apple TV+ Movie": "Películas Apple TV+",
+      "Paramount + Movie": "Películas Paramount+",
+      "Hulu Movie": "Películas Hulu",
+      "Netflix Movie": "Películas Netflix",
+      "Disney Movie": "Películas Disney",
+      "Netflix Series": "Series Netflix",
+      "Disney Series": "Series Disney",
+      "HBO Series": "Series HBO",
+      "Prime Video Series": "Series Prime Video",
+      "Apple TV+ Series": "Series Apple TV+",
+      "Paramount + Series": "Series Paramount+",
+      "Hulu Series": "Series Hulu",
+      "TV Series": "Series de televisión",
+      "Series de televisión": "Series de televisión",
+      "Serie Turquía": "Series turcas",
+      "Drama Coreano": "Dramas coreanos (K-Drama)",
+      Telenovelas: "Telenovelas populares",
+      "Vida familiar famosa": "Familias famosas y dramas",
+      Acción: "Acción y aventura",
+      Comedia: "Comedias destacadas",
+      Horror: "Terror y horror",
+      Drama: "Dramas y romance",
+      Dramas: "Dramas destacados",
+      Aventuras: "Aventura y acción",
+      "Ciencia ficción": "Ciencia ficción y fantasía",
+      Suspenso: "Suspense y misterio",
+      Crimen: "Crimen y policíaco",
+      Familia: "Películas en familia",
+      Fantastico: "Fantasía épica",
+      Romántico: "Romance y drama",
+      "Animación Clásica": "Animación clásica",
+      "Película de Animación": "Películas de animación",
+      "Serie de Animación": "Series animadas",
+      "Dragon Ball Collection": "Colección Dragon Ball",
+      "Colección de Marvel": "Colección Marvel",
+      "Coalition for DC": "Universo DC",
+      "Anime Asiático": "Anime asiático",
+      "Anime Europeo y Americano": "Anime internacional",
+      "Película de Anime": "Películas de anime",
+      "Serie de Anime": "Series de anime",
+    },
+      S = !1;
+
+    var secTitle = (i && i.sectionTitle) || "Catálogo";
+    var secCategories = [];
+    var secCategoryMap = {};
+    var secCategoryTitles = {};
+    for (var wk in w) secCategoryTitles[wk] = w[wk];
+
+    for (var yIdx = 0; yIdx < y.length; yIdx++) {
+      var cKey = y[yIdx];
+      secCategories.push(cKey);
+      secCategoryMap[cKey] = g[cKey] || [];
+    }
+    if (t && t.length) {
+      var allKey = "All";
+      if (secCategories.indexOf(allKey) === -1) {
+        secCategories.push(allKey);
+      }
+      secCategoryMap[allKey] = t;
+      secCategoryTitles[allKey] = "All";
+    }
+
+    var sectionCtx = {
+      sectionTitle: secTitle,
+      catalogSection: i.catalogSection,
+      categories: secCategories,
+      categoryMap: secCategoryMap,
+      categoryTitles: secCategoryTitles
+    };
+
+    if (i && i.sectionTitle === "Destacados" && Q && Q.history && Q.history.length) {
+      u = renderHistoryRail(e, Q.history, u);
+    }
+
+    if (popItems.length) {
+      u = ga(e, popItems, u, i.popularTitle, sectionInfoFor(i.popularTitle, ""), sectionCtx, i.popularTitle);
+    }
+
+    var maxRails = 12;
+    var railsCount = 0;
+    var fallbackList = [];
+    for (s = 0; s < y.length && railsCount < maxRails; s++) {
+      var x = y[s],
+        T = g[x];
+      if (T && T.length) {
+        if (T.length < 3) {
+          for (d = 0; d < T.length; d++) fallbackList.push(T[d]);
+        } else {
+          if (T.length) {
+            u = ga(e, T, u, w[x] || x, sectionInfoFor(w[x] || x, x), sectionCtx, x);
+            S = !0;
+            railsCount++;
+          }
+        }
+      }
+    }
+    if (fallbackList.length && railsCount < maxRails) {
+      var fallbackRail = [];
+      for (d = 0; d < fallbackList.length && fallbackRail.length < 60; d++) {
+        fallbackRail.push(fallbackList[d]);
+      }
+      if (fallbackRail.length) {
+        u = ga(e, fallbackRail, u, i.fallbackRow || "Más títulos del catálogo", null, sectionCtx, i.fallbackRow || "Más títulos");
+        S = !0;
+      }
+    }
+    if (!S) {
+      u = ma(e, t, u, i.defaultTitle || "Catálogo");
+    }
+    return u;
+  }
+  function ba(e) {
+    if (
+      ((X.resumePosition = 0),
+        (X.detail = e),
+        (X.detailReturn = { screen: X.screen, focus: X.focus }),
+        (X.detailRange = 0),
+        (X.detailSeason = 0),
+        (X.detailEpisode = null),
+        e.seasons && e.seasons.length)
+    )
+      for (var a = 0; a < e.seasons.length; a++)
+        if (e.seasons[a].id === e.id) {
+          X.detailSeason = a;
+          break;
+        }
+    (e.episodes && e.episodes.length && (X.detailEpisode = e.episodes[0]),
+      dn(e),
+      _n(),
+      xn(e),
+      Mn(e),
+      Ca(e),
+      lt("detail"),
+      Ce || lr());
+    zr();
+    var screenPlayer = t("screen-player");
+    screenPlayer && (screenPlayer.classList.remove("is-mini"), screenPlayer.classList.remove("is-active"));
+    var n = le ? le.querySelector(".focusable") : null;
+    if (!n && de) n = de.querySelector(".focusable");
+    (n && rt(n),
+      e._detailsLoaded
+        ? void 0
+        : U(e, function (item) {
+          item &&
+            "detail" === X.screen &&
+            X.detail === item &&
+            (dn(item), Ca(item));
+        }));
+  }
+  window.openMovieDetail = ba;
+  function getBaseSeriesTitle(t) {
+    if (!t) return "";
+    return t.replace(/\s*(?:T\d+|S\d+|Temporada\s*\d+|Season\s*\d+).*$/i, "").trim().toLowerCase();
+  }
+  function getRelatedItems(target, catalog, limit) {
+    limit = limit || 10;
+    if (!target || !catalog || !catalog.length) return [];
+    var baseT = getBaseSeriesTitle(target.title || "");
+    var targetGenres = [];
+    if (target.genres && target.genres.length) {
+      for (var i = 0; i < target.genres.length; i++) {
+        var gText = String(target.genres[i] || "").toLowerCase().trim();
+        gText && targetGenres.push(gText);
+      }
+    }
+    var targetCat = String(target.category || "").toLowerCase();
+    var targetCountry = String(target.country || "").toLowerCase().trim();
+    var isAnime = targetCat.indexOf("anime") >= 0 ||
+      targetGenres.indexOf("anime") >= 0 ||
+      /jap[oó]n|japan|tokyo/i.test(targetCountry);
+    var isTargetSeries = x(target);
+
+    var scored = [];
+    for (var j = 0; j < catalog.length; j++) {
+      var item = catalog[j];
+      if (!item || item.id === target.id) continue;
+      if (baseT && getBaseSeriesTitle(item.title || "") === baseT) continue;
+
+      var score = 0;
+      var cat = String(item.category || "").toLowerCase();
+      var itemGenres = [];
+      if (item.genres && item.genres.length) {
+        for (var k = 0; k < item.genres.length; k++) {
+          var ig = String(item.genres[k] || "").toLowerCase().trim();
+          ig && itemGenres.push(ig);
+        }
+      }
+      var itemCountry = String(item.country || "").toLowerCase().trim();
+      var isItemSeries = x(item);
+      var isItemAnime = cat.indexOf("anime") >= 0 ||
+        itemGenres.indexOf("anime") >= 0 ||
+        /jap[oó]n|japan|tokyo/i.test(itemCountry);
+
+      /* Si estamos viendo Anime: afinidad máxima hacia Anime y producciones japonesas/asiáticas */
+      if (isAnime) {
+        if (isItemAnime) {
+          score += 600;
+        } else if (itemGenres.indexOf("animación") >= 0 || itemGenres.indexOf("animation") >= 0) {
+          score -= 100;
+        } else {
+          score -= 800;
+        }
+      } else {
+        /* Fuera de anime, no mezclar anime si no corresponde */
+        if (isItemAnime) score -= 200;
+      }
+
+      /* Coincidencia de formato: Series con Series, Películas con Películas */
+      if (isTargetSeries === isItemSeries) {
+        score += 250;
+      } else {
+        score -= 250;
+      }
+
+      /* Coincidencia de país de origen */
+      if (targetCountry && itemCountry && (targetCountry.indexOf(itemCountry) >= 0 || itemCountry.indexOf(targetCountry) >= 0)) {
+        score += 150;
+      }
+
+      /* Coincidencia de géneros temáticos (Acción, Aventura, Fantasía, etc.) */
+      for (var g = 0; g < itemGenres.length; g++) {
+        if (targetGenres.indexOf(itemGenres[g]) >= 0) {
+          score += 90;
+        }
+      }
+
+      /* Bonificación por calificación */
+      var r = parseFloat(item.score) || 0;
+      score += r * 6;
+
+      if (score > 0) {
+        scored.push({ item: item, score: score });
+      }
+    }
+
+    scored.sort(function (a, b) { return b.score - a.score; });
+    var results = [];
+    var seen = {};
+    for (var m = 0; m < scored.length && results.length < limit; m++) {
+      var itm = scored[m].item;
+      if (!seen[itm.id]) {
+        seen[itm.id] = !0;
+        results.push(itm);
+      }
+    }
+    return results;
+  }
+  function hasDetailCredit(value) {
+    var text = String(value || "").replace(/^\s+|\s+$/g, ""),
+      normalized = o(text);
+    return !!(
+      text &&
+      "—" !== text &&
+      "-" !== text &&
+      "n/a" !== normalized &&
+      "sin datos" !== normalized
+    );
+  }
+  function restoreDetailFocus() {
+    if ("detail" !== X.screen) return;
+    var screen = t("screen-detail");
+    if (X.focus && screen && screen.contains(X.focus)) return;
+    /* Ca() reconstruye los botones del detalle; el foco anterior queda
+       desconectado y el control remoto parecía no responder al entrar por
+       primera vez a una serie. Se devuelve el foco al primer botón. */
+    var target = (le && le.querySelector(".focusable")) || null;
+    if (!target && de) target = de.querySelector(".focusable");
+    target && rt(target);
+  }
+  function Ca(n) {
+    if (X.channelsOpen || (Se && Se.classList.contains("is-active"))) {
+      ro();
+    }
+    ((oe = t("detail-left")),
+      (se = t("detail-player")),
+      (le = t("detail-buttons")),
+      (de = t("detail-bottom")),
+      a(oe),
+      a(le),
+      a(de),
+      a(se));
+
+    var playerBackdropUrl = n.landscape || n.poster || "";
+    var detScreen = t("screen-detail");
+    if (detScreen) {
+      if (playerBackdropUrl) {
+        detScreen.style.backgroundImage =
+          'radial-gradient(circle at 75% 25%, rgba(15,15,15,0.45) 0%, rgba(10,10,10,0.92) 65%, #0a0a0a 100%), linear-gradient(180deg, rgba(10,10,10,0.85) 0%, #0a0a0a 100%), url("' +
+          playerBackdropUrl +
+          '")';
+        detScreen.style.backgroundSize = "cover";
+        detScreen.style.backgroundPosition = "center right";
+      } else {
+        detScreen.style.backgroundImage = "none";
+        detScreen.style.backgroundColor = "#0a0a0a";
+      }
+    }
+
+    var r,
+      hasDirector = hasDetailCredit(n.director),
+      hasActors = hasDetailCredit(n.actors),
+      o = e("div", "detail-titlewrap");
+    o.appendChild(e("div", "detail-title", n.title));
+    if (n.score) {
+      var sc = e("div", "detail-score");
+      sc.innerHTML = '<span class="detail-score-star">' + starSvg(true) + '</span> ' + n.score;
+      o.appendChild(sc);
+    }
+    oe.appendChild(o);
+
+    var metaWrap = e("div", "detail-meta");
+    var metaYear = (n.year && "—" !== n.year) ? n.year : (n.releaseDate ? String(n.releaseDate).substring(0, 4) : "");
+    if (metaYear) {
+      metaWrap.appendChild(e("span", "detail-badge detail-badge-year", metaYear));
+    }
+    var metaDur = (n.duration && "—" !== n.duration) ? n.duration : "";
+    if (metaDur) {
+      var dBadge = e("span", "detail-badge detail-badge-duration");
+      dBadge.innerHTML = '<span class="detail-badge-icon">' + clockSvg() + '</span> ' + metaDur;
+      metaWrap.appendChild(dBadge);
+    }
+    var qBadge = e("span", "detail-badge detail-badge-quality", "4K UHD");
+    metaWrap.appendChild(qBadge);
+    if (n.country && "—" !== n.country) {
+      metaWrap.appendChild(e("span", "detail-badge detail-badge-country", n.country));
+    }
+    oe.appendChild(metaWrap);
+    if (n.tagline && "—" !== n.tagline && n.tagline !== n.title) {
+      oe.appendChild(e("div", "detail-tagline", n.tagline));
+    }
+
+    if (x(n)) {
+      var c = 0,
+        p = /S(\d+)/i.exec(n.alias || "") || /T(\d+)/i.exec(n.title || "");
+      if (
+        (p && (c = parseInt(p[1], 10) || 0),
+          !c && n.seasons && n.seasons.length)
+      ) {
+        var u = n.seasons[X.detailSeason] || n.seasons[0];
+        c = (u && u.number) || 1;
+      }
+      c || (c = 1);
+      var v =
+        n.updateCount || n.volumeCount || (n.episodes ? n.episodes.length : 0);
+      v && oe.appendChild(e("div", "detail-update", "Temporada " + c + "  ·  " + v + " Episodios"));
+    }
+
+    var f = e("div", "detail-genres");
+    for (var h = 0; h < (n.genres || []).length; h++) {
+      var m = e("div", "chip", n.genres[h]);
+      f.appendChild(m);
+    }
+    oe.appendChild(f);
+
+    var w = e("div", "detail-synopsis"),
+      synText = e("div", "text", n.synopsis || "Sin sinopsis disponible.");
+    w.appendChild(synText);
+    if (n.synopsis && n.synopsis.length > 120) {
+      var moreBtn = e("span", "detail-more focusable", "Más");
+      moreBtn._activate = function () {
+        var det = t("screen-detail");
+        if (!det) return;
+        var isOpen = !det.classList.contains("is-synopsis-open");
+        det.classList.toggle("is-synopsis-open", isOpen);
+        moreBtn.textContent = isOpen ? "Menos" : "Más";
+      };
+      w.appendChild(moreBtn);
+    }
+    oe.appendChild(w);
+
+    if (hasDirector || hasActors) {
+      var cred = e("div", "detail-credits-block");
+      if (hasDirector) {
+        var g = e("div", "detail-row");
+        g.appendChild(e("span", "label", "Director : "));
+        g.appendChild(e("span", "val", n.director));
+        cred.appendChild(g);
+      }
+      if (hasActors) {
+        var b = e("div", "detail-row");
+        b.appendChild(e("span", "label", "Reparto : "));
+        b.appendChild(e("span", "val", n.actors));
+        cred.appendChild(b);
+      }
+      oe.appendChild(cred);
+    }
+
+    /* Mini reproductor en pausa con imagen de la peli/serie y botón central para salir en grande */
+    if (se) {
+      a(se);
+      se.style.display = "";
+      se.className = "detail-player focusable";
+      var imgUrl = playerBackdropUrl || n.poster || "";
+      if (imgUrl) {
+        var posterImg = e("img", "detail-player-poster");
+        posterImg.src = imgUrl;
+        posterImg.alt = n.title || "";
+        se.appendChild(posterImg);
+      }
+      var playBtn = e("div", "detail-player-center-btn");
+      playBtn.innerHTML = '<span class="detail-player-icon">' + playSvg() + '</span><span class="detail-player-label">Ver en grande</span>';
+      se.appendChild(playBtn);
+
+      se._activate = function () {
+        Kr(n, X.detailEpisode);
+      };
+      se._onMove = function (dir) {
+        if ("left" === dir) {
+          var targetBtn = le ? (le.querySelector(".focusable.is-focused") || le.querySelector(".focusable:last-child") || le.querySelector(".focusable")) : null;
+          return targetBtn ? (rt(targetBtn), !0) : !1;
+        }
+        if ("down" === dir) {
+          var target = de ? (de.querySelector(".detail-season-btn.is-selected") || de.querySelector(".detail-season-btn") || de.querySelector(".detail-episode.is-playing") || de.querySelector(".detail-episode") || de.querySelector(".poster") || ot(de)) : null;
+          return target ? (rt(target), !0) : !1;
+        }
+        return !1;
+      };
+    }
+
+    var T = [
+      {
+        glyph: "play",
+        label: "Reproducir",
+        kind: "fullscreen",
+      },
+      {
+        glyph: "audio",
+        label: "Idioma",
+        kind: "language",
+      },
+      { glyph: "star", label: "Favorito", kind: "favorite" },
+    ];
+    x(n) &&
+      T.push({
+        glyph: "bell",
+        label: "Avisos",
+        kind: "subscribe",
+      });
+    var detailGlyph = function (kind) {
+      return "play" === kind
+        ? playSvg()
+        : "audio" === kind
+          ? subtitlesSvg()
+          : "star" === kind
+            ? starSvg(true)
+            : "bell" === kind
+              ? bellSvg()
+              : gaugeSvg();
+    };
+    for (var _ = 0; _ < T.length; _++) {
+      var k = e("div", "detail-btn focusable"),
+        iconWrap = e("span", "detail-btn-icon");
+      iconWrap.innerHTML = detailGlyph(T[_].glyph);
+      k.appendChild(iconWrap);
+      k.appendChild(e("span", "detail-btn-label", T[_].label));
+      k._kind = T[_].kind;
+      "favorite" === T[_].kind &&
+        X.favs[String(n.id)] &&
+        (k.classList.add("is-selected"),
+          (k.querySelector(".detail-btn-label").textContent = "En favoritos"));
+      (k._activate = (function (e, t) {
+        return function () {
+          if ("fullscreen" === e) Kr(t, X.detailEpisode);
+          else if ("language" === e) er(t);
+          else if ("favorite" === e) {
+            var a = Z(t);
+            this.classList.toggle("is-selected", a);
+            var i = this.querySelector(".detail-btn-label");
+            i && (i.textContent = a ? "En favoritos" : "Favorito");
+          } else if ("subscribe" === e) {
+            this.classList.toggle("is-selected");
+            var subLbl = this.querySelector(".detail-btn-label");
+            subLbl &&
+              (subLbl.textContent = this.classList.contains("is-selected")
+                ? "Avisos activos"
+                : "Avisos");
+          }
+        };
+      })(T[_].kind, n),
+        (k._onMove = function (dir) {
+          if ("down" === dir) {
+            var target = de ? (de.querySelector(".detail-season-btn.is-selected") || de.querySelector(".detail-season-btn") || de.querySelector(".detail-episode.is-playing") || de.querySelector(".detail-episode") || de.querySelector(".poster") || ot(de)) : null;
+            return target ? (rt(target), !0) : !1;
+          }
+          if ("right" === dir) {
+            var nextBtn = this.nextElementSibling;
+            if (nextBtn && nextBtn.classList.contains("focusable")) {
+              rt(nextBtn);
+              return !0;
+            }
+            if (se && se.classList.contains("focusable")) {
+              rt(se);
+              return !0;
+            }
+          }
+          if ("left" === dir) {
+            var prevBtn = this.previousElementSibling;
+            if (prevBtn && prevBtn.classList.contains("focusable")) {
+              rt(prevBtn);
+              return !0;
+            }
+          }
+          return !1;
+        }),
+        le.appendChild(k));
+    }
+    var M = e("div", "detail-btn detail-smooth-toggle focusable"),
+      smoothIcon = e("span", "detail-btn-icon");
+    smoothIcon.innerHTML = gaugeSvg();
+    M.appendChild(smoothIcon);
+    var E = e(
+      "span",
+      "detail-btn-label",
+      "smooth" === X.streamMode ? "Fluido: Sí" : "Fluido: No"
+    );
+    (M.appendChild(E),
+      (M._activate = function () {
+        (Tn(n, "smooth" !== X.streamMode),
+          (E.textContent =
+            "smooth" === X.streamMode ? "Fluido: Sí" : "Fluido: No"));
+      }),
+      (M._onMove = function (dir) {
+        if ("down" === dir) {
+          var target = de ? (de.querySelector(".detail-season-btn.is-selected") || de.querySelector(".detail-season-btn") || de.querySelector(".detail-episode.is-playing") || de.querySelector(".detail-episode") || de.querySelector(".poster") || ot(de)) : null;
+          return target ? (rt(target), !0) : !1;
+        }
+        if ("right" === dir) {
+          return se && se.classList.contains("focusable") ? (rt(se), !0) : !1;
+        }
+        if ("left" === dir) {
+          var prevBtn = this.previousElementSibling;
+          if (prevBtn && prevBtn.classList.contains("focusable")) {
+            rt(prevBtn);
+            return !0;
+          }
+        }
+        return !1;
+      }),
+      le.appendChild(M),
+      (function (t) {
+        var hasSeasonsList = (t.seasons && t.seasons.length > 1) || (t._catalogSeasons && t._catalogSeasons.length > 1);
+        var isMovie = !hasSeasonsList && ((1 === X.tab) || ("movie" === t.type) || ("película" === t.kind) || ("pelicula" === t.category));
+        var isSeries = hasSeasonsList || (!isMovie && x(t) && ((t.episodes && t.episodes.length > 1) || (t.seasons && t.seasons.length > 1)));
+        var a = isSeries && t.episodes ? t.episodes : [],
+          n = isSeries && a.length > 1,
+          r = wa(a.length);
+        X.detailRange >= r.length && (X.detailRange = 0);
+        var hasMultiSeasons = hasSeasonsList || (isSeries && t.seasons && t.seasons.length > 1);
+        var showRanges = !hasMultiSeasons && n && a.length > 20;
+        var rangesCont = null;
+        var seasonsRail = null;
+        if (hasMultiSeasons) {
+          if (!t.seasons || t.seasons.length < 2) {
+            t.seasons = t._catalogSeasons || t.seasons;
+          }
+          seasonsRail = e("div", "detail-seasons-rail scrollable");
+          for (var sIdx = 0; sIdx < t.seasons.length; sIdx++) {
+            (function (sNum) {
+              var sItem = t.seasons[sNum];
+              var sBtn = e(
+                "div",
+                "detail-season-btn focusable" +
+                (sNum === X.detailSeason ? " is-selected" : ""),
+                "Temporada " + (sItem.number || sNum + 1)
+              );
+              sBtn._seasonIdx = sNum;
+              sBtn._onFocus = function () {
+                if (seasonsRail) {
+                  var cLeft = seasonsRail.scrollLeft,
+                    cWidth = seasonsRail.clientWidth,
+                    oLeft = sBtn.offsetLeft,
+                    oWidth = sBtn.offsetWidth;
+                  if (oLeft < cLeft + 40) {
+                    smoothScroll(seasonsRail, Math.max(0, oLeft - 40), null, 180);
+                  } else if (oLeft + oWidth > cLeft + cWidth - 40) {
+                    smoothScroll(seasonsRail, oLeft + oWidth - cWidth + 40, null, 180);
+                  }
+                }
+              };
+              sBtn._activate = function () {
+                if (X.detailSeason !== sNum) {
+                  X.detailSeason = sNum;
+                  X.detailRange = 0;
+                  X.detailEpisode = null;
+                  jr("Cargando temporada…");
+                  P("detail", { contentId: sItem.id }, function (err, res) {
+                    if (!err && res && !1 !== res.returnValue) {
+                      var pSeasons = (t.seasons && t.seasons.length > 1) ? t.seasons : t._catalogSeasons;
+                      var pCat = t._catalogSeasons;
+                      res.item && H(t, res.item);
+                      if (pCat) t._catalogSeasons = pCat;
+                      if (pSeasons && pSeasons.length) {
+                        t.seasons = pSeasons;
+                        t.kind = "serie";
+                        t.type = "teleplay";
+                      }
+                      t.episodes = res.episodes || [];
+                      t.seasonId = sItem.id;
+                      sItem._episodes = t.episodes;
+                      X.detailEpisode = t.episodes[0] || null;
+                    }
+                    Ca(t);
+                    var newRail = de ? de.querySelector(".detail-seasons-rail") : null;
+                    var newBtn = newRail ? newRail.children[sNum] : null;
+                    newBtn && rt(newBtn);
+                  });
+                }
+              };
+              sBtn._onMove = function (dir) {
+                if ("left" === dir) {
+                  if (sNum > 0 && seasonsRail.children[sNum - 1]) {
+                    rt(seasonsRail.children[sNum - 1]);
+                    return !0;
+                  }
+                  return !0;
+                }
+                if ("right" === dir) {
+                  if (sNum < t.seasons.length - 1 && seasonsRail.children[sNum + 1]) {
+                    rt(seasonsRail.children[sNum + 1]);
+                    return !0;
+                  }
+                  return !0;
+                }
+                if ("down" === dir) {
+                  var ep = de ? (de.querySelector(".detail-episode.is-playing") || de.querySelector(".detail-episode")) : null;
+                  return ep ? (rt(ep), !0) : !0;
+                }
+                if ("up" === dir) {
+                  var dBtn = le ? le.querySelector(".detail-btn") : null;
+                  return dBtn ? (rt(dBtn), !0) : !0;
+                }
+                return !1;
+              };
+              seasonsRail.appendChild(sBtn);
+            })(sIdx);
+          }
+          de.appendChild(seasonsRail);
+        }
+        if (showRanges) {
+          rangesCont = e("div", "detail-ranges scrollable");
+          for (var c = 0; c < r.length; c++)
+            (function (rangeIdx) {
+              var rangeBtn = e(
+                "div",
+                "detail-range focusable" +
+                (rangeIdx === X.detailRange ? " is-selected" : ""),
+                r[rangeIdx].start + 1 + "-" + r[rangeIdx].end
+              );
+              rangeBtn._onFocus = function () {
+                if (rangesCont) {
+                  var cLeft = rangesCont.scrollLeft,
+                    cWidth = rangesCont.clientWidth,
+                    oLeft = rangeBtn.offsetLeft,
+                    oWidth = rangeBtn.offsetWidth;
+                  if (oLeft < cLeft + 40) {
+                    smoothScroll(rangesCont, Math.max(0, oLeft - 40), null, 180);
+                  } else if (oLeft + oWidth > cLeft + cWidth - 40) {
+                    smoothScroll(rangesCont, oLeft + oWidth - cWidth + 40, null, 180);
+                  }
+                }
+              };
+              rangeBtn._activate = function () {
+                Sa(rangeIdx, t);
+              };
+              rangeBtn._onMove = function (dir) {
+                if ("left" === dir) {
+                  if (rangeIdx > 0 && rangesCont.children[rangeIdx - 1]) {
+                    rt(rangesCont.children[rangeIdx - 1]);
+                    return !0;
+                  }
+                  return !0;
+                }
+                if ("right" === dir) {
+                  if (rangeIdx < r.length - 1 && rangesCont.children[rangeIdx + 1]) {
+                    rt(rangesCont.children[rangeIdx + 1]);
+                    return !0;
+                  }
+                  return !0;
+                }
+                if ("up" === dir) {
+                  var dBtn = le ? (le.querySelector(".detail-btn.is-focused") || le.querySelector(".detail-btn")) : null;
+                  return dBtn ? (rt(dBtn), !0) : !0;
+                }
+                if ("down" === dir) {
+                  var epCont = de ? de.querySelector(".detail-episodes") : null;
+                  var ep = epCont ? (epCont.querySelector(".detail-episode.is-playing") || epCont.children[0]) : null;
+                  return ep ? (rt(ep), !0) : !0;
+                }
+                return !1;
+              };
+              rangesCont.appendChild(rangeBtn);
+            })(c);
+          de.appendChild(rangesCont);
+        }
+        if (n) {
+          var p = showRanges ? (r[X.detailRange] || { start: 0, end: a.length }) : { start: 0, end: a.length };
+          var u = e("div", "detail-episodes scrollable");
+          for (var v = p.start; v < p.end; v++)
+            (function (epData, epRelIdx, epAbsIdx) {
+              var isPlaying = X.detailEpisode && (X.detailEpisode.id === epData.id || X.detailEpisode === epData);
+              var epTile = e(
+                "div",
+                "detail-episode focusable" + (isPlaying ? " is-playing" : "")
+              );
+              var epNum =
+                void 0 !== epData.number && null !== epData.number
+                  ? String(epData.number)
+                  : String(epAbsIdx + 1);
+              epTile.appendChild(e("span", "ep-num", epNum));
+              epTile._ep = epData;
+              epTile._activate = function () {
+                Kr(t, epData);
+              };
+              epTile._onFocus = function () {
+                if (u) {
+                  var cLeft = u.scrollLeft,
+                    cWidth = u.clientWidth,
+                    oLeft = epTile.offsetLeft,
+                    oWidth = epTile.offsetWidth;
+                  if (oLeft < cLeft + 40) {
+                    smoothScroll(u, Math.max(0, oLeft - 40), null, 180);
+                  } else if (oLeft + oWidth > cLeft + cWidth - 40) {
+                    smoothScroll(u, oLeft + oWidth - cWidth + 40, null, 180);
+                  }
+                }
+              };
+              epTile._onMove = function (dir) {
+                if ("left" === dir) {
+                  if (epRelIdx > 0 && u.children[epRelIdx - 1]) {
+                    rt(u.children[epRelIdx - 1]);
+                    return !0;
+                  }
+                  if (showRanges && X.detailRange > 0) {
+                    Sa(X.detailRange - 1, t);
+                    var prevU = de ? de.querySelector(".detail-episodes") : null;
+                    var lastChild = prevU ? prevU.children[prevU.children.length - 1] : null;
+                    if (lastChild) rt(lastChild);
+                    return !0;
+                  }
+                  return !0;
+                }
+                if ("right" === dir) {
+                  if (epRelIdx < (p.end - p.start - 1) && u.children[epRelIdx + 1]) {
+                    rt(u.children[epRelIdx + 1]);
+                    return !0;
+                  }
+                  if (showRanges && X.detailRange + 1 < r.length) {
+                    Sa(X.detailRange + 1, t);
+                    var nextU = de ? de.querySelector(".detail-episodes") : null;
+                    var firstChild = nextU ? nextU.children[0] : null;
+                    if (firstChild) rt(firstChild);
+                    return !0;
+                  }
+                  return !0;
+                }
+                if ("up" === dir) {
+                  if (showRanges) {
+                    var rCont = de ? de.querySelector(".detail-ranges") : null;
+                    var curRange = rCont ? (rCont.querySelector(".detail-range.is-selected") || rCont.children[X.detailRange] || rCont.children[0]) : null;
+                    if (curRange) return (rt(curRange), !0);
+                  }
+                  var seasonBtn = de ? (de.querySelector(".detail-season-btn.is-selected") || de.querySelector(".detail-season-btn") || de.querySelector(".detail-range.is-selected") || de.querySelector(".detail-range") || de.querySelector(".detail-season")) : null;
+                  if (seasonBtn) return (rt(seasonBtn), !0);
+                  var dBtn = le ? (le.querySelector(".detail-btn.is-focused") || le.querySelector(".detail-btn")) : null;
+                  return dBtn ? (rt(dBtn), !0) : !0;
+                }
+                if ("down" === dir) {
+                  var relGrid = de ? de.querySelector(".detail-grid") : null;
+                  var firstRel = relGrid ? (relGrid.querySelector(".poster") || ot(relGrid)) : null;
+                  return firstRel ? (rt(firstRel), !0) : !0;
+                }
+                return !1;
+              };
+              u.appendChild(epTile);
+            })(a[v], v - p.start, v);
+          de.appendChild(u);
+        }
+        /* En películas (sin episodios) se usan carátulas de 240x345 que aprovechan
+           todo el espacio vertical hasta el final; en series con episodios se adapta proporcionalmente. */
+        var pWidth = n ? 210 : 240;
+        var pHeight = n ? 295 : 345;
+        var cellH = n ? 370 : 450;
+        var compactCards = (pWidth <= 210);
+
+        var hasSeasonUi = hasMultiSeasons,
+          relTop = n ? (hasSeasonUi ? 136 : 76) : (hasSeasonUi ? 72 : 10),
+          relHeight = 36,
+          relFont = 30,
+          gridTop = relTop + 42;
+        var m = e("div", "detail-related", "Quizás te guste");
+        m.style.top = relTop + "px";
+        m.style.fontSize = relFont + "px";
+        m.style.height = relHeight + "px";
+        de.appendChild(m);
+
+        var g = e("div", "detail-grid scrollable");
+        g.style.top = gridTop + "px";
+        g.style.height = (cellH + 20) + "px";
+
+        var relList = getRelatedItems(t, l, 10);
+        for (var w = 0; w < relList.length; w++) {
+          var S = relList[w];
+          if (S) {
+            (function (relItem, relIdx) {
+              var T = e("div", "cell");
+              T.style.width = pWidth + "px";
+              T.style.height = cellH + "px";
+              var cardPoster = xt(relItem, 0, 0, pWidth, pHeight, { gold: !0 });
+              cardPoster._onFocus = function () {
+                if (g) {
+                  var cLeft = g.scrollLeft,
+                    cWidth = g.clientWidth,
+                    oLeft = T.offsetLeft,
+                    oWidth = T.offsetWidth;
+                  if (oLeft < cLeft + 40) {
+                    smoothScroll(g, Math.max(0, oLeft - 40), null, 180);
+                  } else if (oLeft + oWidth > cLeft + cWidth - 40) {
+                    smoothScroll(g, oLeft + oWidth - cWidth + 40, null, 180);
+                  }
+                }
+              };
+              cardPoster._onMove = function (dir) {
+                if ("up" === dir) {
+                  if (n) {
+                    var ep = de ? (de.querySelector(".detail-episode.is-playing") || de.querySelector(".detail-episode")) : null;
+                    if (ep) return (rt(ep), !0);
+                  } else {
+                    var dBtn = le ? (le.querySelector(".detail-btn.is-focused") || le.querySelector(".detail-btn")) : null;
+                    if (dBtn) return (rt(dBtn), !0);
+                  }
+                  return !0;
+                }
+                if ("down" === dir) {
+                  return !0;
+                }
+                if ("left" === dir) {
+                  if (relIdx > 0 && g.children[relIdx - 1]) {
+                    var prevP = g.children[relIdx - 1].querySelector(".poster");
+                    if (prevP) return (rt(prevP), !0);
+                  }
+                  return !0;
+                }
+                if ("right" === dir) {
+                  if (relIdx < relList.length - 1 && g.children[relIdx + 1]) {
+                    var nextP = g.children[relIdx + 1].querySelector(".poster");
+                    if (nextP) return (rt(nextP), !0);
+                  }
+                  return !0;
+                }
+                return !1;
+              };
+              T.appendChild(cardPoster);
+              var dName = e("div", "d-name", relItem.title);
+              dName.style.top = (pHeight + 6) + "px";
+              dName.style.height = compactCards ? "50px" : "64px";
+              dName.style.fontSize = compactCards ? "22px" : "23px";
+              dName.style.lineHeight = compactCards ? "25px" : "29px";
+              T.appendChild(dName);
+              g.appendChild(T);
+            })(S, w);
+          }
+        }
+        de.appendChild(g);
+      })(n));
+  }
+  function wa(e) {
+    for (var t = [], a = 0; a < e; a += 20)
+      t.push({ start: a, end: Math.min(e, a + 20) });
+    return t;
+  }
+  function Sa(e, t) {
+    ((X.detailRange = e), Ca(t));
+    var a = de.querySelector(".detail-range.is-selected");
+    a && rt(a);
+  }
+  var xa = null;
+  function Ta() {
+    if (DialogManager && DialogManager.isOpen("seasonPopup")) {
+      DialogManager.close("seasonPopup");
+      return;
+    }
+    if (xa && xa.parentNode) {
+      xa.parentNode.removeChild(xa);
+    }
+    xa = null;
+    var e = de ? de.querySelector(".season-arrow") : null;
+    e && e.classList.remove("is-open");
+  }
+  function toggleSeasonPopup(anchorBtn, item) {
+    if (DialogManager && DialogManager.isOpen("seasonPopup")) {
+      DialogManager.close("seasonPopup");
+      return;
+    }
+    if (xa) {
+      Ta();
+      return;
+    }
+    if (!item || !item.seasons || item.seasons.length < 2) return;
+
+    var arrow = anchorBtn ? anchorBtn.querySelector(".season-arrow") : null;
+    if (arrow) arrow.classList.add("is-open");
+
+    xa = e("div", "season-popup");
+    var popupHeight = Math.min(330, item.seasons.length * 54);
+    xa.style.position = "absolute";
+    xa.style.left = "80px";
+    xa.style.top = "100px";
+    xa.style.width = "280px";
+    xa.style.maxHeight = "330px";
+    xa.style.height = popupHeight + "px";
+
+    var selectedSeasonIdx = typeof X.detailSeason === "number" ? X.detailSeason : 0;
+    var initFocusElem = null;
+
+    for (var s = 0; s < item.seasons.length; s++) {
+      (function (sIndex) {
+        var sData = item.seasons[sIndex];
+        var isSelected = sIndex === selectedSeasonIdx;
+        var pItem = e(
+          "div",
+          "season-popup-item focusable" + (isSelected ? " is-selected" : "")
+        );
+        var sText = "Temporada " + (sData.number || sIndex + 1);
+        pItem.appendChild(e("span", "season-item-text", sText));
+
+        var check = e("img", "season-item-check");
+        check.src = "assets/original/vod/icon_nation_selected.png";
+        check.alt = "";
+        pItem.appendChild(check);
+
+        if (isSelected || (!initFocusElem && 0 === sIndex)) {
+          initFocusElem = pItem;
+        }
+
+        pItem._activate = function () {
+          Ta();
+          if (X.detailSeason !== sIndex) {
+            X.detailSeason = sIndex;
+            X.detailRange = 0;
+            X.detailEpisode = null;
+            jr("Cargando temporada…");
+            P("detail", { contentId: sData.id }, function (err, res) {
+              if (!err && res && !1 !== res.returnValue) {
+                var pSeasons = (item.seasons && item.seasons.length > 1) ? item.seasons : item._catalogSeasons;
+                var pCat = item._catalogSeasons;
+                res.item && H(item, res.item);
+                if (pCat) item._catalogSeasons = pCat;
+                if (pSeasons && pSeasons.length) {
+                  item.seasons = pSeasons;
+                  item.kind = "serie";
+                  item.type = "teleplay";
+                }
+                item.episodes = res.episodes || [];
+                item.seasonId = sData.id;
+                sData._episodes = item.episodes;
+                X.detailEpisode = item.episodes[0] || null;
+              }
+              Ca(item);
+            });
+          }
+        };
+
+        pItem._onMove = function (dir) {
+          if ("up" === dir) {
+            if (sIndex > 0 && xa.children[sIndex - 1]) {
+              rt(xa.children[sIndex - 1]);
+              return !0;
+            }
+            return !0;
+          }
+          if ("down" === dir) {
+            if (sIndex < item.seasons.length - 1 && xa.children[sIndex + 1]) {
+              rt(xa.children[sIndex + 1]);
+              return !0;
+            }
+            return !0;
+          }
+          if ("left" === dir || "right" === dir) {
+            return !0;
+          }
+          return !1;
+        };
+
+        xa.appendChild(pItem);
+      })(s);
+    }
+
+    if (de) de.appendChild(xa);
+    else document.body.appendChild(xa);
+
+    var returnTarget = anchorBtn || X.focus;
+
+    DialogManager.open("seasonPopup", xa, {
+      returnFocus: returnTarget,
+      initialFocus: initFocusElem,
+      onClose: function () {
+        if (xa && xa.parentNode) {
+          xa.parentNode.removeChild(xa);
+        }
+        xa = null;
+        var arr = de ? de.querySelector(".season-arrow") : null;
+        arr && arr.classList.remove("is-open");
+      }
+    });
+  }
+  window.toggleSeasonPopup = toggleSeasonPopup;
+  function _a() {
+    ((ce = t("search-keyboard")),
+      (pe = t("search-hot")),
+      (ue = t("search-results")),
+      (ve = t("search-empty")),
+      (fe = t("search-hot-grid")),
+      (he = t("search-result-grid")),
+      (ge = t("search-nav")),
+      a(ce),
+      a(fe),
+      a(he),
+      ue && ue.classList.add("scrollable"));
+    me = e("input", "kb-edit focusable");
+    me.type = "text";
+    me.id = "kb-edit-input";
+    me.placeholder = "Buscar películas, series, actores…";
+    me.autocomplete = "off";
+    me.spellcheck = !1;
+    me.readOnly = !0;
+    me.value = X.searchQuery || "";
+    me.oninput = function () {
+      Aa(me.value);
+    };
+    me.onchange = function () {
+      Aa(me.value);
+    };
+    me.onkeydown = function (e) {
+      var k = e.keyCode || e.which;
+      if (13 === k) {
+        try { me.blur(); } catch (err) { }
+        Pa();
+        var res = ot(he) || (t("search-suggestions") && ot(t("search-suggestions")));
+        if (res) rt(res);
+        e.preventDefault && e.preventDefault();
+      }
+    };
+    me._activate = function () {
+      rt(me);
+      if (X.searchQuery && X.searchQuery.trim().length > 0) {
+        Pa();
+        var res = ot(he) || (t("search-suggestions") && ot(t("search-suggestions")));
+        if (res) rt(res);
+      } else {
+        var firstKey = (Be && Be[0]) || (ce && ce.querySelector(".kb-action.focusable"));
+        if (firstKey) rt(firstKey);
+      }
+    };
+    me.onclick = function () {
+      return (me._activate(), !0);
+    };
+    me._onMove = function (dir) {
+      if ("down" === dir) {
+        var act = ce ? (ce.querySelector(".kb-action.focusable") || (Be && Be[0])) : null;
+        if (act) {
+          rt(act);
+          return !0;
+        }
+      }
+      if ("right" === dir) {
+        var rightTarget = (pe && pe.querySelector(".search-hot-refresh")) ||
+          (ue && ot(ue)) ||
+          (pe && ot(pe));
+        if (rightTarget) {
+          rt(rightTarget);
+          return !0;
+        }
+      }
+      return !1;
+    };
+    ce.appendChild(me);
+    for (
+      var i = e("div", "kb-actions"),
+      n = [
+        { cls: "switch", w: 100.5 },
+        { cls: "clear", w: 100.5 },
+        { cls: "del", w: 100.5 },
+        { cls: "go", w: 120 },
+      ],
+      r = 0;
+      r < n.length;
+      r++
+    ) {
+      var o = e("div", "kb-action focusable " + n[r].cls);
+      if ("go" === n[r].cls) {
+        o.textContent = "Busca";
+      } else {
+        var ico = e("div", "ico");
+        if ("switch" === n[r].cls) {
+          ico.className = "ico ico-switch";
+          ico.textContent = "123";
+        } else if ("clear" === n[r].cls) {
+          ico.innerHTML =
+            '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" stroke-width="2.6"/><path d="M11.5 11.5l9 9M20.5 11.5l-9 9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>';
+        } else {
+          ico.innerHTML =
+            '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M12 7h10a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H12L4.5 16.7a1 1 0 0 1 0-1.4z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M15 12.5l6 7M21 12.5l-6 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
+        }
+        o.appendChild(ico);
+      }
+      ((o.style.width = n[r].w + "px"),
+        (o._kind = n[r].cls),
+        (o._activate = (function (e) {
+          return function () {
+            "switch" === e
+              ? Ra()
+              : "clear" === e
+                ? Aa("")
+                : "del" === e
+                  ? Aa(X.searchQuery.slice(0, -1))
+                  : Pa();
+          };
+        })(n[r].cls)),
+        i.appendChild(o));
+    }
+    (ce.appendChild(i), (Be = []));
+    for (
+      var s = [
+        ["A", "Á", "B", "C", "D", "E", "É"],
+        ["F", "G", "H", "I", "Í", "J", "K"],
+        ["L", "M", "N", "Ñ", "O", "Ó", "P"],
+        ["Q", "R", "S", "T", "U", "Ú", "Ü"],
+        ["V", "W", "X", "Y", "Z", " "],
+      ],
+      l = 0;
+      l < s.length;
+      l++
+    ) {
+      var d = e("div", "kb-row");
+      d.style.top = 264 + 88.5 * l + "px";
+      for (var c = 0; c < s[l].length; c++) {
+        var p = e(
+          "div",
+          "kb-key focusable" + (" " === s[l][c] ? " space" : ""),
+          " " === s[l][c] ? "" : s[l][c]
+        );
+        ((p._char = s[l][c]),
+          (p._activate = (function (e) {
+            return function () {
+              Aa(X.searchQuery + e);
+            };
+          })(s[l][c])),
+          bindMagicActivate(p),
+          d.appendChild(p),
+          Be.push(p));
+      }
+      ce.appendChild(d);
+    }
+    var u = e("div", "kb-feedback focusable", "Feedback");
+    ((u._activate = function () { }),
+      bindMagicActivate(u),
+      ce.appendChild(u));
+    var hotRef = document.querySelector(".search-hot-refresh");
+    if (hotRef) {
+      hotRef.classList.add("focusable");
+      hotRef._activate = function () {
+        Ia();
+        Yt("Catálogo popular actualizado");
+      };
+      bindMagicActivate(hotRef);
+    }
+    (Ia(),
+      ue.classList.remove("is-active"),
+      ve.classList.remove("is-active"),
+      pe.classList.remove("is-hidden"),
+      Ea());
+  }
+  function ka(t, a) {
+    var n = e("div", "search-cell");
+    return (
+      i(n, (a % 5) * 246, 437 * Math.floor(a / 5), 246, 437),
+      n.appendChild(xt(t, 0, 0, 222, 329, { gold: !0 })),
+      n.appendChild(e("div", "s-name", t.title)),
+      n
+    );
+  }
+  function closeCatalogFilter(skipFocus) {
+    if (window.DialogManager && window.DialogManager.isOpen("catalogFilter")) {
+      window.DialogManager.close("catalogFilter", !!skipFocus);
+      return;
+    }
+    var e = catalogFilterDialog;
+    catalogFilterDialog = null;
+    if (e && e.parentNode) e.parentNode.removeChild(e);
+    var ret = catalogFilterReturn;
+    catalogFilterReturn = null;
+    if (!skipFocus) {
+      if (ret && at(ret)) {
+        rt(ret);
+      } else if (ret) {
+        rt(ret);
+      } else if ("section" === X.screen) {
+        var scr = t("screen-section");
+        if (scr) rt(scr.querySelector(".section-sidebar-btn") || scr);
+      }
+    }
+  }
+  var catalogFilterTypes = [
+    { id: "all", label: "Todo" },
+    { id: "movies", label: "Películas" },
+    { id: "series", label: "Series" },
+    { id: "kids", label: "Infantil" },
+    { id: "anime", label: "Anime" },
+    { id: "novels", label: "Novelas" },
+  ];
+  var currentCatalogFilter = null;
+
+  function catalogFilterValues(item, key) {
+    if (key === "year") return /^(19|20)\d{2}$/.test(item.year) ? [String(item.year)] : [];
+    return (item.genres || []).filter(function (value) {
+      return value && o(value) !== "sin clasificar" && !/^(19|20)\d{2}$/.test(value);
+    });
+  }
+
+  function catalogFilterResults(filter, except) {
+    var items = except === "type" || filter.type === "all" ? l : homeCatalogItems(filter.type);
+    return items.filter(function (item) {
+      if (!item) return false;
+      return ["genre", "year"].every(function (key) {
+        return key === except || !filter[key] || catalogFilterValues(item, key).some(function (value) {
+          return o(value) === o(filter[key]);
+        });
+      });
+    });
+  }
+
+  function applyCatalogFilter(filter, title) {
+    var results = catalogFilterResults(filter);
+    if (filter.sort === "title") results.sort(function (a, b) {
+      return o(a.title).localeCompare(o(b.title));
+    });
+    if (filter.sort === "year") results.sort(function (a, b) {
+      return (parseInt(b.year, 10) || 0) - (parseInt(a.year, 10) || 0);
+    });
+    if (filter.sort === "rating") results.sort(function (a, b) {
+      return (parseFloat(b.score) || 0) - (parseFloat(a.score) || 0);
+    });
+    currentCatalogFilter = filter;
+    var returnFocus = X.screen === "section" ? X.sectionReturn : catalogFilterReturn;
+    closeCatalogFilter(!0);
+    openCatalogSection(title, results);
+    if (returnFocus) X.sectionReturn = returnFocus;
+  }
+
+  function openCatalogFilter(returnFocus) {
+    if (catalogFilterDialog) return void closeCatalogFilter();
+    var defaults = { type: "all", genre: "", year: "", sort: "catalog" },
+      filter = Object.assign({}, currentCatalogFilter || defaults),
+      dialog = e("div", "catalog-filter-dialog"),
+      panel = e("div", "catalog-filter-card catalog-filter-refined"),
+      body = e("div", "catalog-filter-body"),
+      groups = e("div", "catalog-filter-groups"),
+      options = e("div", "catalog-filter-choices scrollable"),
+      footer = e("div", "catalog-filter-footer"),
+      count = e("div", "catalog-filter-count"),
+      fields = [
+        { id: "type", label: "Tipo", options: catalogFilterTypes },
+        { id: "genre", label: "Género" },
+        { id: "year", label: "Año" },
+        { id: "sort", label: "Orden", options: [
+          { id: "catalog", label: "Orden del catálogo" },
+          { id: "title", label: "Título (A–Z)" },
+          { id: "year", label: "Más recientes" },
+          { id: "rating", label: "Mejor puntuación" },
+        ] },
+      ],
+      groupButtons = [],
+      optionButtons = [],
+      active = 0;
+
+    function button(className, label, activate) {
+      var control = e("button", className + " focusable", label);
+      control.type = "button";
+      control._activate = activate;
+      bindMagicActivate(control);
+      return control;
+    }
+
+    function choices(field) {
+      if (field.options) return field.options;
+      var byKey = Object.create(null), key = field.id;
+      catalogFilterResults(filter, key).forEach(function (item) {
+        catalogFilterValues(item, key).forEach(function (value) { byKey[o(value)] = value; });
+      });
+      if (filter[key]) byKey[o(filter[key])] = filter[key];
+      var entries = Object.keys(byKey).sort(function (a, b) {
+        return key === "year" ? Number(b) - Number(a) : a.localeCompare(b);
+      }).map(function (value) { return { id: byKey[value], label: byKey[value] }; });
+      return [{ id: "", label: key === "year" ? "Cualquier año" : "Todos los géneros" }].concat(entries);
+    }
+
+    function valueLabel(field) {
+      var match = field.options && field.options.filter(function (option) {
+        return option.id === filter[field.id];
+      })[0];
+      return match ? match.label : filter[field.id] || (field.id === "year" ? "Cualquiera" : "Todos");
+    }
+
+    function refresh() {
+      fields.forEach(function (field, index) {
+        groupButtons[index].lastChild.textContent = valueLabel(field);
+        groupButtons[index].classList.toggle("is-selected", index === active);
+      });
+      var total = catalogFilterResults(filter).length;
+      count.textContent = total + (total === 1 ? " título" : " títulos");
+      a(options);
+      optionButtons = [];
+      choices(fields[active]).forEach(function (option, index) {
+        var selected = option.id === filter[fields[active].id];
+        var control = button("catalog-filter-choice", option.label, function () {
+          filter[fields[active].id] = option.id;
+          refresh();
+          rt(optionButtons[index] || optionButtons[0]);
+        });
+        control.classList.toggle("is-selected", selected);
+        control.setAttribute("aria-pressed", selected ? "true" : "false");
+        control._onMove = function (dir) {
+          if (dir === "left") rt(groupButtons[active]);
+          else if (dir === "up" && index > 0) rt(optionButtons[index - 1]);
+          else if (dir === "down") rt(optionButtons[index + 1] || apply);
+          return !0;
+        };
+        options.appendChild(control);
+        optionButtons.push(control);
+      });
+    }
+
+    function showChoices(index, enter) {
+      if (index !== active || !optionButtons.length) {
+        active = index;
+        options.scrollTop = 0;
+        refresh();
+      }
+      if (enter) rt(options.querySelector(".is-selected") || optionButtons[0]);
+    }
+
+    var reset = button("catalog-filter-footer-btn", "Limpiar", function () {
+      filter = Object.assign({}, defaults);
+      refresh();
+    });
+    var apply = button("catalog-filter-footer-btn primary", "Ver resultados", function () {
+      var labels = [filter.type === "all" ? "Catálogo" : valueLabel(fields[0]), filter.genre, filter.year];
+      applyCatalogFilter(filter, labels.filter(Boolean).join(" · "));
+    });
+    reset._onMove = function (dir) {
+      if (dir === "up") rt(groupButtons[active]);
+      else if (dir === "right") rt(apply);
+      return !0;
+    };
+    apply._onMove = function (dir) {
+      if (dir === "up") showChoices(active, !0);
+      else if (dir === "left") rt(reset);
+      return !0;
+    };
+
+    fields.forEach(function (field, index) {
+      var control = button("catalog-filter-group", field.label, function () { showChoices(index, !0); });
+      control.appendChild(e("span", "catalog-filter-group-value"));
+      control._onFocus = function () { showChoices(index, !1); };
+      control._onMove = function (dir) {
+        if (dir === "right") showChoices(index, !0);
+        else if (dir === "up" && index > 0) rt(groupButtons[index - 1]);
+        else if (dir === "down") rt(groupButtons[index + 1] || reset);
+        return !0;
+      };
+      groups.appendChild(control);
+      groupButtons.push(control);
+    });
+
+    count.setAttribute("aria-live", "polite");
+    footer.appendChild(count);
+    footer.appendChild(reset);
+    footer.appendChild(apply);
+    body.appendChild(groups);
+    body.appendChild(options);
+    panel.appendChild(e("div", "catalog-filter-title", "Filtrar catálogo"));
+    panel.appendChild(body);
+    panel.appendChild(footer);
+    dialog.appendChild(panel);
+    catalogFilterReturn = returnFocus || X.focus;
+    catalogFilterDialog = dialog;
+    (t("app") || document.body).appendChild(dialog);
+    refresh();
+    window.DialogManager.open("catalogFilter", dialog, {
+      returnFocus: catalogFilterReturn,
+      initialFocus: groupButtons[0],
+      onClose: function () {
+        if (dialog.parentNode) dialog.parentNode.removeChild(dialog);
+        catalogFilterDialog = null;
+        catalogFilterReturn = null;
+      },
+    });
+  }
+  function La() {
+    (ce || _a(), lt("search"), X.searchQuery || Ia(), rt(me));
+  }
+  function updateSearchSuggestions(query) {
+    var sugContainer = t("search-suggestions");
+    if (!sugContainer) return;
+    a(sugContainer);
+    if (!query || query.length < 2) {
+      sugContainer.classList.remove("is-active");
+      return;
+    }
+    var cleanQ = o(query.trim());
+    var matches = [];
+    var seenTitles = {};
+    for (var i = 0; i < l.length; i++) {
+      var itm = l[i];
+      if (!itm || !itm.title) continue;
+      var cleanTitle = o(itm.title);
+      var idx = cleanTitle.indexOf(cleanQ);
+      if (-1 !== idx) {
+        var baseKey = cleanTitle.replace(/[^a-z0-9]/g, "");
+        if (!seenTitles[baseKey]) {
+          seenTitles[baseKey] = !0;
+          var sScore = (0 === idx ? 100 : 50) + (parseFloat(itm.score) || 0) * 10;
+          matches.push({ title: itm.title, score: sScore });
+        }
+      }
+    }
+    matches.sort(function (a, b) {
+      return b.score - a.score;
+    });
+    var topSuggestions = matches.slice(0, 5);
+    if (0 === topSuggestions.length) {
+      sugContainer.classList.remove("is-active");
+      return;
+    }
+    sugContainer.classList.add("is-active");
+    var lbl = e("span", "search-sug-label", "Sugerencias:");
+    sugContainer.appendChild(lbl);
+    for (var s = 0; s < topSuggestions.length; s++) {
+      (function (sugTitle) {
+        var chip = e("button", "search-sug-chip focusable", sugTitle);
+        chip._activate = function () {
+          Aa(sugTitle);
+        };
+        bindMagicActivate(chip);
+        sugContainer.appendChild(chip);
+      })(topSuggestions[s].title);
+    }
+  }
+  function Ma() {
+    var scored = [];
+    var seen = {};
+    for (var i = 0; i < l.length; i++) {
+      var itm = l[i];
+      if (!itm || !itm.title || seen[itm.id]) continue;
+      seen[itm.id] = !0;
+      var pScore = 0;
+      var row = (String(itm.category || "") + " " + String(itm.kind || "")).toLowerCase();
+      if (/top|clasificad|popular|ranking|destacad/i.test(row)) pScore += 140;
+      if (/estreno|teatral|cartelera|novedad/i.test(row)) pScore += 120;
+      if (/2026/.test(row) || "2026" === String(itm.year)) pScore += 90;
+      if (/2025/.test(row) || "2025" === String(itm.year)) pScore += 60;
+      if (/netflix|hbo|disney|prime|apple|paramount/i.test(row)) pScore += 40;
+      var numScore = parseFloat(itm.score) || 0;
+      pScore += numScore * 15;
+      var y = parseInt(itm.year, 10) || 0;
+      if (y > 2000) pScore += (y - 2000) * 2;
+      scored.push({ item: itm, score: pScore });
+    }
+    scored.sort(function (a, b) {
+      return b.score - a.score;
+    });
+    var res = [];
+    var titleSeen = {};
+    for (var k = 0; k < scored.length && res.length < 10; k++) {
+      var base = scored[k].item.title.toLowerCase().replace(/[^a-z0-9]/g, "");
+      if (!titleSeen[base]) {
+        titleSeen[base] = !0;
+        res.push(scored[k].item);
+      }
+    }
+    return res.length ? res : l.slice(0, 10);
+  }
+  function Ia() {
+    if (fe && !X.searchQuery) {
+      a(fe);
+      for (var e = Ma(), t = 0; t < e.length; t++) fe.appendChild(ka(e[t], t));
+      wt();
+    }
+  }
+  function Ea() {
+    if (me) {
+      if ("INPUT" === me.tagName) {
+        if (me.value !== (X.searchQuery || "")) {
+          me.value = X.searchQuery || "";
+        }
+      } else {
+        X.searchQuery
+          ? ((me.textContent = X.searchQuery),
+            me.classList.remove("is-placeholder"))
+          : ((me.textContent = "Buscar películas, series…"),
+            me.classList.add("is-placeholder"));
+      }
+    }
+  }
+  function Aa(e) {
+    ((X.searchQuery = e), Ea(), Pa());
+  }
+  function Da() {
+    try { if (me && me.blur) me.blur(); } catch (err) { }
+    try { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); } catch (err) { }
+    (X.searchTimer && (clearTimeout(X.searchTimer), (X.searchTimer = null)),
+      (X.searchQuery = ""),
+      Ea(),
+      updateSearchSuggestions(""),
+      he && a(he),
+      (X.searchMatches = []),
+      (X.searchPage = 0),
+      ge && (ge.textContent = ""),
+      ue && ue.classList.remove("is-active"),
+      ve && ve.classList.remove("is-active"),
+      pe && pe.classList.remove("is-hidden"));
+  }
+  function Pa() {
+    var e = X.searchQuery || "",
+      t = o(e.trim());
+    if (t) {
+      updateSearchSuggestions(e.trim());
+      var scoredMatches = [];
+      var seenIds = {};
+      for (var i = 0; i < l.length; i++) {
+        var itm = l[i];
+        if (!itm || !itm.id || seenIds[itm.id]) continue;
+        var title = o(itm.title || ""),
+          alias = itm.alias ? o(itm.alias) : "";
+        var matchScore = 0;
+        if (title === t) {
+          matchScore += 2000;
+        } else if (0 === title.indexOf(t)) {
+          matchScore += 1000;
+        } else {
+          var wordIdx = title.indexOf(" " + t);
+          if (-1 !== wordIdx) {
+            matchScore += 500;
+          } else if (-1 !== title.indexOf(t)) {
+            matchScore += 250;
+          } else if (alias && -1 !== alias.indexOf(t)) {
+            matchScore += 150;
+          }
+        }
+        if (matchScore > 0) {
+          seenIds[itm.id] = !0;
+          var numScore = parseFloat(itm.score) || 0;
+          matchScore += numScore * 15;
+          var y = parseInt(itm.year, 10) || 0;
+          if (y > 2000) matchScore += (y - 2000) * 2;
+          var catKind = (String(itm.category || "") + " " + String(itm.kind || "")).toLowerCase();
+          if (/top|destacad|estreno|popular|cartelera/i.test(catKind)) matchScore += 100;
+          if (/netflix|hbo|disney|prime|apple|paramount/i.test(catKind)) matchScore += 50;
+          scoredMatches.push({ item: itm, score: matchScore });
+        }
+      }
+      scoredMatches.sort(function (a, b) {
+        return b.score - a.score;
+      });
+      var a = [];
+      for (var k = 0; k < scoredMatches.length; k++) {
+        a.push(scoredMatches[k].item);
+      }
+      if (
+        (qa(a),
+          X.searchTimer && clearTimeout(X.searchTimer),
+          "portal" === p.mode && t.length >= 2)
+      ) {
+        var s = ++X.searchSeq;
+        X.searchTimer = setTimeout(function () {
+          P("search", { value: e.trim() }, function (e, t) {
+            if (
+              s === X.searchSeq &&
+              !e &&
+              t &&
+              !1 !== t.returnValue &&
+              t.items &&
+              t.items.length
+            ) {
+              for (var i = a.slice(), n = {}, r = 0; r < i.length; r++)
+                n[String(i[r].id)] = !0;
+              for (var o = 0; o < t.items.length; o++) {
+                var l = T(t.items[o], i.length + 1);
+                n[String(l.id)] || ((n[String(l.id)] = !0), i.push(l));
+              }
+              qa(i);
+            }
+          });
+        }, 350);
+      }
+    } else {
+      updateSearchSuggestions("");
+      Da();
+    }
+  }
+  var Oa = 10;
+  function qa(e) {
+    ((X.searchMatches = e || []), (X.searchPage = 0), Na(0, -1));
+  }
+  function Na(e, t) {
+    var i = X.searchMatches || [];
+    if (
+      (pe.classList.add("is-hidden"),
+        ue.classList.add("is-active"),
+        a(he),
+        0 === i.length)
+    )
+      return (
+        ve.classList.add("is-active"),
+        void (ge && (ge.textContent = ""))
+      );
+    ve.classList.remove("is-active");
+    var r = Math.ceil(i.length / Oa),
+      o = Math.max(0, Math.min(r - 1, e || 0));
+    X.searchPage = o;
+    var s = o * Oa,
+      l = Math.min(i.length, s + Oa);
+    ge &&
+      (ge.textContent =
+        "Resultados " +
+        (s + 1) +
+        "-" +
+        l +
+        " de " +
+        i.length +
+        (r > 1 ? "  ·  Página " + (o + 1) + "/" + r : ""));
+    for (var d = s; d < l; d++) {
+      var c = d - s,
+        p = ka(T(i[d], d + 1), c),
+        u = p.querySelector(".poster");
+      (u &&
+        (function (e, t) {
+          u._onMove = function (a) {
+            return "down" === a && e >= 5 && l < i.length
+              ? (Na(o + 1, t), !0)
+              : "up" === a && e < 5 && s > 0 && (Na(o - 1, 5 + t), !0);
+          };
+        })(c, c % 5),
+        he.appendChild(p));
+    }
+    if (((he.style.height = "874px"), t >= 0)) {
+      var v = he.querySelectorAll(".poster.focusable")[t];
+      (v || (v = ot(he)), v && rt(v));
+    } else if (
+      "search" === X.screen &&
+      (n(X.focus, ".search-hot") || n(X.focus, ".search-results"))
+    ) {
+      var f = ot(he);
+      f && rt(f);
+    }
+  }
+  function Ra() {
+    X.searchNumeric = !X.searchNumeric;
+    var t = ce.querySelector(".kb-action.switch .ico");
+    t &&
+      (t.className = "ico ico-switch",
+        (t.textContent = X.searchNumeric ? "ABC" : "123"));
+    var a = ce.querySelectorAll(".kb-row:not(.kb-row-num)");
+    if (X.searchNumeric) {
+      for (var i = 0; i < a.length; i++) a[i].classList.add("hidden");
+      if (!ce.querySelector(".kb-row-num"))
+        for (
+          var n = [
+            ["1", "2", "3", "4", "5", "6", "7"],
+            ["8", "9", "0", " "],
+          ],
+          r = 0;
+          r < n.length;
+          r++
+        ) {
+          var o = e("div", "kb-row kb-row-num");
+          o.style.top = 264 + 88.5 * r + "px";
+          for (var s = 0; s < n[r].length; s++) {
+            var l = e(
+              "div",
+              "kb-key focusable" + (" " === n[r][s] ? " space" : ""),
+              " " === n[r][s] ? "" : n[r][s]
+            );
+            ((l._activate = (function (e) {
+              return function () {
+                Aa(X.searchQuery + e);
+              };
+            })(n[r][s])),
+              o.appendChild(l));
+          }
+          ce.appendChild(o);
+        }
+      for (var d = ce.querySelectorAll(".kb-row-num"), c = 0; c < d.length; c++)
+        d[c].classList.remove("hidden");
+    } else {
+      for (var p = 0; p < a.length; p++) a[p].classList.remove("hidden");
+      Be.forEach(function (e) {
+        e.classList.remove("hidden");
+      });
+      for (var u = ce.querySelectorAll(".kb-row-num"), v = 0; v < u.length; v++)
+        u[v].classList.add("hidden");
+    }
+  }
+  function Va() {
+    ((ye = t("settings-menu")),
+      (be = t("settings-right")),
+      a(ye),
+      a(be),
+      (je = []));
+    for (var n = null, r = 0; r < j.length; r++) {
+      var o = j[r];
+      if (o.group && o.group !== n) {
+        var s = e("div", "settings-group", (n = o.group));
+        ye.appendChild(s);
+      }
+      var l = e("div", "settings-item focusable"),
+        d = e("div", "settings-icon");
+      ((d.innerHTML = W[o.id] || ""), l.appendChild(d));
+      var c = e("div", "settings-text");
+      (c.appendChild(e("div", "settings-label", o.label)),
+        o.desc && c.appendChild(e("div", "settings-desc", o.desc)),
+        l.appendChild(c),
+        (l._index = r),
+        (l._activate = (function (e) {
+          return function () {
+            Ua(e, !0);
+          };
+        })(r)),
+        (l._onMove = function (e) {
+          if ("right" === e) {
+            var t = ot(be.querySelector(".settings-panel.is-active"));
+            return (t && rt(t), !0);
+          }
+          return !1;
+        }),
+        ye.appendChild(l),
+        je.push(l));
+    }
+    for (var p in (((ze = {}).profile = za()),
+      (ze.history = ja()),
+      (ze.addons = Wa()),
+      (ze.share = brandLinkPanel(
+        "Compartir " + BRAND_NAME,
+        "Escanea el código para consultar el proyecto y las instrucciones de instalación.",
+        "images/orbivista-proyecto.png",
+        BRAND_PROJECT
+      )),
+      (ze.playback = (function () {
+        var t = Fa("Configuración global de reproducción");
+        (t.appendChild(
+          e(
+            "div",
+            "sp-global-note",
+            "Estas preferencias se aplican automáticamente a todas las películas y series nuevas."
+          )
+        ),
+          t.appendChild(i(e("div", "sp-hr"), 0, 168, 1478, 1)),
+          Ba(
+            t,
+            188,
+            "Reproductor",
+            ["Normal (directo)", "Modo fluido"],
+            "streamMode",
+            "smooth" === X.playback.streamMode ? 1 : 0
+          ),
+          Ba(
+            t,
+            272,
+            "Calidad preferida",
+            ["Automática (hasta 4K)", "1080p (Recomendada)", "720p (Ahorro)"],
+            "quality",
+            "1080" === X.playback.quality ? 1 : "720" === X.playback.quality ? 2 : 0
+          ),
+          Ba(
+            t,
+            356,
+            "Formato de pantalla",
+            ["Pantalla completa", "Normal", "16:9", "4:3"],
+            "screen",
+            X.playback.screen
+          ),
+          Ba(
+            t,
+            440,
+            "Audio preferido",
+            ["Español", "Portugués", "Inglés"],
+            "audio",
+            X.playback.audio
+          ),
+          t.appendChild(i(e("div", "sp-hr"), 0, 524, 1478, 1)),
+          t.appendChild(e("div", "sp-subtitle-h", "Subtítulos")));
+        var a = e(
+          "div",
+          "sp-switch focusable " + (X.playback.subtitle ? "on" : "off")
+        );
+        return (
+          (a._activate = function () {
+            ((X.playback.subtitle = !X.playback.subtitle),
+              (a.className =
+                "sp-switch focusable " + (X.playback.subtitle ? "on" : "off")),
+              Y(),
+              rt(a));
+          }),
+          t.appendChild(a),
+          Ba(
+            t,
+            598,
+            "Idioma",
+            ["Español", "Portugués", "Inglés"],
+            "subLang",
+            X.playback.subLang
+          ),
+          Ba(
+            t,
+            682,
+            "Tamaño",
+            ["Normal", "Grande", "Pequeño"],
+            "size",
+            X.playback.size
+          ),
+          (function (t, a) {
+            var i = e("div", "pb-row");
+            ((i.style.top = a + "px"),
+              i.appendChild(e("div", "pb-label", "Estilo")));
+            var curStyleIdx = ["white", "yellow", "cyan"].indexOf(X.playback.style);
+            if (curStyleIdx < 0) curStyleIdx = 0;
+            for (var n = ["#ffffff", "#f6e33f", "#ffffff"], r = 0; r < 3; r++) {
+              var o = e(
+                "div",
+                "pb-opt focusable" +
+                (r === curStyleIdx ? " is-checked" : "")
+              );
+              ((o.style.marginLeft = (0 === r ? 0 : 28) + "px"),
+                o.appendChild(e("div", "radio")));
+              var s = e("span", null, "Aa");
+              ((s.style.color = n[r]),
+                2 === r &&
+                ((s.style.background = "#000000"),
+                  (s.style.display = "inline-block"),
+                  (s.style.width = "94px"),
+                  (s.style.height = "50px"),
+                  (s.style.lineHeight = "50px"),
+                  (s.style.fontSize = "28px")),
+                o.appendChild(s),
+                (o._group = "style"),
+                (o._index = r),
+                (o._activate = function () {
+                  ((X.playback.style =
+                    ["white", "yellow", "cyan"][this._index] || "white"),
+                    nn(),
+                    Y());
+                  for (
+                    var e = t.querySelectorAll(".pb-opt"), a = 0;
+                    a < e.length;
+                    a++
+                  )
+                    "style" === e[a]._group &&
+                      e[a].classList.toggle(
+                        "is-checked",
+                        e[a]._index === this._index
+                      );
+                }),
+                i.appendChild(o));
+            }
+            t.appendChild(i);
+          })(t, 754),
+          Ba(t, 838, "Saltar intro y resumen", ["Manual", "Automático"], "skipIntroMode", X.playback.skipIntroMode),
+          t.appendChild(i(e("div", "skip-source-note", "Marcas de TheIntroDB. Contiene datos de IntroDB (introdb.app) bajo la licencia ODbL."), 0, 934, 1320, 34)),
+          t
+        );
+      })()),
+      (ze.netdiag = (function () {
+        var t = Fa("Diagnóstico de red");
+        (t.appendChild(
+          e(
+            "div",
+            "dg-note",
+            "Comprueba si tu operador de internet está bloqueando los servidores del catálogo. La app ya usa un DNS seguro (DNS-over-HTTPS) para evitarlo; esta prueba solo lo muestra."
+          )
+        ),
+          t.appendChild(i(e("div", "sp-hr"), 0, 168, 1478, 1)));
+        var n = e("div", "dg-btn focusable", "Analizar red");
+        i(n, 52, 188, 280, 60);
+        var r = e("div", "dg-btn dg-report-btn focusable", "Generar reporte");
+        i(r, 346, 188, 320, 60);
+        var q = e("div", "dg-btn dg-report-btn focusable", "Ver TV en vivo");
+        i(q, 680, 188, 300, 60);
+        var o = e("div", "dg-summary", 'Pulsa "Analizar red" para empezar.');
+        i(o, 52, 262, 1380, 64);
+        var s = e("div", "dg-head");
+        (i(s, 52, 340, 1380, 44),
+          s.appendChild(e("span", "dg-host", "Dominio")),
+          s.appendChild(e("span", "dg-local", "DNS del televisor")),
+          s.appendChild(e("span", "dg-state", "Estado")),
+          s.appendChild(e("span", "dg-ip", "Dirección real (DNS seguro)")));
+        var l = e("div", "dg-list");
+        i(l, 52, 388, 1380, 420);
+        var d = e("div", "dg-env", "");
+        (i(d, 52, 816, 1380, 30), ($a = d));
+        var c = e(
+          "div",
+          "dg-foot",
+          'Si el estado dice "Bloqueado", tu operador está interceptando el nombre del servidor, pero la app ya conecta por la dirección real. El reproductor Normal y el Modo Fluido usan este mismo DNS seguro. Si el vídeo sigue sin abrir con la conexión en verde, el bloqueo es por dirección: hace falta un túnel (VPN local).'
+        );
+        return (
+          i(c, 52, 852, 1380, 110),
+          (n._activate = function () {
+            Za(n, o, l);
+          }),
+          (q._activate = function () {
+            P(
+              "liveLog",
+              { events: [] },
+              function (err, data) {
+                var evs = (data && data.events) || [],
+                  ps = data && data.proxyStats,
+                  lines = [];
+                (lines.push("REPRODUCCION TV EN VIVO"),
+                  lines.push("Version: " + APP_VERSION),
+                  lines.push(
+                    "Ahora: " +
+                    (X.playerMode || "sin reproduccion") +
+                    " | modo " +
+                    (X.streamMode || "normal") +
+                    (X.streamError ? " | error " + Ka(X.streamError) : "")
+                  ),
+                  lines.push(""));
+                if (err) lines.push("Servicio: " + Ka(err));
+                else if (!evs.length)
+                  lines.push(
+                    "Sin eventos todavia. Abre un canal de TV, espera un rato y vuelve aqui."
+                  );
+                for (var k = Math.max(0, evs.length - 16); k < evs.length; k++) {
+                  var ev = evs[k] || {};
+                  lines.push(
+                    Ka(ev.ev || "?") +
+                    "  t=" +
+                    (ev.t || 0) +
+                    "s  rs=" +
+                    (ev.rs || 0) +
+                    "  err=" +
+                    (ev.err || 0) +
+                    "  buf=" +
+                    (ev.buf || 0) +
+                    (ev.b0 ? "-" + ev.b0 : "") +
+                    (ev.ns ? "  ns=" + ev.ns : "") +
+                    (ev.ch ? "  " + Ka(ev.ch) : "")
+                  );
+                }
+                lines.push("");
+                if (ps)
+                  lines.push(
+                    "PROXY CDN: peticiones " +
+                    (ps.reqs || 0) +
+                    " | errores " +
+                    (ps.errors || 0) +
+                    " | timeouts " +
+                    (ps.timeouts || 0) +
+                    " | HTTP>=400 " +
+                    (ps.badStatus || 0) +
+                    (ps.lastError ? " | ultimo: " + Ka(ps.lastError) : "")
+                  );
+                if (ps && ps.hls && ps.hls.length) {
+                  var hlsTxt = [];
+                  for (
+                    var hi = Math.max(0, ps.hls.length - 4);
+                    hi < ps.hls.length;
+                    hi++
+                  ) {
+                    var hh = ps.hls[hi] || {};
+                    hlsTxt.push(
+                      "segs=" +
+                      (hh.segs || 0) +
+                      "/" +
+                      (hh.out || hh.segs || 0) +
+                      (hh.l247 ? " 247" : "") +
+                      " tipo=" +
+                      (hh.type || "?") +
+                      (hh.end ? " FIN" : "") +
+                      " tgt=" +
+                      (hh.tgt || 0) +
+                      " ms=" +
+                      (hh.ms || "?") +
+                      "/" +
+                      (hh.oms || hh.ms || "?") +
+                      (hh.st ? " start=" + hh.st : "")
+                    );
+                  }
+                  lines.push("HLS: " + hlsTxt.join(" | "));
+                }
+                if (ps && ps.seg && ps.seg.length) {
+                  var segTxt = [];
+                  for (
+                    var si = Math.max(0, ps.seg.length - 4);
+                    si < ps.seg.length;
+                    si++
+                  ) {
+                    var sg = ps.seg[si] || {};
+                    segTxt.push(
+                      "hace " +
+                      Math.max(0, Math.round((Date.now() - (sg.at || 0)) / 1e3)) +
+                      "s c=" +
+                      (sg.code || 0) +
+                      " " +
+                      Math.round((sg.len || 0) / 1024) +
+                      "KB " +
+                      (sg.ms || 0) +
+                      "ms" +
+                      (sg.err ? " " + Ka(sg.err) : "")
+                    );
+                  }
+                  lines.push("SEG: " + segTxt.join(" | "));
+                }
+                lines.push(
+                  "Foto de esta pantalla = lo que necesito para ver el corte."
+                );
+                var box = e("div", "dg-report", lines.join("\n"));
+                while (l.firstChild) l.removeChild(l.firstChild);
+                (l.appendChild(box),
+                  (o.className = "dg-summary ok"),
+                  (o.textContent = "Log listo. Toma una foto de esta pantalla."),
+                  rt(q));
+              },
+              8e3
+            );
+          }),
+          (r._activate = function () {
+            !(function (t, i) {
+              if (!Xa.report) {
+                (Xa.runId++, (Xa.running = !1));
+                var n = window.__xuperViewport || {};
+                Xa.report = {
+                  version:
+                    (document.querySelector(".welcome-version") || {})
+                      .textContent || "desconocida",
+                  verdict: "sin respuesta",
+                  partial: !0,
+                  pending: !0,
+                  screen: {
+                    w: n.w || 0,
+                    h: n.h || 0,
+                    scale: n.scale || 0,
+                    panelW: n.panelW || 0,
+                    panelH: n.panelH || 0,
+                  },
+                  layers: {},
+                  hosts: [],
+                };
+              }
+              a(i);
+              var r = e(
+                "div",
+                "dg-report",
+                (function (e) {
+                  var t = [],
+                    a = e.screen || {},
+                    i = e.layers || {},
+                    n = e.hosts || [];
+                  (t.push("REPORTE DE SOPORTE DE ORBIVISTA"),
+                    t.push("Versión: " + (e.version || "desconocida")),
+                    t.push(
+                      "Pantalla: " +
+                      (a.w && a.h ? a.w + "×" + a.h : "sin datos") +
+                      (a.panelW && a.panelH
+                        ? " | panel " + a.panelW + "×" + a.panelH
+                        : "") +
+                      (a.scale ? " | escala " + a.scale : "")
+                    ),
+                    t.push(
+                      "Red: " +
+                      (e.verdict || "sin resultado") +
+                      (e.partial ? " (parcial)" : "")
+                    ),
+                    e.pending &&
+                    t.push(
+                      "Diagnóstico: sin respuesta / detenido para generar este reporte"
+                    ));
+                  e.serviceError && t.push("Servicio: " + Ka(e.serviceError));
+                  (t.push("Portal: " + Ya(i.portal)),
+                    t.push("Sesión: " + Ya(i.session)),
+                    t.push("TV en vivo: " + Ya(i.live)),
+                    t.push("Películas/series: " + Ya(i.vod)),
+                    t.push(
+                      "Reproductor: " +
+                      (X.playerMode || "sin reproducción") +
+                      " | modo " +
+                      (X.streamMode || "normal") +
+                      (X.streamError ? " | error " + Ka(X.streamError) : "")
+                    ));
+                  var dm = (e && e.devMode) || X.devMode;
+                  if (dm) {
+                    t.push(
+                      "Modo Dev LG: " +
+                      (dm.enabled
+                        ? dm.registered
+                          ? "Renovación automática activa 24/7 (lg.pirate.vodka)"
+                          : dm.message || "Activo"
+                        : "No detectado en esta TV")
+                    );
+                  }
+                  /* Tiempos reales de arranque: permiten ver de un vistazo si la
+                     demora está en resolver la señal o en que el reproductor
+                     reciba el primer cuadro (relay/ffmpeg o CDN lento). */
+                  var pt = window.__xuperTiming || {};
+                  if (typeof pt.resolveMs === "number" && pt.resolveMs >= 0)
+                    t.push(
+                      "Tiempos: resolver " +
+                      Math.round(pt.resolveMs) +
+                      " ms | primer cuadro " +
+                      (typeof pt.firstFrameMs === "number" && pt.firstFrameMs >= 0
+                        ? Math.round(pt.firstFrameMs / 100) / 10 + " s"
+                        : "pendiente")
+                    );
+                  for (var r = 0; r < n.length && r < 5; r++)
+                    t.push(
+                      "Host " +
+                      (r + 1) +
+                      ": " +
+                      Ka(n[r].host) +
+                      " — " +
+                      Ga(n[r])
+                    );
+                  var lg = e.liveLog || [];
+                  if (lg.length) {
+                    t.push("");
+                    t.push("TV EN VIVO (ultimos eventos):");
+                    for (var k = 0; k < lg.length && k < 14; k++) {
+                      var ev = lg[k] || {};
+                      t.push(
+                        "  " +
+                        Ka(ev.ev || "?") +
+                        " t=" +
+                        (ev.t || 0) +
+                        "s rs=" +
+                        (ev.rs || 0) +
+                        " err=" +
+                        (ev.err || 0) +
+                        " buf=" +
+                        (ev.buf || 0) +
+                        (ev.b0 ? "-" + ev.b0 : "") +
+                        (ev.ns ? " ns=" + ev.ns : "") +
+                        (ev.ch ? " " + Ka(ev.ch) : "")
+                      );
+                    }
+                  }
+                  var ps = e.proxyStats;
+                  if (ps)
+                    t.push(
+                      "",
+                      "PROXY CDN: peticiones " +
+                      (ps.reqs || 0) +
+                      " | errores " +
+                      (ps.errors || 0) +
+                      " | timeouts " +
+                      (ps.timeouts || 0) +
+                      " | HTTP>=400 " +
+                      (ps.badStatus || 0) +
+                      (ps.lastError ? " | ultimo: " + Ka(ps.lastError) : "")
+                    );
+                  var hlsR = e.proxyStats && e.proxyStats.hls;
+                  if (hlsR && hlsR.length) {
+                    var hlsRTxt = [];
+                    for (
+                      var hri = Math.max(0, hlsR.length - 4);
+                      hri < hlsR.length;
+                      hri++
+                    ) {
+                      var hrh = hlsR[hri] || {};
+                      hlsRTxt.push(
+                        "segs=" +
+                        (hrh.segs || 0) +
+                        "/" +
+                        (hrh.out || hrh.segs || 0) +
+                        (hrh.l247 ? " 247" : "") +
+                        " tipo=" +
+                        (hrh.type || "?") +
+                        (hrh.end ? " FIN" : "") +
+                        " tgt=" +
+                        (hrh.tgt || 0) +
+                        " ms=" +
+                        (hrh.ms || "?") +
+                        "/" +
+                        (hrh.oms || hrh.ms || "?") +
+                        (hrh.st ? " start=" + hrh.st : "")
+                      );
+                    }
+                    t.push("HLS: " + hlsRTxt.join(" | "));
+                  }
+                  var segR = e.proxyStats && e.proxyStats.seg;
+                  if (segR && segR.length) {
+                    var segRTxt = [];
+                    for (
+                      var sri = Math.max(0, segR.length - 4);
+                      sri < segR.length;
+                      sri++
+                    ) {
+                      var srh = segR[sri] || {};
+                      segRTxt.push(
+                        "hace " +
+                        Math.max(
+                          0,
+                          Math.round((Date.now() - (srh.at || 0)) / 1e3)
+                        ) +
+                        "s c=" +
+                        (srh.code || 0) +
+                        " " +
+                        Math.round((srh.len || 0) / 1024) +
+                        "KB " +
+                        (srh.ms || 0) +
+                        "ms" +
+                        (srh.err ? " " + Ka(srh.err) : "")
+                      );
+                    }
+                    t.push("SEG: " + segRTxt.join(" | "));
+                  }
+                  var rl = e.relay;
+                  if (rl) {
+                    t.push(
+                      "",
+                      "MODO FLUIDO: " +
+                      Ka(rl.state || "?") +
+                      (rl.error ? " (" + Ka(rl.error) + ")" : "") +
+                      (rl.running ? " | relay activo" : " | relay detenido")
+                    );
+                    var rlLog = rl.log || [];
+                    for (var rli = 0; rli < rlLog.length; rli++)
+                      t.push("  " + Ka(rlLog[rli]));
+                  }
+                  return (
+                    t.push(""),
+                    t.push(
+                      "Privacidad: este reporte no incluye enlaces, tokens, cabeceras ni historial."
+                    ),
+                    t.push(
+                      "Toma una foto de esta pantalla y envíala al soporte."
+                    ),
+                    t.join("\n")
+                  );
+                })(Xa.report)
+              );
+              (i.appendChild(r),
+                (t.className = "dg-summary ok"),
+                (t.textContent =
+                  "Reporte listo. Toma una foto de esta pantalla y envíala al soporte."));
+            })(o, l);
+          }),
+          (t._ensureDiag = function () {
+            Xa.report ? Ja(o, l, Xa.report) : Za(n, o, l);
+          }),
+          t.appendChild(n),
+          t.appendChild(r),
+          t.appendChild(q),
+          t.appendChild(o),
+          t.appendChild(s),
+          t.appendChild(l),
+          t.appendChild(d),
+          t.appendChild(c),
+          t
+        );
+      })()),
+      (ze.parent = (function () {
+        var t = e("div", "settings-panel");
+        (t.appendChild(
+          e("div", "pl-title", "Contenido para adultos (+18)")
+        ),
+          t.appendChild(
+            e(
+              "div",
+              "pl-tip",
+              "Elige si deseas mostrar contenido y canales clasificados para mayores de edad en este televisor."
+            )
+          ),
+          t.appendChild(e("div", "pl-label", "Contenido +18")));
+        var a = e(
+          "div",
+          "sp-switch focusable " + (X.adultEnabled ? "on" : "off")
+        ),
+          i = e(
+            "div",
+            "pl-note",
+            X.adultEnabled
+              ? "Activo: se mostrarán categorías y canales +18."
+              : "Desactivado: se ocultarán categorías y canales +18."
+          );
+        return (
+          (a._activate = function () {
+            ((X.adultEnabled = !X.adultEnabled),
+              (Q.adultEnabled = X.adultEnabled),
+              K($, Q),
+              (a.className =
+                "sp-switch focusable " + (X.adultEnabled ? "on" : "off")),
+              (i.textContent = X.adultEnabled
+                ? "Activo: se mostrarán categorías y canales +18."
+                : "Desactivado: se ocultarán categorías y canales +18."),
+              Qt(liveFavoritesOnly),
+              hr(X.channel),
+              Yt(X.adultEnabled ? "Contenido +18 habilitado" : "Contenido +18 oculto"),
+              rt(a));
+          }),
+          t.appendChild(a),
+          t.appendChild(i),
+          t
+        );
+      })()),
+      (ze.display = (function () {
+        var t = Fa("Pantalla y compatibilidad"),
+          a = e(
+            "div",
+            "sp-global-note",
+            "La compatibilidad 720p se aplica al instalar esta versión. Este ajuste no reduce ni modifica la superficie de vídeo."
+          ),
+          i = e("div", "pb-row"),
+          n = [
+            { id: "auto", label: "Automático" },
+            { id: "hd", label: "Compatibilidad HD" },
+          ];
+        (t.appendChild(a),
+          (i.style.top = "210px"));
+        var uiLabel = e("div", "pb-label", "Tamaño de interfaz");
+        /* "Tamaño de interfaz" no cabe en los 212 px del TextView original y se
+           partía en dos líneas montándose sobre el primer botón. */
+        ((uiLabel.style.width = "400px"),
+          (uiLabel.style.minWidth = "400px"),
+          (uiLabel.style.whiteSpace = "nowrap"));
+        i.appendChild(uiLabel);
+        for (var r = 0; r < n.length; r++)
+          (function (a) {
+            var r = e(
+              "div",
+              "pb-opt focusable" +
+              (Q.uiScaleMode === a.id ? " is-checked" : "")
+            );
+            ((r.style.marginLeft = 0 === a.index ? 0 : 28 + "px"),
+              r.appendChild(e("div", "radio")),
+              r.appendChild(e("span", null, a.label)),
+              (r._activate = function () {
+                ((Q.uiScaleMode = a.id),
+                  K($, Q),
+                  oo(),
+                  Yt(
+                    "hd" === a.id
+                      ? "Compatibilidad HD activada"
+                      : "Tamaño automático restaurado"
+                  ));
+                for (var e = i.querySelectorAll(".pb-opt"), t = 0; t < e.length; t++)
+                  e[t].classList.toggle("is-checked", e[t] === r);
+                rt(r);
+              }),
+              i.appendChild(r));
+          })({ id: n[r].id, label: n[r].label, index: r });
+        return (t.appendChild(i), t);
+      })()),
+      (ze.feedback = brandLinkPanel(
+        "Ayuda y comentarios",
+        "Escanea el código para abrir el repositorio y consultar la documentación de Orbivista.",
+        "images/orbivista-proyecto.png",
+        BRAND_PROJECT
+      )),
+      (ze.about = (function () {
+        var t = e("div", "settings-panel orbivista-about");
+        var header = e("div", "orbivista-about-header");
+        var mark = e("img", "orbivista-about-logo");
+        mark.src = "images/orbivista-mark.png";
+        mark.alt = "";
+        var identity = e("div", "orbivista-about-identity");
+        identity.appendChild(e("h2", "orbivista-about-title", BRAND_NAME));
+        identity.appendChild(e("div", "orbivista-about-version", "Versión " + APP_VERSION + " · LG webOS"));
+        header.appendChild(mark);
+        header.appendChild(identity);
+        t.appendChild(header);
+        t.appendChild(e("p", "orbivista-about-description", "Películas, series y televisión en vivo en una interfaz pensada para el mando."));
+        var credits = e("div", "orbivista-about-credits");
+        credits.appendChild(e("h3", null, "Créditos y licencias"));
+        credits.appendChild(e("p", null, "Edición Orbivista mantenida por Roger Mesa."));
+        credits.appendChild(e("p", null, "Basada en Xuper Port webOS, de cristianco7. Código original bajo licencia MIT."));
+        credits.appendChild(e("p", null, "FFmpeg se distribuye bajo GPLv3. Las marcas de reproducción proceden de TheIntroDB e IntroDB."));
+        t.appendChild(credits);
+        var o = e("div", "sp-about-update-box");
+        (o.appendChild(
+          e("div", "sp-about-update-title", "Actualizaciones de Orbivista")
+        ),
+          o.appendChild(
+            e(
+              "div",
+              "sp-about-update-desc",
+              "Consulta las versiones publicadas de Orbivista en GitHub."
+            )
+          ));
+        var s = e("div", "sp-about-update-row"),
+          l = e(
+            "button",
+            "sp-about-update-btn focusable",
+            "Buscar actualizaciones"
+          ),
+          d = e("span", "sp-about-update-msg");
+        return (
+          (l._activate = function () {
+            ((l.textContent = "Comprobando..."),
+              (d.textContent = ""),
+              oa(!1, function (e, t) {
+                ((l.textContent = "Buscar actualizaciones"),
+                  e
+                    ? ((d.textContent = "Error: " + ((e && e.message) || e)),
+                      (d.style.color = "#ef4444"))
+                    : t && t.updateAvailable
+                      ? ((d.textContent =
+                        "¡Nueva versión disponible: v" + t.latestVersion + "!"),
+                        (d.style.color = "#22c55e"))
+                      : ((d.textContent =
+                        "No hay una versión más reciente de Orbivista."),
+                        (d.style.color = "#38bdf8")));
+              }));
+          }),
+          bindMagicActivate(l),
+          s.appendChild(l),
+          s.appendChild(d),
+          o.appendChild(s),
+          t.appendChild(o),
+          t
+        );
+      })()),
+      ze))
+      ze.hasOwnProperty(p) && be.appendChild(ze[p]);
+  }
+  function brandLinkPanel(title, description, image, url) {
+    var panel = e("div", "settings-panel orbivista-link-panel");
+    panel.appendChild(e("h2", "orbivista-about-title", title));
+    panel.appendChild(e("p", "orbivista-about-description", description));
+    var qr = e("img", "orbivista-link-qr");
+    qr.src = image;
+    qr.alt = "Código QR de " + title;
+    panel.appendChild(qr);
+    panel.appendChild(e("div", "orbivista-link-url", url));
+    return panel;
+  }
+  function Ha() {
+    (ye || Va(), lt("settings"), Ua(0, !1), rt(je[0]));
+  }
+  function Ua(e, a) {
+    if ("string" == typeof e)
+      for (var i = 0; i < j.length; i++)
+        if (j[i].id === e) {
+          e = i;
+          break;
+        }
+    e = Number(e) || 0;
+    var n = (j[e] && j[e].id) || "profile",
+      r = t("screen-settings");
+    if (
+      (r && r.classList.toggle("is-history-view", "history" === n),
+        "profile" === n && ze.profile && be)
+    ) {
+      var o = za();
+      (be.replaceChild(o, ze.profile), (ze.profile = o));
+    } else if ("history" === n && ze.history && be) {
+      var s = ja();
+      (be.replaceChild(s, ze.history), (ze.history = s));
+    } else if ("addons" === n && ze.addons && be) {
+      var l = Wa();
+      (be.replaceChild(l, ze.addons), (ze.addons = l));
+    } else
+      "netdiag" === n &&
+        ze.netdiag &&
+        ze.netdiag._ensureDiag &&
+        ze.netdiag._ensureDiag();
+    for (var d = 0; d < je.length; d++)
+      je[d].classList.toggle("is-selected", d === e);
+    for (var c in ze)
+      ze.hasOwnProperty(c) && ze[c].classList.toggle("is-active", c === n);
+    a && rt(ot(ze[n]) || je[e]);
+  }
+  window.openSettingsCategory = Ua;
+  function Fa(t) {
+    var a = e("div", "settings-panel");
+    return (a.appendChild(e("div", "sp-title", t)), a);
+  }
+  function Ba(t, a, i, n, r, o) {
+    var s = e("div", "pb-row");
+    ((s.style.top = a + "px"), s.appendChild(e("div", "pb-label", i)));
+    for (var l = 0; l < n.length; l++) {
+      var d = e("div", "pb-opt focusable" + (l === o ? " is-checked" : ""));
+      ((d.style.marginLeft = (0 === l ? 0 : 28) + "px"),
+        d.appendChild(e("div", "radio")),
+        d.appendChild(e("span", null, n[l])),
+        (d._group = r),
+        (d._index = l),
+        (d._activate = function () {
+          ("streamMode" === this._group
+            ? ((X.playback.streamMode =
+              1 === this._index ? "smooth" : "normal"),
+              (Cn = {}),
+              X.playerItem && xn(X.playerItem))
+            : "quality" === this._group
+              ? (X.playback.quality = 1 === this._index ? "1080" : 2 === this._index ? "720" : "auto")
+              : (X.playback[this._group] = this._index),
+            nn(),
+            Y());
+          for (var e = t.querySelectorAll(".pb-opt"), a = 0; a < e.length; a++)
+            e[a]._group === this._group &&
+              e[a].classList.toggle("is-checked", e[a]._index === this._index);
+        }),
+        s.appendChild(d));
+    }
+    t.appendChild(s);
+  }
+  function za() {
+    var t = e("div", "settings-panel account-panel");
+    var header = e("div", "account-header-row");
+    var a = e("div", "account-avatar");
+    a.innerHTML = W.profile;
+    header.appendChild(a);
+    var info = e("div", "account-profile-info");
+    info.appendChild(e("div", "account-number", Q.id || "XUPER-TV-WEBOS-FLUX"));
+    var badges = e("div", "account-badges-row");
+    badges.appendChild(e("span", "account-badge badge-vip", "VIP PREMIUM"));
+    badges.appendChild(e("span", "account-badge badge-free", "100% GRATIS"));
+    badges.appendChild(e("span", "account-badge badge-device", "LG WEBOS"));
+    info.appendChild(badges);
+    header.appendChild(info);
+    t.appendChild(header);
+
+    var grid = e("div", "account-metrics-grid");
+    var m1 = e("div", "account-metric-card");
+    m1.appendChild(e("div", "am-label", "PLAN Y SUSCRIPCIÓN"));
+    m1.appendChild(e("div", "am-val", "Acceso Ilimitado"));
+    m1.appendChild(e("div", "am-sub", "Sin pagos ni suscripciones"));
+    grid.appendChild(m1);
+
+    var m2 = e("div", "account-metric-card");
+    m2.appendChild(e("div", "am-label", "MOTOR DE VIDEO"));
+    m2.appendChild(e("div", "am-val", "Modo Fluido fMP4"));
+    m2.appendChild(e("div", "am-sub", "Demuxer nativo webOS"));
+    grid.appendChild(m2);
+
+    var m3 = e("div", "account-metric-card");
+    m3.appendChild(e("div", "am-label", "SEGURIDAD Y RED"));
+    m3.appendChild(e("div", "am-val", "DoH Anycast Activo"));
+    m3.appendChild(e("div", "am-sub", "Camuflaje anti-bloqueo SNI"));
+    grid.appendChild(m3);
+    t.appendChild(grid);
+
+    var n = e("div", "account-actions-row"),
+      r = e("div", "account-action-btn focusable"),
+      o = e("div", "account-action-btn focusable"),
+      s = e("div", "account-action-btn focusable");
+    r.innerHTML = W.history + "<span>Ver mi lista</span>";
+    o.innerHTML = W.addons + "<span>Administrar Addons</span>";
+    s.innerHTML = W.share + "<span>Compartir APP</span>";
+
+    r._activate = function () { Ua("history", !0); };
+    r._onMove = function (e) {
+      return "left" === e ? (rt(je[0]), !0) : "right" === e && (rt(o), !0);
+    };
+
+    o._activate = function () { sa(); };
+    o._onMove = function (e) {
+      return "left" === e ? (rt(r), !0) : "right" === e && (rt(s), !0);
+    };
+
+    s._activate = function () { Ua("share", !0); };
+    s._onMove = function (e) {
+      return "left" === e && (rt(o), !0);
+    };
+
+    n.appendChild(r);
+    n.appendChild(o);
+    n.appendChild(s);
+    t.appendChild(n);
+
+    var l = e("div", "account-card");
+    l.appendChild(e("div", "account-card-title", "Almacenamiento Local Seguro"));
+    l.appendChild(
+      e(
+        "div",
+        "account-card-text",
+        "Tus canales favoritos, el progreso de películas, capítulos vistos y configuración se guardan exclusivamente en la memoria interna de tu televisor LG webOS. Esta app es 100% privada y no transmite datos a servidores externos."
+      )
+    );
+    t.appendChild(l);
+    return t;
+  }
+  function ja() {
+    for (
+      var t = e("div", "settings-panel history-panel"),
+      a = e("div", "history-tabs"),
+      i = [
+        { id: "history", label: "Historia" },
+        { id: "favs", label: "Mi favoritos" },
+      ],
+      n = 0;
+      n < i.length;
+      n++
+    )
+      (function (t) {
+        var i = e(
+          "div",
+          "history-tab focusable" + (We === t.id ? " is-selected" : ""),
+          t.label
+        );
+        ((i._activate = function () {
+          ((We = t.id), Ua("history", !0));
+        }),
+          a.appendChild(i));
+      })(i[n]);
+    (t.appendChild(a), t.appendChild(e("div", "history-rule")));
+    var r = [];
+    if ("history" === We) r = Q.history || [];
+    else if ("favs" === We)
+      for (var o = 0; o < l.length; o++)
+        X.favs &&
+          X.favs[l[o].id] &&
+          r.push({
+            id: l[o].id,
+            title: l[o].title,
+            poster: l[o].poster || l[o].cover,
+            series: x(l[o]),
+            position: 0,
+          });
+    var s = e("div", "history-total", "Total ");
+    (s.appendChild(e("span", null, String(r.length))), t.appendChild(s));
+    var d = e("div", "history-grid");
+    if (r.length)
+      for (var c = 0; c < r.length && c < 30; c++)
+        (function (t) {
+          var a = e("div", "history-card focusable"),
+            i = document.createElement("img");
+          ((i.className = "history-poster"),
+            (i.alt = ""),
+            (i.src =
+              t.poster || "images/orbivista-poster.png"),
+            a.appendChild(i));
+          var n = t.series
+            ? "Ya miró hasta " +
+            (t.episodeNumber ? "epis. " + t.episodeNumber : "un episodio") +
+            (t.position ? " · " + ai(t.position) : "")
+            : "Ya miró hasta " + ai(t.position || 0);
+          (a.appendChild(e("div", "history-progress", n)),
+            a.appendChild(
+              e("div", "history-card-title", t.title || "Contenido")
+            ),
+            (a._activate = function () {
+              cn(t);
+            }),
+            d.appendChild(a));
+        })(r[c]);
+    else
+      d.appendChild(
+        e("div", "history-grid-empty", "No hay títulos para mostrar todavía.")
+      );
+    return (t.appendChild(d), t);
+  }
+  function Wa() {
+    var t = e("div", "settings-panel addons-panel");
+    t.appendChild(e("div", "sp-title", "Addons y Listas M3U"));
+    t.appendChild(
+      e(
+        "div",
+        "sp-global-note",
+        "Extiende tu catálogo con miles de canales en vivo: Anime 24/7, Telenovelas, Cine continuo, Pluto TV y señales de TV abierta de Latinoamérica y España."
+      )
+    );
+    var a = e("div", "account-card");
+    a.appendChild(
+      e("div", "account-card-title", "Canales en Vivo e IPTV Personalizado")
+    );
+    a.appendChild(
+      e(
+        "div",
+        "account-card-text",
+        "Instala listas temáticas con un solo clic o añade tus propios enlaces M3U / M3U8 para disfrutar de televisión en vivo sin límites."
+      )
+    );
+    t.appendChild(a);
+    var n = e(
+      "button",
+      "account-action-btn focusable"
+    );
+    n.innerHTML = W.addons + "<span>Abrir Administrador de Addons</span>";
+    n._activate = function () {
+      sa();
+    };
+    n._onMove = function (e) {
+      if ("left" === e) {
+        for (var t = 2, a = 0; a < j.length; a++)
+          if ("addons" === j[a].id) {
+            t = a;
+            break;
+          }
+        if (je[t]) return (rt(je[t]), !0);
+      }
+      return !1;
+    };
+    t.appendChild(n);
+    var r = e(
+      "div",
+      "sp-global-note addons-tip",
+      'Consejo: También puedes administrar tus listas directamente desde la sección En Vivo pulsando en la categoría "Addons M3U".'
+    );
+    t.appendChild(r);
+    return t;
+  }
+  var Xa = { running: !1, report: null, error: null, runId: 0 },
+    $a = null;
+  function Ga(e) {
+    if (!e) return "Sin datos";
+    switch (e.verdict) {
+      case "ok":
+        return "Correcto";
+      case "dns-distinto":
+        return "Esquivado (DNS)";
+      case "dns-local-falla":
+        return "Esquivado (DoH)";
+      case "sin-tcp":
+        return "Sin conexión";
+      case "tls-falla":
+        return "HTTPS falla";
+      case "sin-tiempo":
+        return "Sin respuesta";
+      default:
+        return "Sin datos";
+    }
+  }
+  function Qa(e) {
+    return e
+      ? "ok" === e.verdict
+        ? "ok"
+        : "dns-distinto" === e.verdict ||
+          "dns-local-falla" === e.verdict ||
+          "sin-tiempo" === e.verdict ||
+          e.timeout
+          ? "warn"
+          : "bad"
+      : "";
+  }
+  function Ja(t, i, n) {
+    a(i);
+    var r = (function (e) {
+      switch (e) {
+        case "ok":
+          return {
+            cls: "ok",
+            text: "La conexión está bien: el catálogo y los servidores de vídeo responden.",
+          };
+        case "dns-distinto":
+          return {
+            cls: "warn",
+            text: "Tu operador devuelve direcciones distintas a las reales (bloqueo por DNS). La app ya las esquiva sola.",
+          };
+        case "dns-local-falla":
+          return {
+            cls: "warn",
+            text: "Tu operador bloquea el DNS del televisor (no devuelve estos dominios). La app ya lo esquiva con su DNS seguro.",
+          };
+        case "doh-sin-respuesta":
+          return {
+            cls: "bad",
+            text: "El DNS seguro no devolvió respuesta. Revisa la conexión del televisor.",
+          };
+        case "doh-bloqueado":
+          return {
+            cls: "bad",
+            text: "La red bloquea el DNS seguro (Cloudflare y Google por HTTPS).",
+          };
+        case "sin-salida":
+          return {
+            cls: "bad",
+            text: "Los servidores no aceptan la conexión desde esta red.",
+          };
+        case "algun-servidor":
+          return {
+            cls: "warn",
+            text: "Un servidor de vídeo no respondió (suele rotar). El resto del catálogo sí responde: vuelve a analizar.",
+          };
+        case "incompleto":
+          return {
+            cls: "warn",
+            text: "La prueba no terminó: la TV no recibió respuesta de ningún servidor a tiempo. Vuelve a analizar; si se repite, apaga y enciende la TV.",
+          };
+        case "servicio-sin-respuesta":
+          return {
+            cls: "bad",
+            text: "El servicio de fondo no respondió. El reporte indica si fue el servicio completo o solo el diagnóstico.",
+          };
+        default:
+          return { cls: "", text: "Sin resultado todavía." };
+      }
+    })(n.verdict);
+    ((t.textContent = r.text),
+      (t.className = "dg-summary" + (r.cls ? " " + r.cls : "")));
+    for (var o = n.hosts || [], s = 0; s < o.length; s++) {
+      var l = o[s],
+        d = e("div", "dg-row " + Qa(l)),
+        c =
+          l.doh && l.doh.ok && l.doh.ips.length
+            ? l.doh.ips
+            : l.system.ips || [],
+        p = l.system && l.system.ok ? l.system.ips.join(", ") : "sin respuesta";
+      (d.appendChild(e("span", "dg-host", l.host)),
+        d.appendChild(e("span", "dg-local", p)),
+        d.appendChild(e("span", "dg-state", Ga(l))),
+        d.appendChild(e("span", "dg-ip", c.join(", "))),
+        i.appendChild(d));
+    }
+    for (var u = n.providers || [], v = [], f = [], h = 0; h < u.length; h++)
+      u[h].reachable ? v.push(u[h].ip) : f.push(u[h].ip);
+    var m = u.length > 0,
+      g = e("div", "dg-row dns");
+    (g.appendChild(e("span", "dg-host", "DNS seguro (DoH)")),
+      g.appendChild(
+        e(
+          "span",
+          "dg-local",
+          m ? v.length + "/" + u.length + " disponibles" : "sin datos"
+        )
+      ),
+      g.appendChild(
+        e(
+          "span",
+          "dg-state",
+          m ? (v.length ? "Correcto" : "Bloqueado") : "No evaluado"
+        )
+      ),
+      g.appendChild(e("span", "dg-ip", v.join(", "))),
+      m
+        ? v.length
+          ? (g.className = "dg-row dns ok")
+          : (g.className = "dg-row dns bad")
+        : (g.className = "dg-row dns warn"),
+      i.appendChild(g));
+    var y = n.codec || {},
+      b = !!(y.h264 || y.hevc || y.hls),
+      C = e("div", "dg-row" + (b ? " ok" : " warn")),
+      w = [
+        "H.264: " + (y.h264 || "no informado"),
+        "HEVC: " + (y.hevc || "no informado"),
+        "HLS: " + (y.hls || "no informado"),
+      ].join("  ");
+    (C.appendChild(e("span", "dg-host", "Códec")),
+      C.appendChild(e("span", "dg-local", "")),
+      C.appendChild(e("span", "dg-state", b ? "Informado" : "No confirmado")),
+      C.appendChild(e("span", "dg-ip", w)),
+      i.appendChild(C));
+    for (
+      var S = n.layers || {},
+      x = [
+        { key: "portal", label: "Portal" },
+        { key: "session", label: "Sesión" },
+        { key: "live", label: "Live CDN" },
+        { key: "vod", label: "VOD CDN" },
+      ],
+      T = !1,
+      _ = !1,
+      k = 0;
+      k < x.length;
+      k++
+    ) {
+      var L = x[k],
+        M = S[L.key];
+      if (M) {
+        ("live" !== L.key || M.ok || M.timeout || (T = !0),
+          "vod" !== L.key || M.ok || M.timeout || (_ = !0));
+        var I = e(
+          "div",
+          "dg-row " + (M.ok ? "ok" : M.timeout ? "warn" : "bad")
+        ),
+          E =
+            M.error || (M.status ? "HTTP " + M.status : M.ok ? "OK" : "Error");
+        "session" === L.key &&
+          (E = "userId " + (M.userId || "?") + "  token " + (M.token || "?"));
+        var A = M.ms ? " " + M.ms + " ms" : "";
+        (I.appendChild(e("span", "dg-host", L.label)),
+          I.appendChild(e("span", "dg-local", "")),
+          I.appendChild(
+            e(
+              "span",
+              "dg-state",
+              M.ok ? "OK" : M.timeout ? "Sin respuesta" : "Error"
+            )
+          ),
+          I.appendChild(e("span", "dg-ip", E + A)),
+          i.appendChild(I));
+      }
+    }
+    "ok" === r.cls &&
+      (T || _) &&
+      ((r = {
+        cls: "bad",
+        text:
+          "El DNS responde bien, pero " +
+          (T && _
+            ? "los canales en vivo y las películas"
+            : T
+              ? "los canales en vivo"
+              : "las películas") +
+          " no se pueden abrir: tu operador bloquea las direcciones de vídeo (bloqueo por IP/SNI). Ese bloqueo no se arregla desde la app; hace falta una VPN en el router.",
+      }),
+        (t.textContent = r.text),
+        (t.className = "dg-summary " + r.cls));
+    if (
+      (n.partial &&
+        "bad" !== r.cls &&
+        (t.textContent +=
+          " (La prueba no terminó a tiempo: vuelve a analizar.)"),
+        $a)
+    ) {
+      var D = n.screen || {},
+        P = [];
+      (D.w && D.h && P.push("Pantalla " + D.w + "×" + D.h),
+        D.panelW && D.panelH && P.push("panel " + D.panelW + "×" + D.panelH),
+        D.scale && P.push("escala " + Math.round(100 * D.scale) / 100),
+        n.version && P.push("versión " + n.version));
+      var O = document.querySelector(".welcome-version"),
+        q = O ? String(O.textContent || "").replace(/[^\d.]/g, "") : "";
+      (n.version &&
+        q &&
+        n.version !== q &&
+        P.push(
+          "SERVICIO DESACTUALIZADO (app " + q + "): desenchufa la TV 30 s"
+        ),
+        ($a.textContent = P.join(" · ")));
+    }
+  }
+  function Ka(e) {
+    var t = String(null == e ? "" : e);
+    return (t = (t = (t = t.replace(
+      /https?:\/\/[^\s"']+/gi,
+      "[URL OCULTA]"
+    )).replace(
+      /(token|signature|authorization|cookie|key)=?[^\s,&]*/gi,
+      "$1=[OCULTO]"
+    ))
+      .replace(/[\r\n]+/g, " ")
+      .replace(/\s+/g, " ")).slice(0, 150);
+  }
+  function Ya(e) {
+    return e
+      ? e.ok
+        ? e.status
+          ? "OK (HTTP " + e.status + ")"
+          : "OK"
+        : e.timeout
+          ? "sin respuesta"
+          : "error" + (e.error ? ": " + Ka(e.error) : "")
+      : "sin datos";
+  }
+  function Za(t, i, n) {
+    var r = Xa.runId + 1;
+    function o(e) {
+      var a;
+      Xa.runId === r &&
+        Xa.running &&
+        ((Xa.running = !1),
+          Xa.runId++,
+          (Xa.report = {
+            version:
+              (document.querySelector(".welcome-version") || {}).textContent ||
+              "desconocida",
+            verdict: "servicio-sin-respuesta",
+            partial: !0,
+            serviceError: e,
+            screen:
+              ((a = window.__xuperViewport || {}),
+              {
+                w: a.w || 0,
+                h: a.h || 0,
+                scale: a.scale || 0,
+                panelW: a.panelW || 0,
+                panelH: a.panelH || 0,
+              }),
+            layers: {},
+            hosts: [],
+            providers: [],
+          }),
+          (t.textContent = "Analizar de nuevo"),
+          Ja(i, n, Xa.report));
+    }
+    ((Xa.runId = r),
+      (Xa.running = !0),
+      (Xa.error = null),
+      (t.textContent = "Analizando…"),
+      (i.className = "dg-summary"),
+      (i.textContent =
+        "Consultando el DNS del televisor, el DNS seguro y los servidores…"),
+      a(n),
+      n.appendChild(e("div", "dg-row", "Analizando…")));
+    var s = !1,
+      l = setTimeout(function () {
+        s ||
+          ((s = !0),
+            o("ping no respondió en 25 segundos (el servicio no arrancó)"));
+      }, 25e3);
+    P(
+      "ping",
+      {},
+      function (e, t) {
+        if (!e && t && t.devMode) {
+          X.devMode = t.devMode;
+        }
+        s ||
+          ((s = !0),
+            clearTimeout(l),
+            (!e && t) || o("ping falló: " + Ka(e || "sin respuesta")));
+      },
+      24e3
+    );
+    var d = setTimeout(function () {
+      Xa.running &&
+        Xa.runId === r &&
+        (i.textContent =
+          "Analizando… tu red está respondiendo lento, espera un momento.");
+    }, 9e3),
+      c = setTimeout(function () {
+        Xa.running &&
+          Xa.runId === r &&
+          o(
+            "ping respondió, pero netdiag no devolvió resultado en 45 segundos"
+          );
+      }, 45e3);
+    P(
+      "netdiag",
+      (function () {
+        var e = window.__xuperViewport || {},
+          t = xe || document.querySelector("video");
+        function a(e) {
+          return (t && t.canPlayType(e)) || "";
+        }
+        return {
+          screenW: e.w || 0,
+          screenH: e.h || 0,
+          screenScale: e.scale || 0,
+          panelW: e.panelW || 0,
+          panelH: e.panelH || 0,
+          codecH264: a('video/mp4; codecs="avc1.42E01E, mp4a.40.2"'),
+          codecHEVC: a('video/mp4; codecs="hvc1.1.6.L93.B0"'),
+          codecHLS: a("application/x-mpegURL"),
+          liveUrl: (A.live && A.live.url) || "",
+          liveHeaders: (A.live && A.live.headers) || {},
+          vodUrl: (A.vod && A.vod.url) || "",
+          vodHeaders: (A.vod && A.vod.headers) || {},
+        };
+      })(),
+      function (e, a) {
+        if (Xa.runId === r)
+          if (
+            (clearTimeout(d),
+              clearTimeout(c),
+              (Xa.running = !1),
+              (t.textContent = "Analizar de nuevo"),
+              t.parentNode &&
+              -1 !== t.parentNode.className.indexOf("is-active") &&
+              rt(t),
+              !e && a)
+          )
+            ((Xa.report = a), Ja(i, n, a));
+          else {
+            ((Xa.error = e || "sin respuesta"),
+              (i.className = "dg-summary bad"));
+            var o = String(e || "");
+            /denied|permission|not permitted|bloqueado el servicio/i.test(o)
+              ? (i.textContent = E)
+              : /exist|not found|no disponible/i.test(o)
+                ? (i.textContent =
+                  "El servicio de fondo no está instalado en la TV. Reinstala la app usando el instalador .bat")
+                : /timeout|tiempo|espera/i.test(o)
+                  ? (i.textContent =
+                    "Tiempo de espera agotado. La conexión es muy lenta o el DNS de tu operador no responde.")
+                  : (i.textContent =
+                    "No se pudo ejecutar la prueba (" +
+                    (o || "el servicio no respondió") +
+                    ").");
+          }
+      },
+      45e3
+    );
+  }
+  var ei = 5e3,
+    ti = null;
+  function ai(e) {
+    e = Math.max(0, Math.floor(e || 0));
+    var t = Math.floor(e / 3600),
+      a = Math.floor((e % 3600) / 60),
+      i = e % 60;
+    return r(t) + ":" + r(a) + ":" + r(i);
+  }
+  function ii(e) {
+    if ("number" == typeof e && isFinite(e) && e > 0) return e;
+    if ("string" != typeof e) return 0;
+    var t = e.trim();
+    if (!t || "—" === t || "-" === t) return 0;
+    var a = t.match(/(\d+)\s*h(?:our|ora|s)?/i),
+      i = t.match(/(\d+)\s*m(?:in|uto|s)?/i),
+      n = t.match(/(\d+)\s*s(?:ec|eg)?/i);
+    if (a || i || n)
+      return (
+        3600 * (a ? parseInt(a[1], 10) : 0) +
+        60 * (i ? parseInt(i[1], 10) : 0) +
+        (n ? parseInt(n[1], 10) : 0)
+      );
+    if (-1 !== t.indexOf(":")) {
+      var r = t.split(":");
+      if (2 === r.length) {
+        var o = Number(r[0]),
+          s = Number(r[1]);
+        if (isFinite(o) && isFinite(s) && o >= 0 && s >= 0) return 60 * o + s;
+      } else if (3 === r.length) {
+        ((o = Number(r[0])), (s = Number(r[1])));
+        var l = Number(r[2]);
+        if (
+          isFinite(o) &&
+          isFinite(s) &&
+          isFinite(l) &&
+          o >= 0 &&
+          s >= 0 &&
+          l >= 0
+        )
+          return 3600 * o + 60 * s + l;
+      }
+    }
+    var d = Number(t);
+    return isFinite(d) && d > 0 ? d : 0;
+  }
+  var ni = null;
+  function ri() {
+    ni && (clearInterval(ni), (ni = null));
+  }
+  function oi(e, t) {
+    if (Ae && De && Oe) {
+      Ye && (e = Ze);
+      var a = ii(t);
+      if (
+        (!a &&
+          X.playerEpisode &&
+          X.playerEpisode.duration &&
+          (a = ii(X.playerEpisode.duration)),
+          !a &&
+          X.playerItem &&
+          X.playerItem.duration &&
+          (a = ii(X.playerItem.duration)),
+          !a &&
+          xe &&
+          isFinite(xe.duration) &&
+          xe.duration > 0 &&
+          (a = xe.duration),
+          !a && pn && pn.length)
+      ) {
+        var i = pn[pn.length - 1];
+        i && i.end > 0 && (a = Math.round(i.end + 60));
+      }
+      if (((e = Number(e) || 0), (Ae.textContent = ai(e)), !a || a <= 0))
+        e > (a = x(X.playerItem) ? 2700 : 6300) && (a = Math.round(1.15 * e));
+      De.textContent = ai(a);
+      var n = Math.min(100, Math.max(0, (e / a) * 100));
+      if (
+        ((Oe.style.width = n.toFixed(2) + "%"),
+          Ne && (Ne.style.left = n.toFixed(2) + "%"),
+          xe && xe.buffered && xe.buffered.length > 0)
+      )
+        try {
+          var r = xe.buffered.end(xe.buffered.length - 1);
+          br && (r += Cr);
+          var o = Math.min(100, Math.max(0, (r / a) * 100));
+          qe && (qe.style.width = o.toFixed(2) + "%");
+        } catch (e) { }
+    }
+  }
+  function si(e) {
+    (Re || (Re = t("player-osd-icon")),
+      Re &&
+      (ti && (clearTimeout(ti), (ti = null)),
+        "pause" === e
+          ? ((Re.style.backgroundImage =
+            "url(assets/original/common/icon_status_pause.png)"),
+            Re.classList.add("is-active"))
+          : "forward" === e
+            ? ((Re.style.backgroundImage =
+              "url(assets/original/common/icon_status_forward.png)"),
+              Re.classList.add("is-active"),
+              (ti = setTimeout(function () {
+                Re.classList.remove("is-active");
+              }, 900)))
+            : "backward" === e
+              ? ((Re.style.backgroundImage =
+                "url(assets/original/common/icon_status_backward.png)"),
+                Re.classList.add("is-active"),
+                (ti = setTimeout(function () {
+                  Re.classList.remove("is-active");
+                }, 900)))
+              : Re.classList.remove("is-active")));
+  }
+  function li(e) {
+    if (xe) {
+      var t = xe.duration;
+      (isNaN(t) || t <= 0) && (t = 86400);
+      var a = xe.currentTime || 0,
+        i = Math.max(0, Math.min(t, a + e));
+      try {
+        xe.currentTime = i;
+      } catch (e) { }
+      ("live" === X.playerMode &&
+        ((liveGuardUntil = Date.now() + 8e3),
+          (liveGuardLastTime = i),
+          (liveGuardLastWall = Date.now())),
+        oi(i, xe.duration),
+        pi(),
+        si(e > 0 ? "forward" : "backward"));
+    }
+  }
+  function di() {
+    if (xe)
+      if (xe.paused) {
+        ((vodUserPaused = !1),
+          "live" === X.playerMode && (liveUserPaused = !1),
+          Mr(),
+          si("none"),
+          pi());
+      } else {
+        ((vodUserPaused = !0),
+          "live" === X.playerMode && (liveUserPaused = !0));
+        try {
+          xe.pause();
+        } catch (e) { }
+        (si("pause"), pi());
+      }
+  }
+  function ci() {
+    (X.infoTimer && clearTimeout(X.infoTimer),
+      (X.infoTimer = setTimeout(function () {
+        ((X.infoTimer = null), "player" !== X.screen || X.channelsOpen || ui());
+      }, ei)));
+  }
+  function pi() {
+    if (X.channelsOpen) {
+      we && (we.classList.remove("is-active"), (we.style.display = "none"));
+      return;
+    }
+    ao();
+    ((X.infobar = !0),
+      "vod" === X.playerMode
+        ? (Me && Me.classList.add("is-active"),
+          we && we.classList.remove("is-active"))
+        : (we && we.classList.add("is-active"),
+          Me && Me.classList.remove("is-active")),
+      ci());
+  }
+  function ui() {
+    (X.infoTimer && (clearTimeout(X.infoTimer), (X.infoTimer = null)),
+      (X.infobar = !1),
+      we && we.classList.remove("is-active"),
+      Me && Me.classList.remove("is-active"));
+  }
+  function vi() {
+    pi();
+  }
+  function fi() {
+    ui();
+  }
+  var hi = null,
+    mi = null,
+    gi = null,
+    yi = null,
+    bi = null,
+    Ci = null,
+    wi = null,
+    Si = null,
+    xi = null,
+    Ti = null,
+    _i = null,
+    ki = null,
+    Li = null,
+    Mi = null,
+    Ii = null,
+    Ei = null,
+    Ai = null,
+    Di = null,
+    Pi = null,
+    Oi = null,
+    qi = null,
+    Ni = null,
+    Ri = null,
+    ZiRowBg = null,
+    ZiOptsBg = null,
+    ZiOptsQuality = null,
+    Vi = null,
+    Hi = null,
+    Ui = null,
+    Fi = null,
+    Bi = null,
+    zi = !1,
+    ji = !1,
+    Wi = null,
+    Xi = 0,
+    $i = !1,
+    Gi = 0,
+    Qi = null,
+    Ji = !1,
+    Ki = !1,
+    Yi = 0,
+    Zi = "normal",
+    en = "white",
+    enBg = "outline",
+    tn = "contain",
+    an = 0;
+  function nn() {
+    var styleVal = X.playback.style;
+    if ("number" === typeof styleVal)
+      styleVal = ["white", "yellow", "cyan"][Number(styleVal) || 0] || "white";
+    en =
+      ["white", "yellow", "cyan", "lime"].indexOf(styleVal) >= 0
+        ? styleVal
+        : "white";
+    var bgVal = X.playback.subtitleBg;
+    if ("number" === typeof bgVal)
+      bgVal = ["outline", "none", "box"][Number(bgVal) || 0] || "outline";
+    enBg =
+      ["outline", "none", "box"].indexOf(bgVal) >= 0 ? bgVal : "outline";
+    ((Zi =
+      ["normal", "big", "small"][Number(X.playback.size) || 0] || "normal"),
+      /* Estado recordado: si el espectador activó los subtítulos, se mantienen
+         hasta que los desactive. Por defecto vienen apagados. */
+      Ki || (Ji = !!X.playback.subtitle),
+      Zn(
+        ["cover", "contain", "16-9", "4-3"][Number(X.playback.screen) || 0] ||
+        "contain"
+      ),
+      gn());
+  }
+  function rn() {
+    return ["es", "pt", "en"][Number(X.playback.subLang) || 0] || "es";
+  }
+  function on(e, t) {
+    var a = String(e || t || "").toLowerCase(),
+      i = t || "es";
+    return "es" === i
+      ? /^(es|spa|esp|lat|cast)|espa|latino|latin|castell/i.test(a)
+      : "pt" === i
+        ? /^(pt|por)|portu/.test(a)
+        : "en" === i && /^(en|eng|ing)|ingl/.test(a);
+  }
+  function sn(e, t, a) {
+    var i = X.playerItem;
+    if (i && i.id && !(e < 3)) {
+      var n = Date.now();
+      if (a || !(n - an < 15e3)) {
+        an = n;
+        for (
+          var r = X.playerEpisode,
+          o = String(i.id),
+          s = [
+            {
+              id: o,
+              title: i.title || i.name || "Contenido",
+              poster: i.poster || i.cover || "",
+              series: !!x(i),
+              episodeId: r && r.id ? String(r.id) : "",
+              episodeNumber: (r && (r.number || r.seriesNumber)) || "",
+              position: Math.floor(e),
+              duration: Math.floor(t || i.duration || 0),
+              updatedAt: n,
+            },
+          ],
+          l = Q.history || [],
+          d = 0;
+          d < l.length && s.length < 30;
+          d++
+        )
+          String(l[d].id) !== o && s.push(l[d]);
+        ((Q.history = s), K($, Q));
+      }
+    }
+  }
+  var ln = null;
+  function dn(e) {
+    var t = ln;
+    if (!t || String(t.id) !== String(e && e.id)) {
+      var hist = (Q && Q.history) || [];
+      for (var h = 0; h < hist.length; h++) {
+        if (String(hist[h].id) === String(e && e.id)) {
+          t = hist[h];
+          break;
+        }
+      }
+    }
+    if (t && e && String(t.id) === String(e.id)) {
+      X.resumePosition = Math.max(0, Number(t.position) || 0);
+      if (!(t.episodeId && e.episodes)) return;
+      for (var a = 0; a < e.episodes.length; a++)
+        if (String(e.episodes[a].id) === t.episodeId)
+          return (
+            (X.detailEpisode = e.episodes[a]),
+            void (X.playerEpisode = e.episodes[a])
+          );
+    }
+  }
+  function cn(e) {
+    if (e) {
+      for (var t = 0; t < l.length; t++)
+        if (String(l[t].id) === String(e.id)) return ((ln = e), void ba(l[t]));
+      for (var a = o(e.title || ""), i = 0; i < l.length; i++) {
+        for (
+          var n = l[i], r = n._catalogSeasons || [], s = !1, d = 0;
+          d < r.length;
+          d++
+        )
+          if (String(r[d].id) === String(e.id)) {
+            s = !0;
+            break;
+          }
+        if (s || (a && o(n.title || "") === a)) return ((ln = e), void ba(n));
+      }
+      var c = T(
+        {
+          id: e.id,
+          title: e.title,
+          poster: e.poster,
+          type: e.series ? "teleplay" : "movie",
+          portal: !0,
+        },
+        0
+      );
+      ((c._portal = !0), (ln = e), ba(c));
+    }
+  }
+  var pn = [],
+    un = {},
+    unKeys = [],
+    vn = {},
+    fn = null;
+  function cacheTrackInfo(k, val) {
+    if (!k) return;
+    un[k] = val;
+    unKeys.push(k);
+    if (unKeys.length > 150) {
+      var oldest = unKeys.shift();
+      if (oldest && oldest !== k) delete un[oldest];
+    }
+  }
+  function hn(e) {
+    if (!e) return 0;
+    var t = e.replace(",", ".").split(":");
+    return 3 === t.length
+      ? 3600 * parseFloat(t[0]) + 60 * parseFloat(t[1]) + parseFloat(t[2])
+      : 0;
+  }
+  function mn(e) {
+    var t = ++Yi;
+    if (!e || !e.url) return ((pn = []), void (Bi && (Bi.innerHTML = "")));
+    try {
+      var a = new XMLHttpRequest();
+      (a.open("GET", e.url, !0),
+        (a.onload = function () {
+          t === Yi &&
+            a.status >= 200 &&
+            a.status < 300 &&
+            (pn = (function (e) {
+              var t = [];
+              if (!e) return t;
+              for (
+                var a = e
+                  .replace(/\r\n/g, "\n")
+                  .replace(/\r/g, "\n")
+                  .split("\n\n"),
+                i = 0;
+                i < a.length;
+                i++
+              ) {
+                var n = a[i].trim().split("\n");
+                if (n.length >= 2) {
+                  var r = -1 !== n[0].indexOf("--\x3e") ? n[0] : n[1],
+                    o = -1 !== n[0].indexOf("--\x3e") ? n.slice(1) : n.slice(2);
+                  if (r && -1 !== r.indexOf("--\x3e")) {
+                    var s = r.split("--\x3e"),
+                      l = hn(s[0].trim()),
+                      d = hn(s[1].trim()),
+                      c = o
+                        .join("<br>")
+                        .replace(/<font[^>]*>/gi, "")
+                        .replace(/<\/font>/gi, "")
+                        .trim();
+                    c && t.push({ start: l, end: d, text: c });
+                  }
+                }
+              }
+              return t;
+            })(a.responseText));
+        }),
+        a.send());
+    } catch (e) { }
+  }
+  function gn() {
+    Bi &&
+      (Bi.classList.remove("size-small", "size-normal", "size-big"),
+        Bi.classList.add("size-" + Zi),
+        Bi.classList.remove(
+          "color-white",
+          "color-yellow",
+          "color-cyan",
+          "color-lime",
+          "color-black"
+        ),
+        Bi.classList.add("color-" + en),
+        Bi.classList.remove("bg-outline", "bg-none", "bg-box"),
+        Bi.classList.add("bg-" + enBg));
+  }
+  function yn(e) {
+    if (Bi)
+      if ("player" === X.screen && Ji && pn && pn.length) {
+        for (var t = null, a = 0; a < pn.length; a++)
+          if (e >= pn[a].start && e <= pn[a].end) {
+            t = pn[a];
+            break;
+          }
+        if (t) {
+          var i = '<span class="player-subtitles-text">' + t.text + "</span>";
+          Bi.innerHTML !== i && (Bi.innerHTML = i);
+        } else "" !== Bi.innerHTML && (Bi.innerHTML = "");
+      } else "" !== Bi.innerHTML && (Bi.innerHTML = "");
+  }
+  function bn() {
+    return "detail" === X.screen
+      ? X.detail || null
+      : X.playerItem || X.detail || null;
+  }
+  var Cn = {},
+    wn = "";
+  function Sn(e) {
+    if (!e) return "";
+    if (x(e))
+      return (
+        "series:" +
+        (e.seriesContentId || e.seriesId || e.seasonId || e.id || "")
+      );
+    var t = kn(e);
+    return t && t.id ? t.id : e.id || "";
+  }
+  function xn(e) {
+    var t = Sn(e);
+    t && Cn.hasOwnProperty(t)
+      ? (X.streamMode = Cn[t] ? "smooth" : "normal")
+      : (X.streamMode =
+        "smooth" === X.playback.streamMode ? "smooth" : "normal");
+  }
+  function Tn(e, t) {
+    var a = Sn(e);
+    /* Un cambio de modo hecho por el espectador reabre la puerta al rescate
+       automático y al vigilante de arranque. */
+    ((smoothFallbackKey = ""), (xrKey = ""), (xr = !1),
+      (X.streamMode = t ? "smooth" : "normal"), a && (Cn[a] = !!t));
+  }
+  function _n() {
+    ((wn = ""),
+      (Xi = 0),
+      ($i = !1),
+      (X.audioPreferenceCode = X.audioPreferenceCode || "es-lat"),
+      (X.episodeBrowserPage = 0),
+      (Qi = null),
+      (Ji = !1),
+      (Ki = !1),
+      Yi++,
+      (X.trackIndex = 0),
+      (pn = []),
+      Bi && (Bi.innerHTML = ""));
+  }
+  function kn(e) {
+    return e && x(e)
+      ? "player" === X.screen && X.playerEpisode
+        ? X.playerEpisode
+        : X.detailEpisode
+          ? X.detailEpisode
+          : (e.episodes && e.episodes[0]) || null
+      : null;
+  }
+  function Ln(e) {
+    if (!e) return "";
+    var t = kn(e);
+    return t && t.id ? t.id : e.id || "";
+  }
+  function Mn(e, t) {
+    if (((t = t || function () { }), !e)) return t(null);
+    var a = Ln(e);
+    if (!a) return t(null);
+    if (un[a]) return (An(un[a]), t(un[a]));
+    if (vn[a]) vn[a].push(t);
+    else {
+      vn[a] = [t];
+      var i = kn(e),
+        n = { contentId: a },
+        r = e.seasonId || e.id;
+      (i && i.id && r && i.id !== r && (n.seriesContentId = r),
+        P("mediaInfo", n, function (e, t) {
+          var i = vn[a] || [];
+          delete vn[a];
+          var n = !e && t && !1 !== t.returnValue ? t : null;
+          n && ((un[a] = n), An(n));
+          for (var r = 0; r < i.length; r++)
+            try {
+              i[r](n);
+            } catch (e) { }
+        }));
+    }
+  }
+  function audioTracks(e) {
+    var t = String(e || "").split(/[,\/]/),
+      a = [],
+      i = 0;
+    for (i = 0; i < t.length; i++) t[i].trim() && a.push(t[i].trim());
+    return a;
+  }
+  function audioCode(e) {
+    var t = String(e || "").toLowerCase().replace(/^\s+|\s+$/g, "");
+    return /^(?:es|spa|esp)(?:[-_ ]?(?:419|lat|latam|la|mx|us|co|ar|cl|pe|ve|ec|uy|py|bo|do|pr))\b/.test(t) ||
+      /(?:latino|latam|américa latina|america latina)/.test(t)
+      ? "es-lat"
+      : /^(?:es|spa|esp)(?:[-_ ]?(?:es|españa|espana|castellano))\b/.test(t) ||
+        /(?:españa|espana|castellano)/.test(t)
+        ? "es-es"
+        : /^(?:es|spa|esp)\b/.test(t)
+          ? "es"
+          : /^(?:pt|por)\b/.test(t)
+            ? "pt"
+            : /^(?:en|eng|ing)\b/.test(t)
+              ? "en"
+              : /^(?:ja|jpn|jap)\b/.test(t)
+                ? "ja"
+                : t;
+  }
+  function preferredAudioIndex(e) {
+    var t = audioTracks(e),
+      a = ["es", "pt", "en"][Number(X.playback.audio) || 0] || "es",
+      i = 0,
+      n = -1;
+    if (!t.length) return 0;
+    if ($i && X.audioPreferenceCode)
+      for (i = 0; i < t.length; i++)
+        if (audioCode(t[i]) === X.audioPreferenceCode) return i;
+    if ("es" === a) {
+      for (i = 0; i < t.length; i++)
+        if ("es-lat" === audioCode(t[i])) return i;
+      for (i = 0; i < t.length; i++)
+        if ("es" === audioCode(t[i])) return i;
+      for (i = 0; i < t.length; i++)
+        if ("es-es" === audioCode(t[i])) return i;
+    }
+    for (i = 0; i < t.length; i++)
+      if (on(t[i], a)) {
+        n = i;
+        break;
+      }
+    return n >= 0 ? n : 0;
+  }
+  function In(e) {
+    return preferredAudioIndex(e);
+  }
+  function En(e) {
+    for (var t = [], a = (e && e.subtitles) || [], i = 0; i < a.length; i++)
+      t.push({ lang: a[i].lang, url: a[i].url, format: a[i].format });
+    return (
+      t.sort(function (e, t) {
+        return (
+          (/^(es|spa|esp)$/i.test(e.lang || "") ? 0 : 1) -
+          (/^(es|spa|esp)$/i.test(t.lang || "") ? 0 : 1)
+        );
+      }),
+      t
+    );
+  }
+  function An(e) {
+    var t = En(e);
+    if (Ki) {
+      if (Ji) {
+        if (!t.length) return ((Ji = !1), (Qi = null), void mn(null));
+        var a = !1;
+        if (Qi)
+          for (var i = 0; i < t.length; i++)
+            if (t[i].url === Qi.url) {
+              ((Qi = t[i]), (a = !0));
+              break;
+            }
+        a || mn((Qi = t[0]));
+      }
+    } else {
+      /* Si el espectador los había activado antes, se respeta su estado
+         guardado. Si nunca los activó (o los desactivó), quedan apagados. */
+      if (!X.playback.subtitle) return ((Ji = !1), (Qi = null), void mn(null));
+      if (!t.length) return ((Ji = !1), (Qi = null), void mn(null));
+      ((Ji = !0), (Qi = t[0]));
+      for (var n = 0; n < t.length; n++)
+        if (on(t[n].lang, rn())) {
+          Qi = t[n];
+          break;
+        }
+      mn(Qi);
+    }
+  }
+  function Dn() {
+    (Wi && clearTimeout(Wi),
+      (Wi = setTimeout(function () {
+        On();
+      }, 8e3)));
+  }
+  function Pn() {
+    if ((hi || lr(), hi)) {
+      ((zi = !0),
+        (ji = !1),
+        ui(),
+        qn(),
+        hi.classList.add("is-active"),
+        Bi && Bi.classList.add("shift-up"),
+        Mn(X.playerItem, function () {
+          zi && qn();
+        }),
+        Dn());
+      var e = X.playerItem;
+      var initFocus = null;
+      if (x(e) && yi) {
+        var t = yi.querySelector(".psv-ep-btn");
+        if (t) initFocus = t;
+      }
+      if (!initFocus) {
+        initFocus = (x(e) && _i) ? _i : bi;
+      }
+      if (window.DialogManager) {
+        window.DialogManager.open("playSettingView", hi, {
+          returnFocus: Ce,
+          initialFocus: initFocus,
+          fallbackFocus: function () {
+            if ("player" === X.screen && Ce && at(Ce)) return Ce;
+            return null;
+          },
+          onClose: function () {
+            if (Wi) { clearTimeout(Wi); Wi = null; }
+            zi = !1;
+            if (hi) {
+              hi.classList.remove("is-active");
+              hi.style.display = "";
+            }
+            if (Bi) Bi.classList.remove("shift-up");
+          }
+        });
+      } else {
+        initFocus && rt(initFocus);
+      }
+    }
+  }
+  function On(skipFocus) {
+    if (window.DialogManager && window.DialogManager.isOpen("playSettingView")) {
+      window.DialogManager.close("playSettingView", !!skipFocus);
+      return;
+    }
+    (Wi && (clearTimeout(Wi), (Wi = null)),
+      (zi = !1),
+      hi && (hi.classList.remove("is-active"), (hi.style.display = "")),
+      Bi && Bi.classList.remove("shift-up"),
+      !skipFocus && ("player" !== X.screen || ji || rt(Ce)));
+  }
+  function qn() {
+    var e = X.focus ? n(X.focus, ".psv-row") : null,
+      t = e ? e.id : "",
+      a = e && X.focus ? X.focus.textContent : "";
+    if (
+      (Rn(),
+        (function () {
+          if (!Si) return;
+          Si.classList.remove("is-hidden");
+        })(),
+        Kn(),
+        Yn(),
+        Nn(),
+        zi && t && hi)
+    )
+      for (var i = hi.querySelectorAll(".psv-row"), r = 0; r < i.length; r++)
+        if (i[r].id === t) {
+          for (
+            var o = i[r].querySelectorAll(".focusable"), s = null, l = 0;
+            l < o.length;
+            l++
+          )
+            if (o[l].textContent === a) {
+              s = o[l];
+              break;
+            }
+          var d = s || ot(i[r]);
+          d && rt(d, !0);
+          break;
+        }
+  }
+  function Nn() {
+    if (hi) {
+      for (var e = hi.querySelectorAll(".psv-row"), t = 0; t < e.length; t++)
+        e[t].classList.remove("is-row-focused");
+      var a = X.focus ? n(X.focus, ".psv-row") : null;
+      a && a.classList.add("is-row-focused");
+    }
+  }
+  function Rn() {
+    if (gi) {
+      var t = X.playerItem;
+      if (t && x(t)) {
+        if (((gi.style.display = "block"), yi)) {
+          a(yi);
+          var i = Vn(t),
+            n = i[X.playerSeasonIndex] || i[0],
+            r =
+              n &&
+                n.id === (t.seasonId || t.id) &&
+                t.episodes &&
+                t.episodes.length
+                ? t.episodes
+                : (n && n._episodes) || t.episodes || [];
+          if (r.length) {
+            for (var o = 0, s = 0; s < r.length; s++)
+              if (
+                X.playerEpisode &&
+                (r[s].id === X.playerEpisode.id ||
+                  r[s].number === X.playerEpisode.number)
+              ) {
+                o = s;
+                break;
+              }
+            var l = wa(r.length);
+            (void 0 === X.playerEpisodeRange ||
+              X.playerEpisodeRange >= l.length) &&
+              (X.playerEpisodeRange = Math.floor(o / 20));
+            for (
+              var d = l[X.playerEpisodeRange] || l[0],
+              c = e("div", "psv-episode-numbers scrollable"),
+              p = d.start;
+              p < d.end;
+              p++
+            )
+              (function (t, a) {
+                var i = String(
+                  void 0 !== t.number && null !== t.number ? t.number : a + 1
+                ),
+                  n = e(
+                    "button",
+                    "psv-ep-btn focusable" + (a === o ? " is-selected" : ""),
+                    i
+                  );
+                ((n._activate = function () {
+                  Xn(t);
+                }),
+                  (n._onMove = function (dir) {
+                    /* Baja a REPRODUCCIÓN (Normal / Modo Fluido). */
+                    if ("down" !== dir) return !1;
+                    var row = document.getElementById("psv-player-row"),
+                      first = row ? row.querySelector(".psv-btn") || ot(row) : null;
+                    return first ? (rt(first), !0) : !1;
+                  }),
+                  c.appendChild(n));
+              })(r[p], p);
+            yi.appendChild(c);
+            for (
+              var u = e("div", "psv-episode-ranges scrollable"), v = 0;
+              v < l.length;
+              v++
+            )
+              (function (t, a) {
+                var i = e(
+                  "button",
+                  "psv-range-btn focusable" +
+                  (t === X.playerEpisodeRange ? " is-selected" : ""),
+                  a.start + 1 + "-" + a.end
+                );
+                ((i._activate = function () {
+                  ((X.playerEpisodeRange = t), Rn());
+                  var e = yi.querySelector(".psv-ep-btn");
+                  e && rt(e);
+                }),
+                  (i._onFocus = function () {
+                    vr(u, i);
+                  }),
+                  (i._onMove = (function (rangeIndex, rangeButton) {
+                    return function (direction) {
+                      if ("left" === direction) {
+                        if (rangeIndex > 0 && u.children[rangeIndex - 1])
+                          return (rt(u.children[rangeIndex - 1]), !0);
+                        return !0;
+                      }
+                      if ("right" === direction) {
+                        if (rangeIndex + 1 < u.children.length && u.children[rangeIndex + 1])
+                          return (rt(u.children[rangeIndex + 1]), !0);
+                        return !0;
+                      }
+                      if ("up" === direction) {
+                        var episodeButton = yi.querySelector(".psv-ep-btn.is-selected") || yi.querySelector(".psv-ep-btn");
+                        return episodeButton ? (rt(episodeButton), !0) : !0;
+                      }
+                      if ("down" === direction) {
+                        var playerRow = document.getElementById("psv-player-row"),
+                          firstMode = playerRow
+                            ? playerRow.querySelector(".psv-btn") || ot(playerRow)
+                            : null;
+                        return firstMode ? (rt(firstMode), !0) : !1;
+                      }
+                      return !1;
+                    };
+                  })(t, i)),
+                  u.appendChild(i));
+              })(v, l[v]);
+            yi.appendChild(u);
+          } else
+            yi.appendChild(
+              e("div", "psv-selection-empty", "Temporadas y episodios")
+            );
+        }
+      } else gi.style.display = "none";
+    }
+  }
+  function Vn(e) {
+    return e && e.seasons && e.seasons.length
+      ? e.seasons
+      : [{ id: e ? e.id : "", number: 1 }];
+  }
+  function Hn(e, t, a) {
+    return (
+      (a = a || function () { }),
+      e && t
+        ? t.id === (e.seasonId || e.id) && e.episodes && e.episodes.length
+          ? ((t._episodes = e.episodes), a(e.episodes))
+          : t._episodes
+            ? a(t._episodes)
+            : t._loading
+              ? ((t._wait = t._wait || []), void t._wait.push(a))
+              : ((t._loading = !0),
+                (t._wait = [a]),
+                void P("detail", { contentId: t.id }, function (e, a) {
+                  t._loading = !1;
+                  var i =
+                    !e && a && !1 !== a.returnValue && a.episodes
+                      ? a.episodes
+                      : [];
+                  i.length && (t._episodes = i);
+                  var n = t._wait || [];
+                  t._wait = [];
+                  for (var r = 0; r < n.length; r++)
+                    try {
+                      n[r](i);
+                    } catch (e) { }
+                }))
+        : a([])
+    );
+  }
+  function Un(e, t, a) {
+    var i = t && void 0 !== t.number && null !== t.number ? t.number : a + 1,
+      n = String((t && (t.title || t.name)) || "").trim(),
+      r = String((e && e.title) || "")
+        .trim()
+        .replace(/[\s\-–_]*[TtSs]\d+$/, "");
+    return (
+      r && 0 === n.indexOf(r) && (n = n.substring(r.length)),
+      ((n = n.replace(/^[\s\-–_:.]+/, "").trim()) &&
+        !/^(?:[TtSs]?\d+[\s\-–_.:]*)+$/.test(n)) ||
+      (n = "Episodio " + i),
+      n
+    );
+  }
+  function Fn(e) {
+    var t = String((e && e.duration) || "").trim(),
+      a = /^(\d+):(\d+)(?::(\d+))?$/.exec(t);
+    return a
+      ? a[3]
+        ? (parseInt(a[1], 10) || 0) + " h " + (parseInt(a[2], 10) || 0) + " min"
+        : (parseInt(a[1], 10) || 0) + " min"
+      : t;
+  }
+  function Bn() {
+    var t = X.playerItem;
+    if (t && x(t) && (zi && On(), ki || lr(), ki)) {
+      if (!((t.episodes && t.episodes.length) || t._detailsLoaded))
+        return (
+          jr("Cargando capítulos…"),
+          void U(t, function () {
+            "player" === X.screen &&
+              (!X.playerEpisode &&
+                t.episodes &&
+                t.episodes.length &&
+                ((X.playerEpisode = t.episodes[0]),
+                  (X.detailEpisode = t.episodes[0])),
+                Bn());
+          })
+        );
+      (!X.playerEpisode &&
+        t.episodes &&
+        t.episodes.length &&
+        ((X.playerEpisode = t.episodes[0]),
+          (X.detailEpisode = t.episodes[0]),
+          (X.playerSeasonIndex = X.detailSeason || 0)),
+        (X.episodeBrowserOpen = !0),
+        (X.browserSeason = X.playerSeasonIndex || 0),
+        ki.classList.add("is-active"),
+        fi(),
+        (function () {
+          var t = X.playerItem;
+          if (!t || !ki) return;
+          var i = Vn(t);
+          X.browserSeason >= i.length && (X.browserSeason = 0);
+          X.browserSeason < 0 && (X.browserSeason = 0);
+          var n = i[X.browserSeason],
+            r = i[X.playerSeasonIndex] || i[0],
+            o = X.playerEpisode;
+          Li && (Li.textContent = t.title || "");
+          if (Mi)
+            if (o) {
+              var s = [];
+              (r && r.number && s.push("T" + r.number),
+                o.number && s.push("E" + o.number),
+                (Mi.textContent =
+                  "Reproduciendo " + s.join(" ") + " · " + Un(t, o)));
+            } else Mi.textContent = "Elige un episodio";
+          Di &&
+            (Di.textContent =
+              "Episodios · Temporada " +
+              ((n && n.number) || X.browserSeason + 1));
+          ((function (t, i) {
+            if (!Ii || !Ei) return;
+            (a(Ii), (Ei.style.display = "flex"));
+            for (var n = 0; n < i.length; n++)
+              (function (t) {
+                var a = e(
+                  "div",
+                  "pe-season focusable",
+                  "Temporada " + (i[t].number || t + 1)
+                );
+                (t === X.browserSeason && a.classList.add("is-selected"),
+                  (a._onFocus = function () {
+                    if (Ii) {
+                      var targetScroll = a.offsetLeft - (Ii.clientWidth / 2) + (a.clientWidth / 2);
+                      smoothScroll(Ii, Math.max(0, targetScroll), null, 180);
+                    }
+                    X.browserSeason !== t && Wn(t, !1);
+                  }),
+                  (a._onMove = function (e) {
+                    if ("left" === e) {
+                      if (t > 0 && Ii && Ii.children[t - 1]) {
+                        rt(Ii.children[t - 1]);
+                        return !0;
+                      }
+                      return !0;
+                    }
+                    if ("right" === e) {
+                      if (t < i.length - 1 && Ii && Ii.children[t + 1]) {
+                        rt(Ii.children[t + 1]);
+                        return !0;
+                      }
+                      return !0;
+                    }
+                    if ("down" === e) {
+                      var tEp =
+                        (Ai && Ai.querySelector(".pe-ep.is-current")) ||
+                        (Ai && ot(Ai));
+                      return tEp ? (rt(tEp), !0) : !0;
+                    }
+                    return !1;
+                  }),
+                  (a._activate = function () {
+                    Wn(t, !0);
+                  }),
+                  Ii.appendChild(a));
+              })(n);
+          })(0, i),
+            jn(t, n));
+        })());
+      var i =
+        (Ai ? Ai.querySelector(".pe-ep.is-current") : null) ||
+        (Ai ? ot(Ai) : null) ||
+        (Ei && "none" !== Ei.style.display ? ot(Ii) : null);
+      if (window.DialogManager) {
+        window.DialogManager.open("playerEpisodes", ki, {
+          returnFocus: Ce,
+          initialFocus: i,
+          fallbackFocus: function () {
+            if ("player" === X.screen && Ce && at(Ce)) return Ce;
+            return null;
+          },
+          onClose: function () {
+            X.episodeBrowserOpen = !1;
+            if (ki) ki.classList.remove("is-active");
+          }
+        });
+      } else {
+        i && rt(i);
+      }
+    }
+  }
+  function zn(skipFocus) {
+    if (window.DialogManager && window.DialogManager.isOpen("playerEpisodes")) {
+      window.DialogManager.close("playerEpisodes", !!skipFocus);
+      return;
+    }
+    ki &&
+      X.episodeBrowserOpen &&
+      ((X.episodeBrowserOpen = !1),
+        ki.classList.remove("is-active"),
+        !skipFocus && "player" === X.screen && Ce && rt(Ce));
+  }
+  function changeEpisodePage(e, t) {
+    var a = X.playerItem;
+    if (!a) return !1;
+    var i = Vn(a)[X.browserSeason],
+      n = i && i._episodes ? i._episodes : [];
+    if (!i || !n.length) return !1;
+    var r = Math.ceil(n.length / 20),
+      o = Math.max(0, Math.min(r - 1, (X.episodeBrowserPage || 0) + e));
+    return o === X.episodeBrowserPage
+      ? !1
+      : ((X.episodeBrowserPage = o),
+        jn(a, i),
+        setTimeout(function () {
+          var e = Ai && (Ai.querySelectorAll(".pe-ep")[t || 0] || ot(Ai));
+          e && rt(e);
+        }, 0),
+        !0);
+  }
+  function jn(t, i) {
+    if (Ai && i) {
+      a(Ai);
+      var r =
+        i.id === (t.seasonId || t.id) && t.episodes && t.episodes.length
+          ? t.episodes
+          : i._episodes || [];
+      if (!r.length)
+        return (
+          Ai.appendChild(e("div", "pe-loading", "Cargando episodios…")),
+          void Hn(t, i, function (e) {
+            if (
+              X.episodeBrowserOpen &&
+              Vn(t)[X.browserSeason] === i &&
+              (jn(t, i), n(X.focus, "#pe-episodes"))
+            ) {
+              var a = Ai.querySelector(".pe-ep.is-current") || ot(Ai);
+              a && rt(a);
+            }
+          })
+        );
+      var o = 20,
+        s = Math.max(0, Math.min(Math.ceil(r.length / o) - 1, X.episodeBrowserPage || 0)),
+        l = s * o,
+        d = Math.min(r.length, l + o);
+      X.episodeBrowserPage = s;
+      for (var c = l; c < d; c++)
+        (function (a, i) {
+          var n = e("div", "pe-ep focusable"),
+            r = void 0 !== a.number && null !== a.number ? a.number : i + 1;
+          n.appendChild(e("div", "pe-num", String(r)));
+          var o = e("div", "pe-thumb"),
+            s = e("div", "pe-thumb-play");
+          s.innerHTML = playSvg();
+          (o.appendChild(s), n.appendChild(o));
+          var l = e("div", "pe-info");
+          l.appendChild(e("div", "pe-name", Un(t, a, i)));
+          var d = [],
+            c = Fn(a);
+          (c && d.push(c),
+            a.quality && d.push(String(a.quality).split(",")[0].toUpperCase()),
+            l.appendChild(e("div", "pe-meta", d.join("   ·   "))),
+            a.description && l.appendChild(e("div", "pe-desc", a.description)),
+            n.appendChild(l));
+          var p =
+            X.playerEpisode &&
+            (X.playerEpisode.id === a.id ||
+              (void 0 !== X.playerEpisode.number &&
+                X.playerEpisode.number === a.number));
+          (n.appendChild(e("div", "pe-badge", "REPRODUCIENDO")),
+            p && n.classList.add("is-current"),
+            (n._onMove = function (e) {
+              var t = Ai ? Ai.querySelectorAll(".pe-ep") : [],
+                a = 0;
+              for (a = 0; a < t.length; a++) if (t[a] === n) break;
+              return "left" === e
+                ? (Ii && rt(Ii.children[X.browserSeason] || ot(Ii)), !0)
+                : ("right" === e || "down" === e) &&
+                  a === t.length - 1 &&
+                  s + 1 < Math.ceil(r.length / o)
+                  ? changeEpisodePage(1, 0)
+                  : ("left" === e || "right" === e ? !0 : !1);
+            }),
+            (n._activate = function () {
+              Xn(a);
+            }),
+            Ai.appendChild(n));
+        })(r[c], c);
+      r.length > o &&
+        Ai.appendChild(
+          e(
+            "div",
+            "pe-loading",
+            "Capítulos " + (l + 1) + "-" + d + " de " + r.length + " · usa → para ver más"
+          )
+        );
+    }
+  }
+  function Wn(e, t) {
+    var a = X.playerItem,
+      i = Vn(a);
+    if (
+      i[e] &&
+      ((X.browserSeason = e),
+        (X.episodeBrowserPage = 0),
+        (function () {
+          if (Ii)
+            for (var e = Ii.children, t = 0; t < e.length; t++)
+              e[t].classList.toggle("is-selected", t === X.browserSeason);
+        })(),
+        Di &&
+        (Di.textContent = "Episodios · Temporada " + (i[e].number || e + 1)),
+        jn(a, i[e]),
+        t)
+    ) {
+      var n = Ai ? Ai.querySelector(".pe-ep.is-current") || ot(Ai) : null;
+      n && rt(n);
+    }
+  }
+  function Xn(e) {
+    var t = X.playerItem;
+    if (t && e) {
+      var a = Vn(t),
+        i = a[X.playerSeasonIndex];
+      i &&
+        i.id === (t.seasonId || t.id) &&
+        t.episodes &&
+        t.episodes.length &&
+        (i._episodes = t.episodes);
+      var n =
+        void 0 !== X.playerSeasonIndex && null !== X.playerSeasonIndex
+          ? X.playerSeasonIndex
+          : X.browserSeason || 0,
+        r = a[n];
+      (r &&
+        (X.detailSeason !== n &&
+          ((X.detailSeason = n), (X.detailNeedsRebuild = !0)),
+          r.id && (t.seasonId = r.id),
+          r._episodes && (t.episodes = r._episodes)),
+        zn(),
+        zi && On(),
+        $n(t, e));
+    }
+  }
+  function $n(e, t) {
+    if (e && t) {
+      ((X.playerItem = e),
+        (X.playerEpisode = t),
+        (X.detailEpisode = t),
+        (X.playerSeasonIndex = X.detailSeason || 0),
+        (autoNextKey = ""),
+        Ce && we && ao(),
+        Jn(e),
+        X.episodeSwitchTimer && clearTimeout(X.episodeSwitchTimer),
+        (X.episodeSwitchSeq = (X.episodeSwitchSeq || 0) + 1));
+      var a = X.episodeSwitchSeq;
+      (zr(),
+        showLoadingBackdrop(e, "Cargando capítulo " + ((t && (t.number || t.seriesNumber)) || "") + "…"),
+        jr("Cambiando capítulo…"),
+        (X.episodeSwitchTimer = setTimeout(function () {
+          ((X.episodeSwitchTimer = null),
+            a === X.episodeSwitchSeq && ("player" === X.screen || "detail" === X.screen) && Jr(e, t));
+        }, 600)));
+    }
+  }
+  var loadingBackdropTimer = null;
+  function showLoadingBackdrop(e, text) {
+    if ((ke || (ke = t("next-episode-loading")), ke)) {
+      var a = (e && (e.backdrop || e.landscape || e.poster)) || "";
+      ke.style.backgroundImage = a ? 'url("' + String(a).replace(/"/g, "%22") + '")' : "";
+      var txtEl = ke.querySelector(".next-episode-loading-text");
+      if (txtEl) {
+        if (text) {
+          txtEl.innerHTML = text;
+        } else if (e && e.title) {
+          txtEl.innerHTML = "Cargando " + e.title + "…";
+        } else {
+          txtEl.innerHTML = "Cargando…";
+        }
+      }
+      ke.classList.add("is-active");
+      if (loadingBackdropTimer) clearTimeout(loadingBackdropTimer);
+      loadingBackdropTimer = setTimeout(function () {
+        loadingBackdropTimer = null;
+        Gn();
+      }, 3500);
+    }
+  }
+  function Gn() {
+    if (loadingBackdropTimer) {
+      clearTimeout(loadingBackdropTimer);
+      loadingBackdropTimer = null;
+    }
+    (ke || (ke = t("next-episode-loading")),
+      ke &&
+      (ke.classList.remove("is-active"), (ke.style.backgroundImage = "")));
+  }
+  var autoNextKey = "";
+  function nextVodEpisode(item, episode) {
+    if (!item || !episode || !x(item)) return null;
+    var seasons = Vn(item), index = X.playerSeasonIndex || 0,
+      season = seasons[index] || seasons[0];
+    if (!season) return null;
+    var episodes = season.id === (item.seasonId || item.id) && item.episodes && item.episodes.length
+      ? item.episodes : season._episodes || [];
+    for (var i = 0; i < episodes.length; i++) {
+      if ((episode.id && episodes[i].id === episode.id) ||
+          (episode.number != null && episodes[i].number === episode.number)) {
+        if (episodes[i + 1]) return { episode: episodes[i + 1] };
+        if (seasons[index + 1]) return { season: seasons[index + 1], index: index + 1 };
+        break;
+      }
+    }
+    return null;
+  }
+  function Qn() {
+    var item = X.playerItem, episode = X.playerEpisode;
+    if ("player" !== X.screen || "vod" !== X.playerMode || !item || !episode) return;
+    var key = String(item.id || "") + "|" + String(episode.id || "");
+    if (key === autoNextKey) return;
+    var next = nextVodEpisode(item, episode);
+    if (!next) return;
+    autoNextKey = key;
+    showLoadingBackdrop(item, "El siguiente capítulo se está<br>cargando...");
+    if (next.episode) return $n(item, next.episode);
+    Hn(item, next.season, function (episodes) {
+      if (X.playerItem !== item || X.playerEpisode !== episode || X.screen !== "player" ||
+          X.playerMode !== "vod") return;
+      if (!episodes || !episodes.length) return Gn();
+      X.detailSeason = X.playerSeasonIndex = next.index;
+      item.seasonId = next.season.id || item.seasonId;
+      item.episodes = next.season._episodes = episodes;
+      $n(item, episodes[0]);
+    });
+  }
+  function Jn(e) {
+    if (de)
+      for (
+        var t = de.querySelectorAll(".detail-episode"), a = 0;
+        a < t.length;
+        a++
+      ) {
+        var i = !(
+          !t[a]._ep ||
+          !X.detailEpisode ||
+          t[a]._ep.id !== X.detailEpisode.id
+        );
+        t[a].classList.toggle("is-playing", i);
+      }
+  }
+  function Kn() {
+    var e = "relay" === X.streamMode || "smooth" === X.streamMode;
+    if (Ci) {
+      Ci.classList.toggle("is-selected", e);
+      var t = Ci.querySelector(".psv-check");
+      t && (t.style.display = e ? "block" : "none");
+    }
+    if (wi) {
+      wi.classList.toggle("is-selected", !e);
+      var a = wi.querySelector(".psv-check");
+      a && (a.style.display = e ? "none" : "block");
+    }
+  }
+  function Yn() {
+    if (Ti)
+      for (var e = Ti.querySelectorAll(".psv-btn"), t = 0; t < e.length; t++) {
+        var a = e[t].getAttribute("data-aspect") === tn;
+        e[t].classList.toggle("is-selected", a);
+        var i = e[t].querySelector(".psv-check");
+        i && (i.style.display = a ? "block" : "none");
+      }
+  }
+  function Zn(e) {
+    ((tn = e || "contain"),
+      xe &&
+      (xe.classList.remove(
+        "aspect-cover",
+        "aspect-contain",
+        "aspect-16-9",
+        "aspect-4-3"
+      ),
+        xe.classList.add("aspect-" + tn)),
+      Yn());
+  }
+  function er(e) {
+    if ((mi || lr(), mi)) {
+      (Wi && (clearTimeout(Wi), (Wi = null)), (ji = !0), (fn = X.focus));
+      var t = e || bn();
+      ("detail" === X.screen && (t = X.detail || t),
+        ar(),
+        ir(),
+        gn(),
+        mi.classList.add("is-active"),
+        Mn(t, function () {
+          ji && (ar(), ir());
+        }));
+      var a = (Pi && Pi.querySelector(".focusable")) || Oi || Fi;
+      if (zi && hi) {
+        hi.style.display = "none";
+      }
+      if (window.DialogManager) {
+        window.DialogManager.open("playSettings", mi, {
+          returnFocus: fn,
+          initialFocus: a,
+          fallbackFocus: function () {
+            if (zi && bi && at(bi)) return bi;
+            if ("player" === X.screen && Ce && at(Ce)) return Ce;
+            return null;
+          },
+          onClose: function () {
+            ji = !1;
+            if (mi) mi.classList.remove("is-active");
+            if (zi) {
+              if (hi) hi.style.display = "";
+              if (bi) rt(bi);
+              Dn();
+            }
+            fn = null;
+          }
+        });
+      } else {
+        a && rt(a);
+      }
+    }
+  }
+  function tr() {
+    if (window.DialogManager && window.DialogManager.isOpen("playSettings")) {
+      window.DialogManager.close("playSettings");
+      return;
+    }
+    ((ji = !1),
+      mi && mi.classList.remove("is-active"),
+      zi
+        ? (hi && (hi.style.display = ""), bi && rt(bi), Dn())
+        : fn && at(fn)
+          ? rt(fn)
+          : "player" === X.screen && rt(Ce),
+      (fn = null));
+  }
+  function ar() {
+    if (Pi) {
+      a(Pi);
+      var t = un[Ln(bn())];
+      t && !$i && (Xi = preferredAudioIndex(t.audio));
+      var i = (function (e) {
+        for (
+          var t = [], a = audioTracks(e && e.audio), i = 0;
+          i < a.length;
+          i++
+        ) {
+          var n = a[i].trim();
+          n && t.push({ index: i, code: n, label: nr(n) });
+        }
+        return t;
+      })(t);
+      i.length || (i = [{ index: Xi || 0, label: "Español" }]);
+      for (var n = 0; n < i.length; n++)
+        (function (t) {
+          var a = e("button", "dps-btn focusable");
+          ((a.textContent = t.label),
+            Xi === t.index && a.classList.add("is-selected"),
+            (a._activate = function () {
+              (or(t.index), ar(), Dn());
+            }),
+            Pi.appendChild(a));
+        })(i[n]);
+    }
+  }
+  function refreshQualityOptions() {
+    if (!ZiOptsQuality) return;
+    a(ZiOptsQuality);
+    var info = window.__xuperStreamInfo || null,
+      mi = un[Ln(bn())],
+      tracks = (mi && mi.tracks) || (info && info.availableTracks) || [],
+      uhd = xUhdPanel(),
+      heights = [],
+      seen = {},
+      k,
+      h;
+    for (k = 0; k < tracks.length; k++) {
+      h = Number(tracks[k] && tracks[k].height) || 0;
+      if (!h) continue;
+      if (!uhd && h >= 2000) continue;
+      if (seen[h]) continue;
+      seen[h] = !0;
+      heights.push(h);
+    }
+    if (!seen[1080]) {
+      seen[1080] = !0;
+      heights.push(1080);
+    }
+    if (!seen[720]) {
+      seen[720] = !0;
+      heights.push(720);
+    }
+    heights.sort(function (a, b) {
+      return b - a;
+    });
+    var cur = X.playback.quality || "auto",
+      opts = [{ label: "Automática", value: "auto" }];
+    for (k = 0; k < heights.length; k++)
+      opts.push({
+        label: heights[k] >= 2000 ? "4K" : heights[k] + "p",
+        value: String(heights[k]),
+      });
+    var hasCur = !1;
+    for (k = 0; k < opts.length; k++) if (opts[k].value === cur) hasCur = !0;
+    if (!hasCur)
+      opts.push({
+        label: /^\d+$/.test(cur) ? (/^(?:2160|2000)$/.test(cur) ? "4K" : cur + "p") : cur,
+        value: cur,
+      });
+    for (k = 0; k < opts.length; k++)
+      (function (opt) {
+        var b = e("button", "dps-btn focusable", opt.label);
+        (b.setAttribute("data-quality", opt.value),
+          opt.value === cur && b.classList.add("is-selected"),
+          (b._activate = function () {
+            ((X.playback.quality = opt.value), (X.trackIndex = 0), Y(), ir());
+            "player" === X.screen &&
+              "vod" === X.playerMode &&
+              (jr("Cambiando calidad a " + opt.label + "…"), sr());
+          }),
+          ZiOptsQuality.appendChild(b));
+      })(opts[k]);
+  }
+  function ir() {
+    var t = En(un[Ln(bn())]);
+    refreshQualityOptions();
+    if (Oi) {
+      var i = Oi.parentNode;
+      (i && i.classList.toggle("is-hidden", !t.length),
+        Oi.classList.toggle("is-on", Ji));
+      var n = Oi.querySelector(".dps-switch-text");
+      n && (n.textContent = Ji ? "ON" : "OFF");
+    }
+    if (
+      (qi && qi.classList.toggle("is-visible", Ji && t.length > 0),
+        Ni && Ni.classList.toggle("is-visible", Ji && t.length > 0),
+        Ri && Ri.classList.toggle("is-visible", Ji && t.length > 0),
+        ZiRowBg && ZiRowBg.classList.toggle("is-visible", Ji && t.length > 0),
+        Ji)
+    ) {
+      if (Vi) {
+        a(Vi);
+        for (var r = 0; r < t.length; r++)
+          (function (t) {
+            var a = e("button", "dps-btn focusable");
+            ((a.textContent = nr(t.lang || "Sub")),
+              Qi && Qi.url === t.url && a.classList.add("is-selected"),
+              (a._activate = function () {
+                ((Qi = t), (Ji = !0), (Ki = !0), mn(t), ir(), Dn());
+              }),
+              Vi.appendChild(a));
+          })(t[r]);
+      }
+      if (Hi)
+        for (
+          var o = Hi.querySelectorAll(".dps-btn"), s = 0;
+          s < o.length;
+          s++
+        ) {
+          var l = o[s].getAttribute("data-size");
+          o[s].classList.toggle("is-selected", l === Zi);
+        }
+      if (Ui)
+        for (
+          var d = Ui.querySelectorAll(".dps-btn"), c = 0;
+          c < d.length;
+          c++
+        ) {
+          var p = d[c].getAttribute("data-style");
+          d[c].classList.toggle("is-selected", p === en);
+        }
+      if (ZiOptsBg)
+        for (
+          var dB = ZiOptsBg.querySelectorAll(".dps-btn"), cB = 0;
+          cB < dB.length;
+          cB++
+        ) {
+          var pB = dB[cB].getAttribute("data-bg");
+          dB[cB].classList.toggle("is-selected", pB === enBg);
+        }
+    }
+  }
+  function nr(e) {
+    var a = String(e || "").toLowerCase().replace(/^\s+|\s+$/g, ""),
+      t = a.split(/[-_]/)[0],
+      i = audioCode(a);
+    return "es-lat" === i
+      ? "Español latino"
+      : "es-es" === i
+        ? "Español España"
+        : /^(spa|esp|es|castellano|latino|lat|latam)$/.test(t)
+          ? "Español"
+          : /^(eng|ing|en)$/.test(t)
+            ? "Inglés"
+            : /^(jpn|jap|ja)$/.test(t)
+              ? "Japonés"
+              : /^(kor|cor|ko)$/.test(t)
+                ? "Coreano"
+                : /^(por|pt)$/.test(t)
+                  ? "Portugués"
+                  : /^(fra|fre|fr|franc)$/.test(t)
+                    ? "Francés"
+                    : /^(ita|it)$/.test(t)
+                      ? "Italiano"
+                      : /^(deu|ger|de)$/.test(t)
+                        ? "Alemán"
+                        : /^(chi|zho|zh)$/.test(t)
+                          ? "Chino"
+                          : t
+                            ? t.charAt(0).toUpperCase() + t.slice(1)
+                            : "Pista";
+  }
+  function rr(e) {
+    if (!xe) return !1;
+    var t;
+    try {
+      t = xe.audioTracks;
+    } catch (e) {
+      return !1;
+    }
+    if (!t || !t.length || !(e >= 0 && e < t.length)) return !1;
+    try {
+      for (var a = 0; a < t.length; a++) t[a].enabled = a === e;
+      return !0;
+    } catch (e) {
+      return !1;
+    }
+  }
+  function or(e) {
+    var a = un[Ln(bn())],
+      i = audioTracks(a && a.audio),
+      n = i[e] ? audioCode(i[e]) : "";
+    ((X.audioPreferenceCode = n), (Xi = e), ($i = !0));
+    if ("player" !== X.screen || !xe) return;
+    if ("relay" === X.streamMode || "smooth" === X.streamMode)
+      if (br) {
+        var t = Cr + (xe.currentTime || 0);
+        Gr(br + "?start=" + Math.floor(t) + "&a=" + e);
+      } else sr();
+    else if (rr(e)) {
+      ((Gi = Date.now() + 5e3), jr("Idioma cambiado"));
+    } else {
+      /* Si la TV no soporta conmutar audio nativo en Modo Normal, se activa
+         Modo Fluido con la pista de audio seleccionada para que el relay
+         entregue el stream remultiplexado en español/idioma elegido. */
+      jr("Activando Modo Fluido para idioma " + (nr(n) || "seleccionado") + "…");
+      X.streamMode = "smooth";
+      sr();
+    }
+  }
+  /* Compatibilidad de pista (port de XuperMH v2.31.1): informa al servicio si
+     el panel decodifica HEVC y si es UHD, para que no entregue 4K/HEVC a un
+     SoC que no puede, y permite probar otra copia cuando el primer intento
+     falla con error de media. */
+  var panelHevc = null,
+    panelUhd = null,
+    panelUhdAsked = !1,
+    copyTryKey = "",
+    copyTryCount = 0,
+    Tr = null;
+  function panelInfo() {
+    try {
+      return (
+        JSON.parse((window.PalmSystem && window.PalmSystem.deviceInfo) || "{}") ||
+        {}
+      );
+    } catch (e) {
+      return {};
+    }
+  }
+  function xWebosVersion() {
+    if (null !== Tr) return Tr;
+    var e = "";
+    try {
+      window.webOS &&
+        window.webOS.systemInfo &&
+        window.webOS.systemInfo.version &&
+        (e = String(window.webOS.systemInfo.version));
+    } catch (t) {
+      e = "";
+    }
+    if (!e && window.PalmSystem && window.PalmSystem.deviceInfo)
+      try {
+        var t = window.PalmSystem.deviceInfo;
+        ("string" == typeof t && (t = JSON.parse(t)),
+          t &&
+          (t.platformVersion
+            ? (e = String(t.platformVersion))
+            : t.version
+              ? (e = String(t.version))
+              : void 0 !== t.platformVersionMajor &&
+                null !== t.platformVersionMajor
+                ? (e =
+                  String(t.platformVersionMajor) +
+                  "." +
+                  String(t.platformVersionMinor || 0))
+                : t.sdkVersion && (e = String(t.sdkVersion))));
+      } catch (t) {
+        e = "";
+      }
+    if (!e && navigator && navigator.userAgent) {
+      var a = /(?:webOS|Web0S)[ \/]([0-9]+(?:\.[0-9]+)?)/i.exec(
+        navigator.userAgent
+      );
+      a && a[1] && (e = a[1]);
+    }
+    if (!e && navigator && navigator.userAgent) {
+      /Chrome\/38\./i.test(navigator.userAgent)
+        ? (e = "3.0")
+        : /Chrome\/53\./i.test(navigator.userAgent)
+          ? (e = "3.5")
+          : /Chrome\/68\./i.test(navigator.userAgent) && (e = "4.0");
+    }
+    var i = parseFloat(e);
+    return (Tr = isNaN(i) ? 0 : i);
+  }
+  function xHevcCapable() {
+    if ("boolean" == typeof panelHevc) return panelHevc;
+    var e = panelInfo(),
+      t = Number(e.platformVersionMajor) || 0,
+      m = String(e.modelName || "");
+    /* TVs FHD como LJ550/LJ5500/LJ550T (webOS 3.5/3.7) NO decodifican HEVC de
+       forma fiable y deben recibir H.264/AVC en lugar de HEVC para no quedar
+       en pantalla negra. */
+    if (/LJ55|LJ54|LJ50|LJ51|LJ52|LF59|LF63|LH57|LH59|LH60/i.test(m)) {
+      panelHevc = !1;
+      return !1;
+    }
+    panelHevc =
+      !t ||
+      t >= 4 ||
+      /OLED|^\d{2}(UB|UF|UH|UJ|SJ|EG|EF|EC9)/i.test(m);
+    try {
+      panelHevc ||
+        !window.webOS ||
+        !webOS.deviceInfo ||
+        webOS.deviceInfo(function (e) {
+          e && e.uhd && (panelHevc = !0);
+        });
+    } catch (e) { }
+    return panelHevc;
+  }
+  function xUhdPanel() {
+    if ("boolean" != typeof panelUhd) {
+      var e = panelInfo();
+      panelUhd =
+        (Number(e.screenWidth) || 0) >= 3800 ||
+        (Number(e.screenHeight) || 0) >= 2100;
+    }
+    if (!panelUhdAsked) {
+      panelUhdAsked = !0;
+      try {
+        window.webOS &&
+          webOS.deviceInfo &&
+          webOS.deviceInfo(function (e) {
+            e && "boolean" == typeof e.uhd && (panelUhd = e.uhd);
+          });
+      } catch (e) { }
+    }
+    return panelUhd;
+  }
+  try {
+    /* Precalienta deviceInfo al arrancar para que el primer título ya use la
+       capacidad real del panel (UHD / HEVC) y no el valor provisional. */
+    xHevcCapable();
+    xUhdPanel();
+  } catch (e) { }
+  function xNextCopy() {
+    var e = X.playerItem;
+    if (!e) return !1;
+    var t = Ln(e) + "|" + ((X.playerEpisode && X.playerEpisode.id) || "");
+    t !== copyTryKey && ((copyTryKey = t), (copyTryCount = 0));
+    var a =
+      (window.__xuperStreamInfo && window.__xuperStreamInfo.availableTracks) ||
+      [],
+      i = (X.trackIndex || 0) + 1;
+    if (copyTryCount >= 2 || i >= a.length) return !1;
+    copyTryCount++;
+    X.trackIndex = i;
+    var n = a[i] || {};
+    return (
+      jr(
+        "Probando otra copia compatible" +
+        (n.height ? " (" + n.height + "p " + (n.codec || "") + ")" : "") +
+        "…"
+      ),
+      setTimeout(function () {
+        "vod" === X.playerMode && X.playerItem === e && sr();
+      }, 0),
+      !0
+    );
+  }
+  function sr() {
+    if (xe) {
+      var e = br ? Cr + (xe.currentTime || 0) : xe.currentTime || 0,
+        t = X.playerItem;
+      (zr(),
+        jr("Cambiando reproductor…"),
+        Qr(t, function (t) {
+          if (t) {
+            if (-1 !== t.indexOf(":8787/s/")) {
+              var a = t + "?start=" + Math.floor(e);
+              (Xi && (a += "&a=" + Xi), Gr(a));
+            } else if ((Gr(t), e > 0))
+              try {
+                xe.currentTime = e;
+              } catch (e) { }
+          } else X.streamError || jr("Sin fuente de reproducción");
+        }));
+    }
+  }
+  function seekByPointer(evt) {
+    if ("vod" !== X.playerMode || !xe || !Pe) return;
+    var total = Hr();
+    if (!total || total <= 0) return;
+    var rect = Pe.getBoundingClientRect();
+    if (!rect || rect.width <= 0) return;
+    var clientX = evt.clientX;
+    if (typeof clientX !== "number" || isNaN(clientX)) return;
+    var ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    var targetTime = Math.max(0, Math.min(total - 2, Math.floor(ratio * total)));
+    var current = Vr();
+    var diff = targetTime - current;
+    if (Math.abs(diff) >= 1) {
+      li(diff);
+      oi(targetTime, total);
+    }
+    pi();
+    rt(Pe, !0);
+  }
+  function lr() {
+    var skipButton = t("vod-skip");
+    if (skipButton) bindMagicActivate(skipButton, activateVodSkip);
+    if (
+      ((Ce = t("player-stage")),
+        (we = t("player-infobar")),
+        (Me = t("player-vod-infobar")),
+        (Se = t("player-channels")),
+        ($e = t("player-categories")),
+        (Ge = t("pcat-grid")),
+        (Qe = t("pcat-sub")),
+        (xe = t("player-video")),
+        (_e = t("player-status")),
+        (ke = t("next-episode-loading")),
+        (Le = t("player-mode-hint")),
+        (Re = t("player-osd-icon")),
+        (Te = Ce ? Ce.querySelector(".player-frame") : null),
+        (Ie = t("vod-infobar-poster")),
+        (Ee = t("vod-infobar-title")),
+        (Ae = t("vod-time-current")),
+        (De = t("vod-time-total")),
+        (Pe = t("vod-seekbar")),
+        (Oe = t("vod-seek-progress")),
+        (qe = t("vod-seek-buffered")),
+        (Ne = t("vod-seek-thumb")),
+        Pe &&
+        (Pe.classList.add("focusable"),
+          (Pe._activate = function (evt) {
+            if (evt && typeof evt.clientX === "number") {
+              seekByPointer(evt);
+              return;
+            }
+            Ur(!0);
+          }),
+          Pe.addEventListener("click", function (evt) {
+            seekByPointer(evt);
+            evt.stopPropagation();
+          }),
+          (Pe._onMove = function (e) {
+            return "left" === e
+              ? (Br(-1), !0)
+              : "right" === e
+                ? (Br(1), !0)
+                : ("down" === e || "up" === e) && (Ur(!1), !0);
+          })),
+        Pe &&
+        Pe.parentNode &&
+        Pe.parentNode.addEventListener &&
+        Pe.parentNode.addEventListener("click", function (evt) {
+          if (evt.target === Pe || (Pe && Pe.contains(evt.target)) || evt.target === Pe.parentNode) {
+            seekByPointer(evt);
+            evt.stopPropagation();
+          }
+        }),
+        (hi = t("player-playsetting-view")),
+        (gi = t("psv-sec-selection")),
+        (yi = t("psv-episodes-row")),
+        (_i = t("psv-btn-episodes")),
+        (bi = t("psv-btn-config")),
+        (Ci = t("psv-btn-p1")),
+        (wi = t("psv-btn-p2")),
+        (Si = t("psv-sec-audio")),
+        t("psv-sec-quality"),
+        t("psv-quality-row"),
+        t("psv-sec-aspect"),
+        t("psv-sec-player"),
+        (xi = t("psv-btn-feedback")),
+        (Ti = t("psv-aspect-row")),
+        (ki = t("player-episodes")),
+        (Li = t("pe-title")),
+        (Mi = t("pe-sub")),
+        (Ii = t("pe-seasons")),
+        (Ei = t("pe-seasons-col")),
+        (Ai = t("pe-episodes")),
+        (Di = t("pe-season-label")),
+        _i &&
+        (_i._activate = function () {
+          Bn();
+        }),
+        xi &&
+        (xi._activate = function () {
+          Dn();
+        }),
+        bi &&
+        (bi._activate = function () {
+          er();
+        }),
+        Ci &&
+        (Ci._activate = function () {
+          (Tn(bn(), !0), Kn(), Dn(), sr());
+        }),
+        wi &&
+        (wi._activate = function () {
+          (Tn(bn(), !1), Kn(), Dn(), sr());
+        }),
+        Ti)
+    )
+      for (var i = Ti.querySelectorAll(".psv-btn"), n = 0; n < i.length; n++)
+        (function (e) {
+          e._activate = function () {
+            Zn(e.getAttribute("data-aspect"));
+          };
+        })(i[n]);
+    if (
+      ((mi = t("dialog-playsettings")),
+        (Pi = t("dps-audio-options")),
+        (Oi = t("dps-sub-switch")),
+        (qi = t("dps-row-lang")),
+        (Ni = t("dps-row-size")),
+        (Ri = t("dps-row-style")),
+        (ZiRowBg = t("dps-row-bg")),
+        (Vi = t("dps-lang-options")),
+        (Hi = t("dps-size-options")),
+        (Ui = t("dps-style-options")),
+        (ZiOptsBg = t("dps-bg-options")),
+        (ZiOptsQuality = t("dps-quality-options")),
+        (Fi = t("dps-btn-exit")),
+        (Bi = t("player-subtitles")),
+        Oi &&
+        (Oi._activate = function () {
+          if (((Ki = !0), (Ji = !Ji))) {
+            var e = En(un[Ln(bn())]);
+            (!Qi && e.length && (Qi = e[0]), Qi && mn(Qi));
+          } else mn(null);
+          /* Guarda la elección del espectador: se mantiene en los próximos
+             títulos hasta que vuelva a desactivar los subtítulos. */
+          X.playback.subtitle = Ji;
+          Y();
+          (ir(), Dn());
+        }),
+        Hi)
+    )
+      for (var r = Hi.querySelectorAll(".dps-btn"), o = 0; o < r.length; o++)
+        (function (e) {
+          e._activate = function () {
+            ((Zi = e.getAttribute("data-size") || "normal"), gn(), ir());
+          };
+        })(r[o]);
+    if (Ui)
+      for (var s = Ui.querySelectorAll(".dps-btn"), l = 0; l < s.length; l++)
+        (function (e) {
+          e._activate = function () {
+            ((en = e.getAttribute("data-style") || "white"),
+              (X.playback.style = en),
+              Y(),
+              gn(),
+              ir());
+          };
+        })(s[l]);
+    if (ZiOptsBg)
+      for (var s2 = ZiOptsBg.querySelectorAll(".dps-btn"), l2 = 0; l2 < s2.length; l2++)
+        (function (e) {
+          e._activate = function () {
+            ((enBg = e.getAttribute("data-bg") || "outline"),
+              (X.playback.subtitleBg = enBg),
+              Y(),
+              gn(),
+              ir());
+          };
+        })(s2[l2]);
+    (Fi &&
+      (Fi._activate = function () {
+        tr();
+      }),
+      gn(),
+      nn(),
+      setInterval(function () {
+        xe &&
+          !X.streamError &&
+          _e &&
+          _e.classList.contains("is-active") &&
+          (xe.paused ||
+            xe.readyState < 2 ||
+            (xe.currentTime || 0) <= 0 ||
+            jr(""));
+      }, 2e3),
+      a(we),
+      a(Se),
+      Ce.classList.add("focusable"),
+      (Ce._onMove = function (e) {
+        return "vod" === X.playerMode
+          ? "left" === e
+            ? (li(-10), !0)
+            : "right" === e
+              ? (li(10), !0)
+              : "down" === e
+                ? (Pn(), !0)
+                : "up" === e && (Fr(), !0)
+          : "left" === e
+            ? (no(), !0)
+            : "right" === e
+              ? (ro(), !0)
+              : "up" === e
+                ? (Kt(X.channel - 1), !0)
+                : "down" === e && (Kt(X.channel + 1), !0);
+      }),
+      (Ce._activate = function () {
+        "vod" !== X.playerMode ? (X.infobar ? ui() : pi()) : di();
+      }),
+      we.appendChild(e("div", "pi-logo")),
+      we.appendChild(e("div", "pi-index")));
+    var d = e("div", "pi-namerow"),
+      c = e("div", "pi-name");
+    d.appendChild(c);
+    var p = e("div", "pi-uhd");
+    ((p.style.left = "20px"),
+      d.appendChild(p),
+      we.appendChild(d),
+      we.appendChild(e("div", "pi-date")),
+      we.appendChild(e("div", "pi-range")),
+      we.appendChild(e("div", "pi-now")),
+      we.appendChild(e("div", "pi-next")));
+    var u = e("div", "pi-seek");
+    (u.appendChild(e("div", "bar")),
+      we.appendChild(u),
+      we.appendChild(e("div", "pi-menu", "info")),
+      we.appendChild(e("div", "pi-quality", "HD")),
+      we.appendChild(e("div", "pi-scale", "Normal")),
+      we.appendChild(e("div", "pi-func", "Selecion de función")));
+    for (
+      var v = e("div", "pi-actions"),
+      f = [
+        { label: "Pip", right: 446, w: 67, hidden: !0 },
+        { label: "HD", right: 389, w: 67 },
+        { label: "Anterior", right: 333, w: 67 },
+        { label: "Formato", right: 249, w: 120 },
+        { label: "Favorito", right: 219, w: 67 },
+        { label: "Reproductor 1", right: 151, w: 90 },
+        { label: "Bloquear", right: 107, w: 67 },
+        { label: "Feedback", right: 50, w: 67 },
+      ],
+      h = 0;
+      h < f.length;
+      h++
+    ) {
+      var m = f[h];
+      if (!m.hidden) {
+        var g = e("div", "pi-act focusable", m.label);
+        ((g.style.width = 1.5 * m.w + "px"),
+          (g.style.left = 1920 - 1.5 * m.right - 1.5 * m.w + "px"),
+          (g._kind = m.label),
+          (g._activate = (function (e) {
+            return function () {
+              if ("Anterior" === e) Kt(X.channel - 1);
+              else if ("Formato" === e) {
+                var t = we.querySelector(".pi-scale");
+                ((t.textContent =
+                  "Normal" === t.textContent
+                    ? "16:9"
+                    : "16:9" === t.textContent
+                      ? "4:3"
+                      : "Normal"),
+                  io());
+              } else if ("Favorito" === e) {
+                var a = F[X.channel];
+                a &&
+                  (toggleLiveFavorite(a),
+                    hr(X.channel),
+                    Yt(
+                      X.liveFavorites[liveChannelKey(a)]
+                        ? "Canal agregado a favoritos"
+                        : "Canal quitado de favoritos"
+                    ));
+              }
+            };
+          })(m.label)),
+          v.appendChild(g));
+      }
+    }
+    we.appendChild(v);
+    var y = e("div", "pc-header"),
+      titleRow = e("div", "pc-title-row"),
+      titleText = e("div", "pc-title", "Canales de TV"),
+      catBadge = e("span", "pc-cat-badge", Mt ? Mt.name : "Todos"),
+      toolbar = e("div", "pc-toolbar"),
+      channelSearch = e("button", "pc-toolbar-btn pc-btn-search focusable"),
+      channelFavorites = e("button", "pc-toolbar-btn pc-btn-fav focusable"),
+      channelAll = e("button", "pc-toolbar-btn pc-btn-all focusable"),
+      channelCategory = e("button", "pc-toolbar-btn pc-btn-filter focusable");
+
+    titleRow.appendChild(titleText);
+    titleRow.appendChild(catBadge);
+    y.appendChild(titleRow);
+
+    (channelSearch.setAttribute("aria-label", "Buscar canales"),
+      (channelSearch.innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="13" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="3"/><path d="M19 19l8 8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg><span>Buscar</span>'),
+      channelFavorites.setAttribute("aria-label", "Canales favoritos"),
+      (channelFavorites.innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3l4 8 9 1-6.5 6 1.7 9L16 22.5 7.8 27l1.7-9L3 12l9-1z" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round"/></svg><span>Favoritos</span>'),
+      channelFavorites.classList.toggle("is-active", liveFavoritesOnly),
+      channelAll.setAttribute("aria-label", "Todos los canales"),
+      (channelAll.innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M7 16h18M16 7v18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="16" cy="16" r="12" fill="none" stroke="currentColor" stroke-width="2"/></svg><span>Todos</span>'),
+      channelCategory.setAttribute("aria-label", "Categorías de canales"),
+      (channelCategory.innerHTML = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 8h22M5 16h22M5 24h22" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="11" cy="8" r="3" fill="currentColor"/><circle cx="22" cy="16" r="3" fill="currentColor"/><circle cx="15" cy="24" r="3" fill="currentColor"/></svg><span>Categorías</span>'),
+      (channelSearch._activate = function () {
+        openLiveChannelSearch(channelSearch);
+      }),
+      (channelFavorites._activate = function () {
+        liveFavoritesOnly = !liveFavoritesOnly;
+        syncLiveFavoriteButtons();
+        hr(X.channel);
+        Yt(liveFavoritesOnly ? "Mostrando canales favoritos" : "Mostrando todos los canales");
+        rt(channelFavorites);
+      }),
+      (channelAll._activate = function () {
+        selectAllLiveChannels(channelAll);
+      }),
+      (channelCategory._activate = function () {
+        pr(channelCategory);
+      }),
+      (channelSearch._onMove = function (e) {
+        if ("right" === e) return rt(channelFavorites), !0;
+        if ("down" === e) return (F.length && fr(X.channel), !0);
+        return !1;
+      }),
+      (channelFavorites._onMove = function (e) {
+        if ("left" === e) return rt(channelSearch), !0;
+        if ("right" === e) return rt(channelAll), !0;
+        if ("down" === e) return (F.length && fr(X.channel), !0);
+        return !1;
+      }),
+      (channelAll._onMove = function (e) {
+        if ("left" === e) return rt(channelFavorites), !0;
+        if ("right" === e) return rt(channelCategory), !0;
+        if ("down" === e) return (F.length && fr(X.channel), !0);
+        return !1;
+      }),
+      (channelCategory._onMove = function (e) {
+        if ("left" === e) return rt(channelAll), !0;
+        if ("right" === e || "up" === e) return !0;
+        if ("down" === e) return (F.length && fr(X.channel), !0);
+        return !1;
+      }),
+      toolbar.appendChild(channelSearch),
+      toolbar.appendChild(channelFavorites),
+      toolbar.appendChild(channelAll),
+      toolbar.appendChild(channelCategory),
+      y.appendChild(toolbar),
+      Se.appendChild(y));
+    var b = e("div", "pc-categories scrollable");
+    ((b.id = "pc-categories"),
+      Se.appendChild(b),
+      Se.appendChild(e("div", "pc-div")));
+    var C = e("div", "pc-list scrollable");
+    (Se.appendChild(C), dr(), hr());
+    var w = e("div", "pc-menu");
+    (w.appendChild(e("div", "ic")),
+      w.appendChild(e("div", "l1", "[OK] Reproducir  •  [AMARILLO / →] Favorito")),
+      w.appendChild(e("div", "l2", "[SALIR] Pantalla completa  •  ← Menú")),
+      Se.appendChild(w));
+  }
+  function closeLiveChannelSearch(returnFocus) {
+    var e = Se && Se.querySelector(".pc-search-box");
+    ((liveSearchOpen = !1),
+      Se && Se.classList && Se.classList.remove("pc-searching"),
+      liveSearchInput && liveSearchInput.blur && liveSearchInput.blur(),
+      (liveSearchInput = null),
+      e && e.parentNode && e.parentNode.removeChild(e),
+      hr(X.channel),
+      returnFocus && rt(returnFocus));
+  }
+  function openLiveChannelSearch(returnFocus) {
+    if (!Se) return;
+    if (liveSearchOpen) return void closeLiveChannelSearch(returnFocus);
+    liveSearchOpen = !0;
+    var box = e("div", "pc-search-box"),
+      label = e("label", "pc-search-label", "Buscar canal"),
+      input = document.createElement("input"),
+      clear = e("button", "pc-search-clear focusable", "Limpiar");
+    ((input.type = "search"),
+      (input.className = "pc-search-input focusable"),
+      (input.placeholder = "Escribe el nombre del canal"),
+      (input.value = liveSearchText),
+      (input._onMove = function (e) {
+        return "left" === e || "up" === e
+          ? (closeLiveChannelSearch(returnFocus), !0)
+          : "down" === e &&
+          (function () {
+            var e = visibleLiveIndexes(),
+              t = e.indexOf(X.channel) >= 0 ? X.channel : e[0];
+            return void 0 !== t && fr(t), !0;
+          })();
+      }),
+      (input._activate = function () {
+        hr(X.channel);
+      }),
+      input.addEventListener("input", function () {
+        ((liveSearchText = input.value || ""), hr(X.channel));
+      }),
+      (clear._activate = function () {
+        ((input.value = ""), (liveSearchText = ""), hr(X.channel), rt(input));
+      }),
+      (clear._onMove = function (e) {
+        if ("left" === e) return (rt(input), !0);
+        if ("down" === e) {
+          var t = visibleLiveIndexes(),
+            a = t.indexOf(X.channel) >= 0 ? X.channel : t[0];
+          return void 0 !== a && fr(a), !0;
+        }
+        return !1;
+      }),
+      label.appendChild(input),
+      box.appendChild(label),
+      box.appendChild(clear),
+      Se.appendChild(box),
+      Se.classList.add("pc-searching"),
+      (liveSearchInput = input),
+      hr(X.channel),
+      rt(input),
+      setTimeout(function () {
+        try {
+          input.focus();
+        } catch (e) { }
+      }, 0));
+  }
+  function dr() {
+    if (Se) {
+      var t = Se.querySelector(".pc-categories");
+      if (t) {
+        var i =
+          Lt && Lt.length
+            ? Lt
+            : [
+              { id: 76182, name: "Todos" },
+              { id: 76206, name: "Deportes" },
+              { id: 76205, name: "Cine y Series" },
+              { id: 76188, name: "Colombia" },
+              { id: 76191, name: "España" },
+              { id: 76197, name: "México" },
+              { id: "addons", name: "Addons M3U", isAddon: !0 },
+            ];
+        X.adultEnabled ||
+          (i = i.filter(function (e) {
+            return !!(e && (e.isAddon || !isAdultLiveChannel(e)));
+          }));
+        for (var n = "", r = 0; r < i.length; r++)
+          n += i[r].id + "|";
+        var o = X.focus && X.focus._cat ? X.focus._cat : null;
+        if (n !== Je) {
+          a(t);
+          for (var s = [], l = 0; l < i.length; l++) {
+            var d = i[l],
+              c = e("button", "pc-cat-pill focusable", d.name);
+            ((c._cat = d),
+              (c._idx = l),
+              (c._activate = (function (e) {
+                return function () {
+                  /* Igual que en el selector de categorías: la carga es
+                     asíncrona, así que hay que recolocar X.channel cuando
+                     llega la lista nueva (si no, el foco/OK apuntaba a un
+                     canal fuera de rango y la TV no cambiaba). */
+                  var prevKey = F[X.channel] ? liveChannelKey(F[X.channel]) : "";
+                  Xt(e, function () {
+                    var j = 0,
+                      k;
+                    if (prevKey) {
+                      for (k = 0; k < F.length; k++)
+                        if (liveChannelKey(F[k]) === prevKey) {
+                          j = k;
+                          break;
+                        }
+                    }
+                    X.channel = Math.max(0, Math.min(F.length - 1, j));
+                    if ("player" === X.screen) fr(X.channel);
+                    else if ("home" === X.screen) Qt(liveFavoritesOnly);
+                  });
+                };
+              })(d)),
+              (c._onMove = (function (e) {
+                return function (a) {
+                  if ("left" === a)
+                    return (
+                      e > 0 && s[e - 1] && (rt(s[e - 1]), vr(t, s[e - 1])),
+                      !0
+                    );
+                  if ("right" === a)
+                    return (
+                      e < s.length - 1 && s[e + 1]
+                        ? (rt(s[e + 1]), vr(t, s[e + 1]))
+                        : rt(Ce),
+                      !0
+                    );
+                  /* Las categorías se abren únicamente con el botón Filtrar;
+                     subir desde Todos no debe abrir un panel inesperado. */
+                  if ("up" === a) return !0;
+                  if ("down" === a) {
+                    var i = Se.querySelector(".pc-row-addon-promo");
+                    if (i) return (rt(i), !0);
+                    if (F.length) return (fr(X.channel), !0);
+                  }
+                  return !1;
+                };
+              })(l)),
+              t.appendChild(c),
+              s.push(c));
+          }
+          ((t._pills = s), (Je = n));
+        }
+        for (var p = Mt || i[0], u = t._pills || [], v = 0; v < u.length; v++) {
+          var f = u[v];
+          f._cat && p && f._cat.id === p.id
+            ? f.classList.add("is-selected")
+            : f.classList.remove("is-selected");
+        }
+        if (o) {
+          for (var h = null, m = 0; m < u.length; m++)
+            if (u[m]._cat && u[m]._cat.id === o.id) {
+              h = u[m];
+              break;
+            }
+          h && (X.focus !== h && rt(h), vr(t, h));
+        }
+      }
+    }
+  }
+  function cr() {
+    if (Se) {
+      var e = Se.querySelector(".pc-categories"),
+        t = e ? e.querySelector(".pc-cat-pill.is-selected") : null;
+      e && t && vr(e, t);
+    }
+  }
+  var categoryPickerReturnFocus = null;
+  function pr(returnFocus) {
+    categoryPickerReturnFocus = returnFocus || X.focus;
+    if (!$e) {
+      $e = t("player-categories");
+      Ge = t("pcat-grid");
+      Qe = t("pcat-sub");
+    }
+    if ($e && Ge) {
+      var scrP = t("screen-player");
+      scrP && scrP.classList.add("categories-open");
+      Se && Se.classList.remove("is-active");
+      we && (we.classList.remove("is-active"), (we.style.display = "none"));
+      X.categoryPickerOpen = !0;
+      $e.classList.add("is-active");
+      ui();
+      var pClose = t("pcat-close");
+      if (pClose) {
+        pClose._activate = function () { ur(); };
+        pClose._onMove = function (dir) {
+          if ("down" === dir) {
+            var firstTile = Ge ? Ge.querySelector(".pcat-tile.focusable") : null;
+            return firstTile ? (rt(firstTile), !0) : !0;
+          }
+          return !1;
+        };
+      }
+      (function () {
+        if (!Ge) return;
+        var cats = Lt && Lt.length ? Lt : DEFAULT_LIVE_CATEGORIES.slice();
+        X.adultEnabled ||
+          (cats = cats.filter(function (el) {
+            return !!(el && (el.isAddon || !isAdultLiveChannel(el)));
+          }));
+        a(Ge);
+        if (Qe) {
+          Qe.textContent = cats.length
+            ? cats.length + " categorías · selecciona para ver canales"
+            : "Cargando categorías…";
+        }
+        var catTiles = [];
+        for (var i = 0; i < cats.length; i++) {
+          (function (catObj, idx) {
+            var tile = e("div", "pcat-tile focusable");
+            tile.appendChild(e("div", "pcat-name", catObj.name));
+            if (Mt && Mt.id === catObj.id) tile.classList.add("is-selected");
+            tile._cat = catObj;
+            tile._activate = function () {
+              var chosenCategory = catObj;
+              ur(!0);
+              Yt("Categoría: " + chosenCategory.name);
+              if ("player" === X.screen && Ce) rt(Ce);
+              Xt(chosenCategory, function () {
+                X.channel = 0;
+                if ("player" === X.screen) {
+                  if (F && F.length && F[0]) {
+                    to(F[0], !0);
+                  }
+                  no();
+                } else if ("home" === X.screen) {
+                  Qt(liveFavoritesOnly);
+                  if (Fe[0] && at(Fe[0])) {
+                    rt(Fe[0]);
+                    Wt(F[0]);
+                  } else {
+                    var homeFastCat = document.querySelector(".live-fast .f-cat");
+                    if (homeFastCat && at(homeFastCat)) rt(homeFastCat);
+                  }
+                }
+              });
+            };
+            tile._onMove = function (dir) {
+              var cols = 4;
+              if ("left" === dir && idx % cols > 0) {
+                if (catTiles[idx - 1]) return rt(catTiles[idx - 1]), !0;
+              }
+              if ("right" === dir && idx % cols < cols - 1) {
+                if (catTiles[idx + 1]) return rt(catTiles[idx + 1]), !0;
+              }
+              if ("up" === dir) {
+                if (idx - cols >= 0 && catTiles[idx - cols]) return rt(catTiles[idx - cols]), !0;
+                var pCloseBtn = t("pcat-close");
+                if (pCloseBtn && at(pCloseBtn)) return rt(pCloseBtn), !0;
+                return !0;
+              }
+              if ("down" === dir) {
+                if (idx + cols < catTiles.length && catTiles[idx + cols]) return rt(catTiles[idx + cols]), !0;
+                return !0;
+              }
+              return !1;
+            };
+            Ge.appendChild(tile);
+            catTiles.push(tile);
+          })(cats[i], i);
+        }
+      })();
+      var selTile = Ge.querySelector(".pcat-tile.is-selected") || ot(Ge);
+      if (window.DialogManager) {
+        window.DialogManager.open("playerCategories", $e, {
+          returnFocus: categoryPickerReturnFocus,
+          initialFocus: selTile,
+          fallbackFocus: function () {
+            if ("home" === X.screen) {
+              var homeCat = document.querySelector(".live-fast .f-cat") || document.querySelector(".live-fast .f-all");
+              if (homeCat && at(homeCat)) return homeCat;
+              if (Fe && Fe[0] && at(Fe[0])) return Fe[0];
+              if (Ue && Ue[0] && at(Ue[0])) return Ue[0];
+            } else if ("player" === X.screen) {
+              var pFilter = Se ? (Se.querySelector(".pc-btn-filter") || Se.querySelector(".pc-filter")) : null;
+              if (pFilter && at(pFilter)) return pFilter;
+              if (Xe && Xe[X.channel] && at(Xe[X.channel])) return Xe[X.channel];
+              if (Ce && at(Ce)) return Ce;
+            }
+            return null;
+          },
+          onClose: function () {
+            var scrP2 = t("screen-player");
+            scrP2 && scrP2.classList.remove("categories-open");
+            if ($e) $e.classList.remove("is-active");
+            X.categoryPickerOpen = !1;
+            if ("player" === X.screen) {
+              if (Se) {
+                Se.classList.add("is-active");
+                X.channelsOpen = !0;
+              }
+            }
+          }
+        });
+      } else {
+        selTile && rt(selTile);
+      }
+    }
+  }
+  function ur(skipFocus) {
+    if (window.DialogManager && window.DialogManager.isOpen("playerCategories")) {
+      window.DialogManager.close("playerCategories", !!skipFocus);
+      if (!skipFocus) return;
+    }
+    var scrP = t("screen-player");
+    scrP && scrP.classList.remove("categories-open");
+    if (!$e) $e = t("player-categories");
+    if ($e) $e.classList.remove("is-active");
+    X.categoryPickerOpen = !1;
+    if ("player" === X.screen) {
+      if (Se) {
+        Se.classList.add("is-active");
+        X.channelsOpen = !0;
+      }
+    }
+    if (!skipFocus) {
+      if (categoryPickerReturnFocus && at(categoryPickerReturnFocus)) {
+        rt(categoryPickerReturnFocus);
+      } else if ("home" === X.screen) {
+        var homeCat = document.querySelector(".live-fast .f-cat") || document.querySelector(".live-fast .f-all");
+        if (homeCat && at(homeCat)) {
+          rt(homeCat);
+        } else if (Fe[0] && at(Fe[0])) {
+          rt(Fe[0]);
+        } else if (Ue[0]) {
+          rt(Ue[0]);
+        }
+      } else if ("player" === X.screen) {
+        var pFilter = Se ? (Se.querySelector(".pc-btn-filter") || Se.querySelector(".pc-filter")) : null;
+        if (pFilter && at(pFilter)) {
+          rt(pFilter);
+        } else if (Xe && Xe[X.channel] && at(Xe[X.channel])) {
+          rt(Xe[X.channel]);
+        } else if (Ce && at(Ce)) {
+          rt(Ce);
+        }
+      }
+    }
+  }
+  function vr(e, t) {
+    if (e && t) {
+      var a = t.offsetLeft,
+        i = t.offsetWidth,
+        n = e.scrollLeft,
+        r = e.clientWidth;
+      if (a < n) smoothScroll(e, Math.max(0, a - 20), null, 180);
+      else if (a + i > n + r) smoothScroll(e, a + i - r + 20, null, 180);
+    }
+  }
+  function fr(e) {
+    if (F.length) {
+      var visible = visibleLiveIndexes();
+      if (!visible.length) return;
+      e = Math.max(0, Math.min(F.length - 1, Number(e) || 0));
+      /* Si Favoritos acaba de ocultar el canal reproducido, ↓ debe entrar al
+         primer favorito visible, nunca conservar un foco en una fila ausente. */
+      if (visible.indexOf(e) < 0) e = visible[0];
+      (Xe[e] || hr(e), Xe[e] && rt(Xe[e]));
+    }
+  }
+  function closeLiveFavoriteConfirm(returnFocus) {
+    if (window.DialogManager && window.DialogManager.isOpen("liveFavoriteConfirm")) {
+      window.DialogManager.close("liveFavoriteConfirm");
+      return;
+    }
+    var e = liveFavoritePrompt;
+    ((liveFavoritePrompt = null),
+      e && e.parentNode && e.parentNode.removeChild(e),
+      returnFocus && at(returnFocus) && rt(returnFocus));
+  }
+  function hr(t) {
+    var previousFocus = X.focus,
+      previousChannel =
+        previousFocus && void 0 !== previousFocus._channel
+          ? previousFocus._channel
+          : -1,
+      previousWasFavorite =
+        previousFocus &&
+        previousFocus.classList &&
+        previousFocus.classList.contains("pc-channel-fav");
+    if (Se) {
+      var i = Se.querySelector(".pc-list");
+      if (i) {
+        if ((a(i), (Xe = {}), Mt && Mt.isAddon)) {
+          var n = e("div", "pc-row-addon-promo focusable");
+          var promoIcon = e("div", "promo-icon");
+          promoIcon.innerHTML = gearSvg();
+          n.appendChild(promoIcon);
+          var o = e("div", "promo-info");
+          (o.appendChild(
+            e("div", "promo-text", "Administrar Addons y Listas M3U")
+          ),
+            o.appendChild(
+              e(
+                "div",
+                "promo-sub",
+                "Instala listas recomendadas o agrega tu enlace"
+              )
+            ),
+            n.appendChild(o),
+            (n._activate = function () {
+              sa();
+            }),
+            (n._onMove = function (e) {
+              if ("up" === e) {
+                var t =
+                  Se.querySelector(".pc-cat-pill.is-selected") ||
+                  Se.querySelector(".pc-cat-pill");
+                return (t && rt(t), !0);
+              }
+              return "down" === e
+                ? (F.length && fr(0), !0)
+                : "right" === e && (rt(Ce), !0);
+            }),
+            i.appendChild(n));
+        }
+        var visible = visibleLiveIndexes();
+        if (!visible.length) {
+          var s = e(
+            "div",
+            "pc-empty-channels",
+            liveSearchText
+              ? "No hay canales que coincidan con la búsqueda"
+              : liveFavoritesOnly
+                ? "Aún no tienes canales favoritos en esta categoría"
+                : "No hay canales disponibles en esta categoría"
+          );
+          return (
+            (s.style.padding = "30px"),
+            (s.style.color = "#888"),
+            (s.style.fontSize = "20px"),
+            void i.appendChild(s)
+          );
+        }
+        ((t = Number(t)),
+          isFinite(t) || (t = X.channel),
+          (t = Math.max(0, Math.min(F.length - 1, t || 0))));
+        var currentPosition = visible.indexOf(t);
+        currentPosition < 0 && (currentPosition = 0);
+        for (
+          var l = Math.max(0, currentPosition - Math.floor(Ke / 2)),
+          d = Math.min(visible.length, l + Ke),
+          c = (l = Math.max(0, d - Ke));
+          c < d;
+          c++
+        ) {
+          var channelIndex = visible[c];
+          var p = e("div", "pc-row focusable");
+          p._channel = channelIndex;
+          var u = e("div", "ic");
+          F[channelIndex].logo &&
+            ((u.style.backgroundImage = "url(" + F[channelIndex].logo + ")"),
+              (u.style.backgroundSize = "contain"),
+              (u.style.backgroundRepeat = "no-repeat"),
+              (u.style.backgroundPosition = "center"));
+          var v = e("div", "num", r(F[channelIndex].index || channelIndex + 1)),
+            f = e("div", "nm", F[channelIndex].name),
+            h = e("div", "epg", F[channelIndex].now || "En vivo"),
+            m = e(
+              "button",
+              "pc-channel-fav focusable" +
+              (X.liveFavorites[liveChannelKey(F[channelIndex])] || F[channelIndex].fav
+                ? " is-favorite"
+                : "")
+            );
+          m.innerHTML = starSvg(
+            !!(X.liveFavorites[liveChannelKey(F[channelIndex])] || F[channelIndex].fav)
+          );
+          (p.appendChild(u),
+            p.appendChild(v),
+            p.appendChild(f),
+            p.appendChild(h),
+            p.appendChild(m),
+            channelIndex === X.channel && p.classList.add("is-current"),
+            (p._activate = (function (e) {
+              return function () {
+                /* Elegir un canal desde la lupa debe terminar la búsqueda:
+                   antes el texto quedaba pegado en el panel y las siguientes
+                   veces el filtro seguía ocultando el resto de canales. */
+                var wasSearch = liveSearchOpen || !!(liveSearchText || "");
+                if (wasSearch) {
+                  liveSearchText = "";
+                  if (liveSearchOpen) closeLiveChannelSearch();
+                  Kt(e, !0);
+                  fr(e);
+                  return;
+                }
+                (Kt(e, !0), rt(this));
+              };
+            })(channelIndex)),
+            (p._onMove = (function (e, favoriteButton) {
+              return function (t) {
+                if ("left" === t) {
+                  var a = Se.querySelector(".pc-btn-search");
+                  return (a && rt(a), !0);
+                }
+                if ("right" === t) return (rt(favoriteButton), !0);
+                if ("up" === t) {
+                  if (e > 0) fr(visible[e - 1]);
+                  else if (0 === e) {
+                    var a = Se.querySelector(".pc-row-addon-promo");
+                    if (a) rt(a);
+                    else {
+                      var i = Se.querySelector(".pc-btn-all");
+                      i && rt(i);
+                    }
+                  }
+                  return !0;
+                }
+                return "down" === t &&
+                  (e < visible.length - 1 && fr(visible[e + 1]), !0);
+              };
+            })(c, m)),
+            (m._channel = channelIndex),
+            (m._activate = (function (e, t) {
+              return function () {
+                (toggleChannelFavoriteDirect(e, null),
+                  (t = Xe[e] && Xe[e].querySelector(".pc-channel-fav")),
+                  t && rt(t));
+              };
+            })(channelIndex, m)),
+            (m._onMove = (function (e, t) {
+              return function (a) {
+                if ("left" === a) return (rt(t), !0);
+                if ("right" === a) return (rt(Ce), !0);
+                if ("up" === a || "down" === a) {
+                  var i = visible.indexOf(e),
+                    n = "up" === a ? i - 1 : i + 1,
+                    r = n >= 0 && n < visible.length ? Xe[visible[n]] : null,
+                    o = r && r.querySelector(".pc-channel-fav");
+                  r ||
+                    (n >= 0 && n < visible.length &&
+                      (hr(visible[n]), (r = Xe[visible[n]]), (o = r && r.querySelector(".pc-channel-fav"))));
+                  return o && rt(o), !0;
+                }
+                return !1;
+              };
+            })(channelIndex, p)),
+            i.appendChild(p),
+            (Xe[channelIndex] = p));
+        }
+        /* Igual que Inicio: no se deja el foco apuntando a una fila eliminada
+           cuando hr() refresca la grilla de TV completa. */
+        if (
+          "player" === X.screen &&
+          X.channelsOpen &&
+          previousChannel >= 0 &&
+          !at(previousFocus) &&
+          Xe[previousChannel]
+        )
+          rt(
+            previousWasFavorite
+              ? Xe[previousChannel].querySelector(".pc-channel-fav") ||
+              Xe[previousChannel]
+              : Xe[previousChannel]
+          );
+      }
+    }
+  }
+  var mr = "",
+    gr = "",
+    yr = 0,
+    br = "",
+    Cr = 0,
+    wr = !1,
+    Sr = null,
+    xr = !1,
+    /* Clave del título para el que ya se volvió a Normal: el vigilante debe
+       poder rearmarse en el siguiente título (antes quedaba desactivado para
+       toda la sesión y el segundo intento se quedaba en "Conectando"). */
+    xrKey = "",
+    smoothFallbackKey = "";
+  function _r() {
+    xWebosVersion();
+    /* Modo Fluido usa siempre fMP4 (igual que XuperMH): el pipeline nativo de
+       webOS 1/2/3 no demuxa de forma fiable el MPEG-TS crudo y dejaba la
+       pantalla en negro. El Modo Normal no pasa por aquí. */
+    return "mp4";
+  }
+  function kr(e) {
+    return (
+      "string" == typeof e &&
+      (-1 !== e.indexOf(":8787/s/") || -1 !== e.indexOf(":8787/t/"))
+    );
+  }
+  function Lr() {
+    Sr && (clearTimeout(Sr), (Sr = null));
+  }
+  function Mr() {
+    if (!xe) return;
+    if (wr && br && "vod" === X.playerMode) {
+      var base = br,
+        at = Math.max(0, Math.floor(Cr + (xe.currentTime || 0)));
+      wr = !1;
+      var pausedDuration = vodPauseTime > 0 ? Date.now() - vodPauseTime : 0;
+      vodPauseTime = 0;
+      if (pausedDuration > 6000 || xe.ended || xe.readyState < 2) {
+        var a = base + "?start=" + at;
+        return (Xi && (a += "&a=" + Xi), jr("Reanudando vídeo…"), void Gr(a));
+      }
+      if (!xe.ended && xe.readyState > 0) {
+        /* Reanudación instantánea: el relay sigue entregando datos, así que
+           basta con play(). Antes siempre se reiniciaba ffmpeg (varios
+           segundos de espera al quitar la pausa). Sólo si el vídeo no avanza
+           en 1.8 s se reinicia el relay en la misma posición. */
+        try {
+          var pr = xe.play();
+          pr && pr.catch && pr.catch(function () { });
+        } catch (e) { }
+        var before = xe.currentTime || 0,
+          startedAt = Date.now();
+        setTimeout(function () {
+          if (!xe || br !== base || "vod" !== X.playerMode) return;
+          if (xe.paused || xe.ended) return;
+          if ((xe.currentTime || 0) > before + 0.2 || xe.readyState >= 3)
+            return;
+          if (Date.now() - startedAt < 1200) return;
+          var url = base + "?start=" + at;
+          Xi && (url += "&a=" + Xi);
+          jr("Reanudando vídeo…");
+          Gr(url);
+        }, 1800);
+        return;
+      }
+      var a = base + "?start=" + at;
+      return (Xi && (a += "&a=" + Xi), jr("Reanudando vídeo…"), void Gr(a));
+    }
+    try {
+      var i = xe.play();
+      i && i.catch && i.catch(function () { });
+    } catch (e) { }
+  }
+  var Ir = 0,
+    Er = null,
+    Ar = null;
+  function Dr() {
+    Ar && (clearTimeout(Ar), (Ar = null));
+  }
+  function Pr(e) {
+    if (!Ar && !X.streamError) {
+      var t = (xe && xe.currentTime) || 0;
+      Ar = setTimeout(function () {
+        ((Ar = null),
+          X.streamError ||
+          !xe ||
+          xe.paused ||
+          xe.readyState >= 3 ||
+          (xe.currentTime || 0) > t + 0.35 ||
+          jr(e));
+      }, 700);
+    }
+  }
+  var Or = !1,
+    qr = null;
+  function Nr() {
+    ((Or = !1), qr && (clearTimeout(qr), (qr = null)));
+  }
+  function Rr() {
+    if (((Er = null), xe && Ir)) {
+      if (br) {
+        /* Modo Fluido no admite seek dentro del pipe: cada búsqueda reinicia el
+           relay con ?start=. Si el espectador vuelve a buscar mientras el
+           anterior arranca, se cancela ese arranque y se atiende el nuevo
+           (antes se ignoraba y la TV parecía no responder). */
+        if (Or) {
+          (qr && (clearTimeout(qr), (qr = null)), (Or = !1));
+        }
+        var step = Ir,
+          e = Cr + (xe.currentTime || 0),
+          t = Math.max(0, e + Ir);
+        Ir = 0;
+        var a = ii(
+          (X.playerItem && X.playerItem.duration) ||
+          (X.playerEpisode && X.playerEpisode.duration) ||
+          0
+        );
+        (!a &&
+          xe &&
+          isFinite(xe.duration) &&
+          xe.duration > 0 &&
+          (a = xe.duration),
+          a > 0 && t > a - 2 && (t = Math.max(0, a - 2)));
+        /* No se toca Cr antes de Gr(): zr() guarda el progreso real con
+           Cr + currentTime. Si se adelantaba Cr aquí, el progreso se guardaba
+           duplicado y al reanudar el título podía saltar de posición. */
+        var seekTo = Math.floor(t),
+          i = br + "?start=" + seekTo;
+        /* Conserva la pista de audio elegida: antes el reinicio volvía a la 0. */
+        Xi && (i += "&a=" + Xi);
+        (Gr(i),
+          jr("Buscando " + ai(seekTo) + "…"),
+          oi(seekTo, Hr()),
+          si(step > 0 ? "forward" : "backward"),
+          (Or = !0),
+          (qr = setTimeout(Nr, 12e3)));
+        return;
+      }
+      var n = (xe.currentTime || 0) + Ir;
+      Ir = 0;
+      var r = xe.duration || 0;
+      (n < 0 && (n = 0), r > 0 && n > r - 1 && (n = r - 1));
+      try {
+        xe.currentTime = n;
+      } catch (e) { }
+    } else Ir = 0;
+  }
+  function li(e) {
+    if (!xe) return;
+    /* Modo Fluido no es seekable dentro del pipe (Accept-Ranges: none): el
+       salto se resuelve en Rr() reiniciando el relay en la posición destino.
+       El aviso se muestra ya para que la TV no parezca congelada. */
+    if (br && "vod" === X.playerMode) {
+      var target = Math.max(0, Math.min(Hr() || 86400, Vr() + e));
+      (jr("Buscando " + ai(target) + "…"), pi());
+    }
+    ((Ir += e),
+      Er && clearTimeout(Er),
+      (Er = setTimeout(Rr, 800)),
+      si(e > 0 ? "forward" : "backward"),
+      setTimeout(function () {
+        si("none");
+      }, 600));
+  }
+  var vodSkip = null;
+  var skipLabels = { intro: "Saltar intro", recap: "Saltar resumen", credits: "Saltar créditos" };
+
+  function hideVodSkip() {
+    var button = t("vod-skip");
+    if (!button) return;
+    button.classList.remove("is-visible");
+    if (X.focus === button) rt(Ce);
+  }
+
+  function skipVodTo(seconds) {
+    if (X.screen !== "player" || X.playerMode !== "vod" || !xe) return;
+    if (Er) clearTimeout(Er);
+    Er = null;
+    Ir = seconds - Vr();
+    Rr();
+  }
+
+  function activateVodSkip() {
+    var button = t("vod-skip");
+    if (!button || !button.classList.contains("is-visible") || !vodSkip || !vodSkip.active ||
+        vodSkip.item !== X.playerItem || vodSkip.episode !== X.playerEpisode ||
+        X.screen !== "player" || X.playerMode !== "vod") return;
+    var active = vodSkip.active;
+    if (active.countdown) {
+      vodSkip.used.credits = !0;
+    } else if (active.next) {
+      vodSkip.countdown = 5;
+      vodSkip.wallTime = Date.now();
+      updateVodSkip(Vr(), Hr());
+      return;
+    } else {
+      vodSkip.used[active.kind] = !0;
+      skipVodTo(active.target);
+    }
+    vodSkip.countdown = 0;
+    vodSkip.active = null;
+    hideVodSkip();
+  }
+
+  function updateVodSkip(position, duration) {
+    var item = X.playerItem, episode = X.playerEpisode, api = window.XuperSkipSegments;
+    if (!item || !api || !xe || !xe.currentSrc || xe.readyState < 2 ||
+        X.screen !== "player" || X.playerMode !== "vod" || X.streamError) {
+      hideVodSkip();
+      return;
+    }
+    if (!br && isFinite(xe.duration) && xe.duration > 0) duration = xe.duration;
+    if (!vodSkip || vodSkip.item !== item || vodSkip.episode !== episode) {
+      vodSkip = { item: item, episode: episode, local: {}, remote: {}, used: {}, lastPosition: position };
+    }
+    var state = vodSkip;
+    if (state.source !== xe.currentSrc) {
+      state.source = xe.currentSrc;
+      state.local = {};
+      state.checkChaptersAt = 0;
+    }
+    if (!br && Date.now() >= state.checkChaptersAt) {
+      state.local = api.merge(api.chapters(xe), state.local);
+      state.checkChaptersAt = Date.now() + 1500;
+    }
+    var series = x(item);
+    if (!state.requested && duration > 0 &&
+        !(state.local.intro && state.local.credits && (!series || state.local.recap))) {
+      state.requested = true;
+      var season = series ? Vn(item)[X.playerSeasonIndex || 0] : null;
+      api.lookup({
+        imdb: item.imdbId,
+        tmdb: item.tmdbId,
+        series: series,
+        season: season && Number(season.number),
+        episode: episode && Number(episode.number || episode.seriesNumber),
+        duration: duration
+      }, function (segments) { state.remote = segments; }, function (provider, query, done) {
+        P("skipSegments", Object.assign({ provider: provider }, query), function (error, response) {
+          done(!error && response && response.segments || {});
+        }, 5500);
+      });
+    }
+    var previous = state.lastPosition;
+    state.lastPosition = position;
+    if (ji || zi || Ye || X.episodeBrowserOpen || DialogManager.isOpen() || !duration) {
+      state.wallTime = Date.now();
+      hideVodSkip();
+      return;
+    }
+    var segments = api.merge(state.local, state.remote);
+    var kinds = ["recap", "intro", "credits"], active = null;
+    for (var i = 0; i < kinds.length; i++) {
+      var kind = kinds[i], segment = segments[kind];
+      if (!segment || state.used[kind]) continue;
+      var end = segment.end === Infinity ? duration : segment.end;
+      if (end > duration + 1 || position < segment.start || position >= end - 1) continue;
+      var scene = segments.postCredits;
+      var sceneStart = scene && scene.start >= segment.start && scene.start < duration - 1 ? scene.start : 0;
+      var target = Math.min(duration - 1, kind === "credits" && sceneStart > position ? sceneStart : end);
+      if (target <= position + 1) continue;
+      active = {
+        kind: kind, target: target,
+        next: kind === "credits" && !sceneStart && end >= duration - 2 && !!nextVodEpisode(item, episode)
+      };
+      if (kind !== "credits" && X.playback.skipIntroMode === 1 && !xe.paused &&
+          !xe.seeking && position >= previous && position - previous < 3 &&
+          position < segment.start + 3) {
+        state.used[kind] = !0;
+        hideVodSkip();
+        skipVodTo(target);
+        return;
+      }
+      break;
+    }
+    var button = t("vod-skip");
+    if (!active || !button) {
+      state.countdown = 0;
+      state.active = null;
+      hideVodSkip();
+      return;
+    }
+    if (state.countdown > 0 && active.next) {
+      var now = Date.now();
+      if (!xe.paused && !xe.seeking) state.countdown -= Math.min(1, (now - state.wallTime) / 1000);
+      state.wallTime = now;
+      if (state.countdown <= 0) {
+        state.used.credits = !0;
+        state.active = null;
+        hideVodSkip();
+        Qn();
+        return;
+      }
+      active.countdown = !0;
+    }
+    state.active = active;
+    var label = active.countdown ? "Cancelar siguiente episodio (" + Math.ceil(state.countdown) + ")" : skipLabels[active.kind];
+    if (button.textContent !== label) button.textContent = label;
+    button.classList.add("is-visible");
+  }
+
+  function Vr() {
+    return xe ? (br ? Cr + (xe.currentTime || 0) : xe.currentTime || 0) : 0;
+  }
+  function Hr() {
+    var meta =
+      (X.playerEpisode && X.playerEpisode.duration && ii(X.playerEpisode.duration)) ||
+      (X.playerItem && X.playerItem.duration && ii(X.playerItem.duration)) ||
+      0;
+    if (br && meta > 0) return meta;
+    var e = xe && isFinite(xe.duration) && xe.duration > 0 ? xe.duration : 0;
+    return meta || e || 0;
+  }
+  function Ur(e) {
+    if (Ye) {
+      var t = Ze,
+        a = Vr();
+      ((Ye = !1),
+        Pe && Pe.classList.remove("is-scrubbing"),
+        e && Math.abs(t - a) >= 1 && li(t - a),
+        /* Muestra de inmediato el destino elegido: en Modo Fluido el <video>
+           reinicia su currentTime en 0 y Vr() volvería a sumar la posición
+           vieja hasta que arranca el relay. */
+        oi(e ? t : Vr(), Hr()),
+        rt(Ce),
+        ci());
+    }
+  }
+  function Fr() {
+    var e = Hr();
+    Pe && e
+      ? ((Ze = Math.max(0, Math.min(e - 1, Vr()))),
+        (Ye = !0),
+        Pe.classList.add("is-scrubbing"),
+        pi(),
+        X.infoTimer && (clearTimeout(X.infoTimer), (X.infoTimer = null)),
+        oi(Ze, e),
+        rt(Pe))
+      : pi();
+  }
+  function Br(e) {
+    var t = Hr();
+    if (Ye && t) {
+      var a = Math.max(60, Math.min(300, Math.round(0.05 * t)));
+      oi((Ze = Math.max(0, Math.min(t - 1, Ze + e * a))), t);
+    }
+  }
+  function zr(skipAbort) {
+    hideVodSkip();
+    (Lr(), "vod" === X.playerMode && xe) &&
+      sn(
+        br ? Cr + (xe.currentTime || 0) : xe.currentTime || 0,
+        xe && isFinite(xe.duration) && xe.duration > 0
+          ? xe.duration
+          : ii(
+            (X.playerEpisode && X.playerEpisode.duration) ||
+            (X.playerItem && X.playerItem.duration) ||
+            0
+          ),
+        !0
+      );
+    ((X.streamError = ""),
+      clearLiveStallWatch(),
+      Dr(),
+      jr(""),
+      si("none"),
+      ri(),
+      Er && (clearTimeout(Er), (Er = null), (Ir = 0)),
+      Nr(),
+      (wr = !1),
+      (br = ""),
+      (Cr = 0),
+      yr++);
+    var e = mr;
+    if (!e && gr && -1 !== gr.indexOf("127.0.0.1")) {
+      var a = /^(http:\/\/127\.0\.0\.1:\d+)/.exec(gr);
+      a && (e = a[1]);
+    }
+    /* Al reiniciar el relay (seek o cambio de modo) NO se envía /media/abort:
+       esa petición es asíncrona y podía llegar después de que el relay hubiera
+       arrancado el nuevo ffmpeg, matándolo. El relay ya detiene el proceso
+       anterior al recibir la nueva petición. Esto causaba que al adelantar el
+       vídeo volviera al principio o se quedara cargando. */
+    if (!skipAbort) {
+      if (e)
+        try {
+          var i = new XMLHttpRequest();
+          (i.open("GET", e + "/media/abort", !0), i.send());
+        } catch (e) { }
+      try {
+        P("abortMedia", {}, function () { });
+      } catch (e) { }
+    }
+    if (((gr = ""), (mr = ""), xe)) {
+      ((xe.onerror = null),
+        (xe.onwaiting = null),
+        (xe.onstalled = null),
+        (xe.onloadeddata = null),
+        (xe.oncanplay = null),
+        (xe.onloadedmetadata = null),
+        (xe.ondurationchange = null),
+        (xe.onplaying = null),
+        (xe.onended = null),
+        (xe.ontimeupdate = null),
+        (xe.onpause = null),
+        (xe.onplay = null));
+      try {
+        xe.pause();
+      } catch (e) { }
+      try {
+        xe.currentTime = 0;
+      } catch (e) { }
+      xe.removeAttribute("src");
+      try {
+        xe.src = "";
+        xe.load();
+      } catch (e) { }
+      for (; xe.firstChild;) xe.removeChild(xe.firstChild);
+      (xe.classList.remove("is-active"),
+        Te && (Te.style.display = "block"),
+        (function () {
+          Wr && (clearTimeout(Wr), (Wr = null));
+          Le || (Le = t("player-mode-hint"));
+          Le && (Le.classList.remove("is-active"), (Le.textContent = ""));
+        })());
+    }
+  }
+  function jr(e) {
+    (_e || (_e = t("player-status")),
+      _e &&
+      (e
+        ? ((_e.textContent = e), _e.classList.add("is-active"))
+        : ((_e.textContent = ""), _e.classList.remove("is-active"))));
+  }
+  var Wr = null,
+    Xr = "";
+  function $r() {
+    if (
+      "vod" === X.playerMode &&
+      ("smooth" === X.streamMode || "relay" === X.streamMode) &&
+      "player" === X.screen &&
+      (Le || (Le = t("player-mode-hint")), Le)
+    ) {
+      var a =
+        String((X.playerItem && X.playerItem.id) || "") +
+        "|" +
+        String((X.playerEpisode && X.playerEpisode.id) || "");
+      ("|" !== a && a === Xr) ||
+        ((Xr = a),
+          (Le.textContent = ""),
+          Le.appendChild(e("span", "pmh-title", "Modo Fluido activado")),
+          Le.appendChild(
+            e(
+              "span",
+              "pmh-sub",
+              "Úsalo cuando las películas van trabadas o se cortan. Si tu TV las reproduce bien en Normal, déjalo en Normal para ver mejor imagen."
+            )
+          ),
+          Le.classList.add("is-active"),
+          Wr && clearTimeout(Wr),
+          (Wr = setTimeout(function () {
+            ((Wr = null), Le && Le.classList.remove("is-active"));
+          }, 9e3)));
+    }
+  }
+  function Gr(e, t) {
+    if (xe && e) {
+      var a = !!(t = t || {}).nativeHls;
+      /* Marca de arranque para medir cuánto tarda el primer cuadro. */
+      try {
+        var ptT = window.__xuperTiming || (window.__xuperTiming = {});
+        ((ptT.playT0 = Date.now()), (ptT.firstFrameMs = -1));
+      } catch (e) { }
+      (zr(!!kr(e)), (wr = !1), (gr = e));
+      "live" === X.playerMode && resetLiveLatencyGuard();
+      var i = /^(http:\/\/127\.0\.0\.1:\d+)/.exec(e);
+      if ((i && (mr = i[1]), kr(e))) {
+        br = e.split("?")[0];
+        var n = /[?&]start=(\d+)/.exec(e);
+        ((Cr = n ? parseInt(n[1], 10) : 0),
+          (function (e) {
+            /* El vigilante anti-pantalla-negra se rearma por título. Antes solo
+               disparaba una vez por sesión: el segundo intento en Modo Fluido
+               se quedaba en "Conectando" indefinidamente. */
+            var wkey =
+              String((X.playerItem && X.playerItem.id) || "") +
+              "|" +
+              String((X.playerEpisode && X.playerEpisode.id) || "");
+            wkey !== xrKey && ((xrKey = wkey), (xr = !1));
+            (Lr(),
+              kr(e) &&
+              !xr &&
+              (Sr = setTimeout(function () {
+                ((Sr = null),
+                  !xe ||
+                  xe.readyState >= 2 ||
+                  (console.warn(
+                    "[relay] Watchdog: Modo Fluido no arrancó en 15 s, volviendo a Modo Normal..."
+                  ),
+                    (xr = !0),
+                    (X.streamMode = "normal"),
+                    K(STREAM_MODE_KEY, "normal"),
+                    /* No rebotar Normal → Fluido para este título: ya se
+                       comprobó que el relay no arranca aquí. */
+                    (wn =
+                      Ln(X.playerItem) || Sn(X.playerItem) || wn),
+                    jr("Modo Fluido no respondió, usando Modo Normal…"),
+                    sr()));
+              }, 15e3)));
+          })(e));
+      } else ((br = ""), (Cr = 0), Lr());
+      (jr("Conectando con el vídeo…"), (X.streamError = ""));
+      try {
+        xe.preload = "auto";
+      } catch (e) { }
+      var r = (X.playerItem && X.playerItem.streamMime) || "",
+        o =
+          -1 !== e.indexOf(".m3u8") ||
+          -1 !== r.indexOf("mpegurl") ||
+          !(!X.playerItem || !X.playerItem.isHls),
+        s = o
+          ? "application/vnd.apple.mpegurl"
+          : -1 !== e.indexOf(".mp4") || -1 !== r.indexOf("mp4")
+            ? "video/mp4"
+            : "video/mp2t";
+      ((xe.onerror = function () {
+        (Gn(), Nr(), logLive("err"));
+        var t = xe.error && xe.error.code;
+        /* TV en vivo: un fallo del decodificador (err=3) o de red (err=2) no
+           debe dejar el canal parado. Se recarga la señal con un token nuevo,
+           sin seek y sin mostrar error fatal. */
+        if (
+          (2 === t || 3 === t) &&
+          "live" === X.playerMode &&
+          liveRecoverFromError(t)
+        )
+          return;
+        if (4 === t && "live" === X.playerMode && o && !a) {
+          var i = Zr;
+          return (
+            jr("Reintentando señal con compatibilidad webOS…"),
+            void setTimeout(function () {
+              "live" === X.playerMode && Zr === i && Gr(e, { nativeHls: !0 });
+            }, 0)
+          );
+        }
+        /* Modo Fluido es la red de seguridad: si el relay no entrega un vídeo
+           que la TV pueda decodificar (err 2/3/4/6 o cualquier código de error), se vuelve a Modo Normal una
+           sola vez por título en lugar de terminar en "no se pudo abrir el
+           stream (código 6)". Se fija wn para no rebotar Normal → Fluido. */
+        if (
+          t &&
+          "vod" === X.playerMode &&
+          ("smooth" === X.streamMode || "relay" === X.streamMode) &&
+          X.playerItem
+        ) {
+          var sfItem = X.playerItem,
+            sfKey =
+              (Ln(sfItem) || Sn(sfItem) || "") +
+              "|" +
+              String((X.playerEpisode && X.playerEpisode.id) || "");
+          if (smoothFallbackKey !== sfKey)
+            return (
+              (smoothFallbackKey = sfKey),
+              (wn = Ln(sfItem) || Sn(sfItem) || wn),
+              (X.streamMode = "normal"),
+              K(STREAM_MODE_KEY, "normal"),
+              Lr(),
+              jr("Modo Fluido no pudo abrir el vídeo; volviendo a Modo Normal…"),
+              void setTimeout(function () {
+                "vod" === X.playerMode &&
+                  X.playerItem === sfItem &&
+                  "normal" === X.streamMode &&
+                  sr();
+              }, 0)
+            );
+        }
+        if (
+          4 === t &&
+          "vod" === X.playerMode &&
+          "normal" === X.streamMode &&
+          Gi &&
+          Date.now() < Gi
+        )
+          return (
+            (Gi = 0),
+            (X.streamError =
+              "No fue posible cambiar el idioma en reproducción Normal"),
+            void jr(X.streamError)
+          );
+        /* Antes de saltar a Modo Fluido, prueba otra copia compatible en el
+           reproductor nativo. Así muchas películas se ven en Normal sin que
+           el espectador tenga que activar nada. */
+        if (
+          (3 === t || 4 === t || 6 === t) &&
+          "vod" === X.playerMode &&
+          "normal" === X.streamMode &&
+          X.playerItem &&
+          copyTryCount < 1 &&
+          xNextCopy()
+        )
+          return;
+        if (
+          (4 === t || 6 === t) &&
+          "vod" === X.playerMode &&
+          "normal" === X.streamMode &&
+          X.playerItem
+        ) {
+          var n = X.playerItem,
+            r = Ln(n) || Sn(n);
+          if (wn !== r)
+            return (
+              (wn = r),
+              (X.streamMode = "smooth"),
+              jr("Reintentando película en modo compatible…"),
+              void setTimeout(function () {
+                "vod" === X.playerMode &&
+                  X.playerItem === n &&
+                  "smooth" === X.streamMode &&
+                  sr();
+              }, 0)
+            );
+        }
+        if (
+          (3 === t || 4 === t || 6 === t) &&
+          "vod" === X.playerMode &&
+          X.playerItem &&
+          xNextCopy()
+        )
+          return;
+        ((X.streamError =
+          "No se pudo abrir el stream (código " + (t || "error") + ")"),
+          xe.classList.remove("is-active"),
+          Te && (Te.style.display = "block"),
+          jr(X.streamError));
+      }),
+        (xe.onloadeddata = function () {
+          (Gn(), v(), $r());
+        }),
+        (xe.oncanplay = function () {
+          (Nr(), Gn(), v());
+        }),
+        (xe.onloadedmetadata = function () {
+          if ((Gn(), v(), "vod" === X.playerMode && "normal" === X.streamMode)) {
+            var e = X.playerItem && X.playerItem.streamAudioInfo,
+              t = preferredAudioIndex(e);
+            rr(t) && (Xi = t);
+          }
+          if (
+            "vod" === X.playerMode &&
+            !br &&
+            Number(X.resumePosition) > 3
+          ) {
+            var resumeAt = Math.floor(Number(X.resumePosition) || 0);
+            X.resumePosition = 0;
+            try {
+              xe.currentTime = resumeAt;
+              jr("Reanudando desde " + ai(resumeAt) + "…");
+            } catch (e) { }
+          }
+          if ("vod" === X.playerMode) {
+            var a = br ? Cr : xe.currentTime || 0;
+            oi(a, Hr());
+          }
+        }),
+        (xe.ondurationchange = function () {
+          if ("vod" === X.playerMode) {
+            var e = br ? Cr + (xe.currentTime || 0) : xe.currentTime || 0;
+            oi(e, Hr());
+          }
+        }),
+        (xe.onplaying = function () {
+          vodUserPaused = !1;
+          try {
+            var ptP = window.__xuperTiming;
+            ptP &&
+              ptP.playT0 &&
+              !(ptP.firstFrameMs >= 0) &&
+              (ptP.firstFrameMs = Date.now() - ptP.playT0);
+          } catch (e) { }
+          (clearLiveStallWatch(),
+            "live" === X.playerMode && logLive("play"),
+            "live" === X.playerMode &&
+            (resetLiveLatencyGuard(),
+              (liveStallLastTime = Number(xe.currentTime) || 0)),
+            Lr(),
+            Gn(),
+            v(),
+            "live" === X.playerMode && watchLiveStall(20e3));
+        }),
+        (xe.onended = function () {
+          "vod" === X.playerMode && Qn();
+        }),
+        (xe.ontimeupdate = function () {
+          if (
+            ("live" === X.playerMode &&
+              (function () {
+                var liveTime = Number(xe.currentTime) || 0;
+                if (liveTime > liveStallLastTime + 0.25) {
+                  liveStallLastTime = liveTime;
+                  liveStallStableSince || (liveStallStableSince = Date.now());
+                  if (
+                    Date.now() - liveStallStableSince >= 3e4 &&
+                    (liveStallRetries || liveDecodeRetries)
+                  ) {
+                    liveStallRetries = 0;
+                    liveDecodeRetries = 0;
+                    liveDecodeCooldown = 0;
+                  }
+                }
+              })(),
+              !X.streamError &&
+              (xe.currentTime > 0 || xe.readyState >= 2) &&
+              ("live" === X.playerMode
+                ? (liveStallTimer || watchLiveStall(20e3), v())
+                : (clearLiveStallWatch(), Gn(), v())),
+              "vod" === X.playerMode)
+          ) {
+            var e = br ? Cr + (xe.currentTime || 0) : xe.currentTime || 0,
+              n = Hr();
+            (oi(e, n), yn(e), sn(e, n), updateVodSkip(e, n));
+          }
+        }),
+        (xe.onpause = function () {
+          vodPauseTime = Date.now();
+          ("vod" === X.playerMode) &&
+            sn(
+              br ? Cr + (xe.currentTime || 0) : xe.currentTime || 0,
+              Hr(),
+              !0
+            );
+          if ("vod" === X.playerMode && !vodUserPaused && "player" === X.screen && !X.streamError) {
+            Pr("Cargando buffer…");
+            try {
+              var pr = xe.play();
+              if (pr && pr.catch) {
+                pr.catch(function () {
+                  setTimeout(function () {
+                    if (xe && xe.paused && !vodUserPaused && "vod" === X.playerMode) {
+                      var p2 = xe.play();
+                      p2 && p2.catch && p2.catch(function () { });
+                    }
+                  }, 250);
+                });
+              }
+            } catch (e) { }
+            return;
+          }
+          (ri(),
+            si("pause"),
+            br && (wr = !0));
+        }),
+        (xe.onplay = function () {
+          vodUserPaused = !1;
+          "vod" === X.playerMode &&
+            (si("none"),
+              ri(),
+              (ni = setInterval(function () {
+                if (
+                  "player" === X.screen &&
+                  "vod" === X.playerMode &&
+                  xe &&
+                  !xe.paused
+                ) {
+                  var e = br ? Cr + (xe.currentTime || 0) : xe.currentTime || 0,
+                    n = Hr();
+                  (oi(e, n), yn(e), sn(e, n));
+                  /* Watchdog de pantalla negra / solo audio:
+                     Si el video arranca en Modo Normal, ya lleva >= 3.5 s reproduciéndose (audio suena),
+                     pero videoWidth === 0 (el decodificador de video no puede demuxar la pista de imagen),
+                     se activa automáticamente Modo Fluido para rescatar la imagen sin que el usuario deba hacer nada. */
+                  if (
+                    "player" === X.screen &&
+                    "vod" === X.playerMode &&
+                    "normal" === X.streamMode &&
+                    xe &&
+                    !xe.paused &&
+                    (xe.currentTime || 0) >= 3.5 &&
+                    xe.videoWidth === 0 &&
+                    X.playerItem
+                  ) {
+                    var noVideoKey = (Ln(X.playerItem) || Sn(X.playerItem)) + "|no_video";
+                    if (wn !== noVideoKey) {
+                      wn = noVideoKey;
+                      X.streamMode = "smooth";
+                      Lr();
+                      jr("Optimizando imagen con Modo Fluido…");
+                      setTimeout(function () {
+                        "vod" === X.playerMode &&
+                          "smooth" === X.streamMode &&
+                          sr();
+                      }, 0);
+                      return;
+                    }
+                  }
+                  /* Watchdog de pantalla negra en Modo Fluido:
+                     Si lleva >= 3.5 s reproduciéndose pero videoWidth === 0, reinicia el relay
+                     en el segundo actual para solicitar un IDR keyframe fresco. */
+                  if (
+                    "player" === X.screen &&
+                    "vod" === X.playerMode &&
+                    ("smooth" === X.streamMode || "relay" === X.streamMode) &&
+                    br &&
+                    xe &&
+                    !xe.paused &&
+                    (xe.currentTime || 0) >= 3.5 &&
+                    xe.videoWidth === 0 &&
+                    X.playerItem
+                  ) {
+                    var smoothNoVideoKey = (Ln(X.playerItem) || Sn(X.playerItem)) + "|smooth_no_video";
+                    if (wn !== smoothNoVideoKey) {
+                      wn = smoothNoVideoKey;
+                      var curAt = Math.max(0, Math.floor(Cr + (xe.currentTime || 0)));
+                      console.log("[xuper-smooth] audio sin video en Modo Fluido, reiniciando en " + curAt);
+                      jr("Sincronizando imagen…");
+                      Gr(br + "?start=" + curAt);
+                      return;
+                    }
+                  }
+                }
+              }, 500)));
+        }),
+        (xe.onwaiting = function () {
+          /* Solo el aviso visual, como en la 2.2.77. Aquí NO se arma el
+             vigilante: "waiting" se dispara de forma normal entre segmentos
+             de una señal en vivo. */
+          Pr("Cargando vídeo…");
+        }),
+        (xe.onstalled = function () {
+          Pr("Conectando…");
+        }));
+      /* Cambiar de canal reutiliza el mismo <video>. En el reproductor nativo de
+         webOS dejar la señal anterior decodificando mientras entra la nueva
+         termina en MEDIA_ERR_DECODE (err=3) y el canal se queda en
+         "Conectando". Se detiene el pipeline anterior antes de montar la nueva
+         fuente. No se toca currentTime (prohibido en vivo). */
+      try {
+        if (xe.currentSrc || xe.getAttribute("src")) {
+          (xe.pause(), xe.removeAttribute("src"), xe.load());
+        }
+      } catch (e) { }
+      for (
+        /* En vivo NO se envía playTime.start=0: forzar el inicio al segmento
+           más viejo de la ventana HLS saca al decodificador del borde en vivo
+           y termina en MEDIA_ERR_DECODE (err=3). VOD conserva el inicio en 0. */
+        var l = "live" === X.playerMode
+          ? { mediaTransportType: o ? "HLS" : "URI" }
+          : {
+            mediaTransportType: o ? "HLS" : "URI",
+            option: {
+              transmission: {
+                playTime: { start: 0 },
+              },
+            },
+          },
+        d = encodeURI(JSON.stringify(l)),
+        c = a ? s : s + ";mediaOption=" + d;
+        xe.firstChild;
+      )
+        xe.removeChild(xe.firstChild);
+      if ((xe.removeAttribute("src"), a))
+        try {
+          xe.mediaOption = null;
+        } catch (e) { }
+      else
+        try {
+          xe.mediaOption = l;
+        } catch (e) { }
+      var p = document.createElement("source");
+      if ((p.setAttribute("src", e), p.setAttribute("type", c), o))
+        try {
+          xe.load();
+        } catch (e) { }
+      if ((xe.appendChild(p), !o))
+        try {
+          xe.src = e;
+        } catch (e) { }
+      /* En vivo no se altera currentTime: en el demuxer nativo de webOS
+         cualquier posición forzada (aunque sea 0) rompe la sincronización de
+         una emisión HLS/TS y provoca MEDIA_ERR_DECODE (err=3). */
+      "vod" === X.playerMode &&
+        (function () {
+          try {
+            xe.currentTime = 0;
+          } catch (e) { }
+        })();
+      (xe.classList.add("is-active"), Te && (Te.style.display = "none"));
+      try {
+        xe.load();
+        var u = xe.play();
+        u &&
+          u.catch &&
+          u.catch(function () {
+            xe.error ||
+              ((X.streamError = "Pulsa OK para iniciar la reproducción"),
+                jr(X.streamError));
+          });
+      } catch (e) {
+        ((X.streamError = "Pulsa OK para iniciar la reproducción"),
+          jr(X.streamError));
+      }
+    }
+    function v() {
+      (Dr(), jr(""), Gn());
+    }
+  }
+  function Qr(e, t) {
+    var a = yr;
+    function i() {
+      if ((!X.resumePosition || X.resumePosition <= 3) && e) {
+        var hist = (Q && Q.history) || [];
+        for (var h = 0; h < hist.length; h++) {
+          if (String(hist[h].id) === String(e.id)) {
+            var pos = Math.floor(Number(hist[h].position) || 0);
+            if (pos > 3) X.resumePosition = pos;
+            break;
+          }
+        }
+      }
+      var i = { contentId: e.id, title: e.title || e.name || "" };
+      var ptT0 = Date.now();
+      if (
+        ((i.playbackMode = X.streamMode),
+          (i.forceRelay = "smooth" === X.streamMode || "relay" === X.streamMode),
+          i.forceRelay)
+      ) {
+        var n = _r();
+        i.container = n;
+      }
+      i.trackIndex = X.trackIndex || 0;
+      var panelUhd = xUhdPanel();
+      var curQuality = (X.playback && X.playback.quality) || "auto";
+      var ver = xWebosVersion();
+      var legacyModel = /^\d{2}(UB|UF|UG)/i.test(String(panelInfo().modelName || ""));
+      /* En televisores webOS 1.x y 2.x (2014-2015, ej. LG UF7700 / UB8500), el SoC
+         temprano (MStar LM15U) solo decodifica HEVC 8-bit y no soporta flujos 4K pesados ni
+         HEVC 10-bit sin descartar cuadros (tirones). En calidad "auto", se limita a 1080p
+         para que la reproducción sea completamente fluida. Si el usuario fuerza 4K
+         manualmente en el reproductor (curQuality === "2160"), se respeta. */
+      if (((ver > 0 && ver < 3) || legacyModel) && "auto" === curQuality) {
+        panelUhd = !1;
+      }
+      if ("1080" === curQuality || "720" === curQuality) {
+        panelUhd = !1;
+      }
+      ((i.quality = curQuality),
+        (i.hevc = xHevcCapable()),
+        (i.uhd = panelUhd));
+      var r = X.playerEpisode,
+        o = (r && r.id) || (e && e.id) || "",
+        s = un[o] || un[Ln(e)],
+        l =
+          (s && s.audio) || (r && r.streamAudioInfo) || e.streamAudioInfo || "";
+      if (
+        ((Xi = preferredAudioIndex(l)),
+          (i.audioTrack = Xi || 0),
+          (i.audioPreference = X.audioPreferenceCode || ""),
+          x(e))
+      ) {
+        var d = X.playerEpisode,
+          c = e.seasonId || e.id;
+        if (d && d.id) ((i.contentId = d.id), (i.seriesContentId = c));
+        else {
+          if (!e.episodes || !e.episodes.length) return t("");
+          ((X.playerEpisode = e.episodes[0]),
+            (i.contentId = e.episodes[0].id),
+            (i.seriesContentId = c));
+        }
+      }
+      var done = function (resErr, n) {
+        if (a !== yr) return;
+        /* Tiempo que tardó el servicio en resolver la señal (diagnóstico). */
+        try {
+          (window.__xuperTiming || (window.__xuperTiming = {})).resolveMs =
+            Date.now() - ptT0;
+        } catch (e) { }
+        /* Como XuperMH: si Modo Fluido no se puede resolver, reintenta una vez
+           por el camino Normal en lugar de dejar al espectador sin vídeo. */
+        if (
+          (resErr || !n || !1 === n.returnValue) &&
+          i.forceRelay &&
+          !i._retryNormal
+        ) {
+          i._retryNormal = !0;
+          i.forceRelay = !1;
+          i.playbackMode = "normal";
+          jr("Modo Fluido no respondió, usando Modo Normal…");
+          return void P("resolve", i, done);
+        }
+        if (resErr || !n || !1 === n.returnValue)
+          return (
+            (X.streamError =
+              "No se pudo resolver el título" + (resErr ? ": " + resErr : "")),
+            jr(X.streamError),
+            t("")
+          );
+        (D("vod", n),
+          (e.streamMime = n.mime || ""),
+          (e.streamCodec = n.codec || ""),
+          n.duration > 0
+            ? ((e.duration = n.duration),
+              X.playerEpisode && (X.playerEpisode.duration = n.duration))
+            : (e.duration = e.duration || 0),
+          (e.subtitles = n.subtitles || []),
+          (e.streamAudioInfo = n.audio || e.streamAudioInfo || ""),
+          X.playerEpisode &&
+          (X.playerEpisode.streamAudioInfo = n.audio || ""),
+          (e.isHls = !!n.isHls),
+          n.audio && (Xi = preferredAudioIndex(n.audio)));
+        var r = {
+          audio: n.audio || e.streamAudioInfo,
+          subtitles: e.subtitles,
+          tracks: n.availableTracks || [],
+          selected: n.selectedTrack || {},
+          duration: n.duration || 0,
+        };
+        (cacheTrackInfo(Ln(e), r), An(r));
+        try {
+          window.__xuperStreamInfo = {
+            selectedTrack: n.selectedTrack || {},
+            availableTracks: n.availableTracks || [],
+          };
+        } catch (e) { }
+        var o = n.proxyPath || n.url || "",
+          s = Math.floor(Number(X.resumePosition) || 0);
+        if (s > 3 && /127\.0\.0\.1:8787\/s\//.test(o)) {
+          o += (o.indexOf("?") >= 0 ? "&" : "?") + "start=" + s;
+          jr("Reanudando desde " + ai(s) + "…");
+          X.resumePosition = 0;
+        }
+        t(o);
+      };
+      P(i.forceRelay ? "resolveSmooth" : "resolve", i, done);
+    }
+    if (
+      x(e) &&
+      !X.playerEpisode &&
+      (!e.episodes || !e.episodes.length) &&
+      !e._detailsLoaded
+    )
+      return (
+        jr("Cargando capítulos…"),
+        void U(e, function () {
+          a === yr && i();
+        })
+      );
+    i();
+  }
+  function Jr(e, t) {
+    if (xe) {
+      vodUserPaused = !1;
+      (t &&
+        ((X.playerEpisode = t), (X.playerSeasonIndex = X.detailSeason || 0)),
+        e && (X.playerItem = e));
+      var a = e || X.playerItem;
+      if ((a && xn(a), zr(), a)) {
+        var i = t || X.playerEpisode,
+          n = (i && i.id) || (a && a.id) || "",
+          r = n ? un[n] : null,
+          o = (r && r.audio) || (i && i.streamAudioInfo) || "";
+        if (a._portal && !$i && !o) {
+          var s = !1,
+            l = yr,
+            d = function () {
+              if (!s && l === yr) {
+                s = !0;
+                var e = (t && (t.number || t.seriesNumber)) || "";
+                (jr(e ? "Cargando capítulo " + e + "…" : "Cargando capítulo…"),
+                  Qr(a, function (e) {
+                    e
+                      ? Gr(e)
+                      : X.streamError || jr("Sin fuente de reproducción");
+                  }));
+              }
+            };
+          return (
+            setTimeout(d, 2500),
+            void Mn(a, function (e) {
+              d();
+            })
+          );
+        }
+        if (a._portal) {
+          var c = (t && (t.number || t.seriesNumber)) || "";
+          return (
+            jr(c ? "Cargando capítulo " + c + "…" : "Cargando capítulo…"),
+            void Qr(a, function (e) {
+              e ? Gr(e) : X.streamError || jr("Sin fuente de reproducción");
+            })
+          );
+        }
+        a.streamUrl && Gr(a.streamUrl);
+      }
+    }
+  }
+  function Kr(e, a) {
+    Ce || lr();
+    if (X.channelsOpen || (Se && Se.classList.contains("is-active"))) {
+      ro();
+    }
+    var i =
+      !a ||
+      !X.playerEpisode ||
+      X.playerEpisode === a ||
+      X.playerEpisode.id === a.id,
+      n = "detail" === X.screen && xe && !!xe.src && X.playerItem === e && i;
+    if (!n) vodSkip = null;
+    ((X.playerMode = "vod"),
+      (vodUserPaused = !1),
+      e && X.playerItem !== e && _n(),
+      e && (X.playerItem = e),
+      a && (X.playerEpisode = a),
+      e && xn(e),
+      (X.playerReturn = { screen: "detail", focus: X.focus }));
+    var r = t("screen-player"),
+      o = t("screen-detail");
+    (r && (r.classList.remove("is-mini"), r.classList.add("is-active")),
+      o && o.classList.remove("is-active"),
+      (X.screen = "player"),
+      Ce.classList.add("is-vod"),
+      ao(),
+      rt(Ce),
+      vi(),
+      n
+        ? X.streamError || (Dr(), jr(""), $r())
+        : (showLoadingBackdrop(X.playerItem, "Cargando " + ((X.playerItem && X.playerItem.title) || "") + "…"), Jr(X.playerItem, X.playerEpisode)));
+  }
+  function Yr(e, t, a) {
+    var sp = document.getElementById("screen-player");
+    sp && sp.classList.remove("is-mini");
+    if (zi) On();
+    var viBar = document.getElementById("player-vod-infobar");
+    viBar && viBar.classList.remove("is-active");
+    if (e !== "vod" || X.screen !== "detail") vodSkip = null;
+    "vod" !== e || "detail" !== X.screen
+      ? (Ce || lr(),
+        "live" === e && jt(),
+        (X.playerMode = e),
+        t && X.playerItem !== t && _n(),
+        (X.playerItem = t || null),
+        (X.playerEpisode = a || null),
+        "vod" === e && t && xn(t),
+        (X.playerReturn = { screen: X.screen, focus: X.focus }),
+        (X.channelsOpen = !1),
+        we.classList.remove("is-active"),
+        Se.classList.remove("is-active"),
+        Ce.classList.toggle("is-vod", "vod" === e),
+        ao(),
+        lt("player"),
+        rt(Ce),
+        ao(),
+        "vod" === e
+          ? (vi(), showLoadingBackdrop(X.playerItem, "Cargando " + ((X.playerItem && X.playerItem.title) || "") + "…"), Jr(X.playerItem, X.playerEpisode))
+          : (pi(), to(F[X.channel])))
+      : Kr(t, a);
+  }
+  var Zr = 0,
+    eo = null,
+    liveStallTimer = null,
+    liveStallChannel = -1,
+    liveStallRetries = 0,
+    liveStallLastTime = -1,
+    liveStallStableSince = 0,
+    liveWatchSample = 0,
+    liveGuardLastTime = -1,
+    liveGuardLastWall = 0,
+    liveGuardUntil = 0,
+    liveGuardCooldown = 0,
+    liveUserPaused = !1,
+    vodUserPaused = !1,
+    vodPauseTime = 0,
+    liveDecodeRetries = 0,
+    liveDecodeCooldown = 0,
+    liveLogBuf = [],
+    liveLogTimer = null;
+  /* Registro de eventos de TV en vivo: se envía al servicio (método liveLog)
+     para que el diagnóstico diga si el corte fue de red o del reproductor. */
+  function logLive(ev) {
+    try {
+      var b = xe && xe.buffered;
+      liveLogBuf.push({
+        ev: ev,
+        t: Math.round((Number(xe && xe.currentTime) || 0) * 10) / 10,
+        rs: (xe && xe.readyState) || 0,
+        err: (xe && xe.error && xe.error.code) || 0,
+        buf: b && b.length ? Math.round(b.end(b.length - 1)) : 0,
+        /* Rango del buffer y estado de red: solo diagnóstico, permite ver si
+           el congelamiento es un hueco de buffer (b0) o una espera de red. */
+        b0: b && b.length ? Math.round(b.start(b.length - 1)) : 0,
+        ns: (xe && xe.networkState) || 0,
+        ch: String((F[X.channel] && F[X.channel].name) || "").slice(0, 40),
+      });
+      if (liveLogBuf.length > 60) liveLogBuf.shift();
+      liveLogTimer ||
+        (liveLogTimer = setTimeout(function () {
+          liveLogTimer = null;
+          var batch = liveLogBuf;
+          liveLogBuf = [];
+          if (!batch.length) return;
+          try {
+            P("liveLog", { events: batch }, function () { }, 8e3);
+          } catch (e) { }
+        }, 1500));
+    } catch (e) { }
+  }
+  function clearLiveStallWatch() {
+    liveStallTimer && (clearTimeout(liveStallTimer), (liveStallTimer = null));
+  }
+  /* TV en vivo: no se hace seek ni se fuerza posición en HLS/TS en vivo;
+     en webOS forzar currentTime en un flujo en vivo destruye el demuxer y causa
+     MEDIA_ERR_DECODE (err=3). */
+  function resetLiveLatencyGuard() {
+    ((liveGuardLastTime = -1),
+      (liveGuardLastWall = 0),
+      (liveWatchSample = 0),
+      (liveUserPaused = !1));
+  }
+  function isLive247Channel() {
+    var ch = F[X.channel];
+    return !!(ch && /24[\s\/-]?7/i.test(String(ch.name || "")));
+  }
+  function liveLatencyGuard(cur) {
+    return;
+  }
+  /* Recuperación de TV en vivo ante error del reproductor nativo.
+     No hace seek ni toca currentTime: pide un token nuevo al servicio y
+     vuelve a montar el <video> en el borde en vivo. Se limita a 2 intentos
+     por canal con enfriamiento para no entrar en un bucle de recargas. */
+  function liveRecoverFromError(code) {
+    if ("live" !== X.playerMode || "player" !== X.screen) return !1;
+    if (Date.now() < liveDecodeCooldown) return !1;
+    if (liveDecodeRetries >= 2) return !1;
+    liveDecodeRetries++;
+    liveDecodeCooldown = Date.now() + 4e3;
+    liveStallRetries = 0;
+    X.streamError = "";
+    logLive("recover" + (code || ""));
+    jr("Reconectando señal…");
+    clearLiveStallWatch();
+    try {
+      xe && xe.pause();
+    } catch (e) { }
+    eo && (clearTimeout(eo), (eo = null));
+    setTimeout(function () {
+      "live" === X.playerMode &&
+        "player" === X.screen &&
+        to(F[X.channel], !0, !0);
+    }, 600);
+    return !0;
+  }
+  function watchLiveStall(delay, mark) {
+    clearLiveStallWatch();
+    if ("live" !== X.playerMode || !xe || "player" !== X.screen) return;
+    liveWatchSample = Number(xe.currentTime) || 0;
+    liveStallTimer = setTimeout(function () {
+      liveStallTimer = null;
+      if (
+        "live" !== X.playerMode ||
+        !xe ||
+        "player" !== X.screen ||
+        X.streamError
+      )
+        return;
+      var cur = Number(xe.currentTime) || 0;
+      if (xe.paused) {
+        /* Pausa pedida por el espectador: se respeta. Si el televisor se
+           pausó solo (vacío de buffer), se reanuda una vez. */
+        if (!liveUserPaused) {
+          try {
+            var pr = xe.play();
+            pr && pr.catch && pr.catch(function () { });
+            logLive("resume");
+          } catch (e) { }
+        }
+        watchLiveStall(delay);
+        return;
+      }
+      if (cur > liveWatchSample + 0.8) {
+        watchLiveStall(delay);
+        return;
+      }
+      var end = 0;
+      try {
+        if (xe.buffered && xe.buffered.length > 0)
+          end = xe.buffered.end(xe.buffered.length - 1);
+      } catch (e) { }
+      /* Si la reproducción en vivo tiene buffer saludable (más de 1.5s por
+         delante) y readyState >= 3, el canal está fluyendo normalmente y
+         NO se debe interrumpir ni recargar. */
+      if ("live" === X.playerMode && end > cur + 1.5 && xe.readyState >= 3) {
+        watchLiveStall(delay);
+        return;
+      }
+      /* nudge desactivado en live: seek sobre HLS/TS nativo de webOS Starfish
+         destruye el demuxer y deja la pantalla congelada (MEDIA_ERR_DECODE).
+         En live simplemente dejamos que el watchdog continúe. */
+      if (end > cur + 1 && "vod" === X.playerMode) {
+        try {
+          xe.currentTime = Math.min(end - 0.5, cur + 5);
+          logLive("nudge");
+          watchLiveStall(25e3);
+          return;
+        } catch (e) { }
+      }
+      if (liveStallRetries < 2) {
+        liveStallRetries++;
+        resetLiveLatencyGuard();
+        logLive("stall" + (xe.readyState || 0));
+        logLive("reload");
+        to(F[X.channel], !0, !0);
+        return;
+      }
+      logLive("freeze" + (xe.readyState || 0));
+      watchLiveStall(3e4);
+    }, delay || 20e3);
+  }
+  function to(e, t, force) {
+    if (
+      (eo && (clearTimeout(eo), (eo = null)),
+        e || (e = F[X.channel]),
+        e && (e.channelCode || e.streamUrl))
+    ) {
+      if (F && F.length) {
+        var idx = F.indexOf(e);
+        if (idx >= 0) X.channel = idx;
+      }
+      liveStallChannel !== X.channel &&
+        ((liveStallChannel = X.channel),
+          (liveStallRetries = 0),
+          (liveStallLastTime = -1),
+          (liveStallStableSince = 0),
+          (liveDecodeRetries = 0),
+          (liveDecodeCooldown = 0));
+      clearLiveStallWatch();
+      logLive("zap");
+      /* Al cambiar de canal o solicitar recarga, pausar y desmontar la señal
+         anterior para que no siga sonando ni reproduciéndose de fondo mientras
+         resuelve la nueva. */
+      try {
+        if (xe) {
+          xe.pause();
+          xe.removeAttribute("src");
+          xe.load();
+        }
+      } catch (errZap) { }
+      var doResolveLive = function () {
+        var t = ++Zr;
+        (jr("Cargando señal " + (e.name || "") + "…"),
+          P(
+            "resolveLive",
+            e.streamUrl
+              ? { streamUrl: e.streamUrl, channelCode: e.channelCode || "", force: force ? 1 : 0, name: e.name || "" }
+              : { channelCode: e.channelCode, force: force ? 1 : 0, name: e.name || "" },
+            function (errLive, resPayload) {
+              if (t === Zr) {
+                if (errLive || !resPayload || !1 === resPayload.returnValue) {
+                  clearLiveStallWatch();
+                  try {
+                    xe && (xe.pause(), xe.removeAttribute("src"), xe.load());
+                  } catch (errErr) { }
+                  var errStr = String(errLive || "");
+                  var is200001 = /200001|版本已停止使用/i.test(errStr) || errStr.indexOf("portal200001") !== -1;
+                  var errMsg = is200001
+                    ? "Señal temporalmente no disponible en el servidor. Reconectando…"
+                    : ("No se pudo conectar con la señal" + (errLive ? ": " + errLive : ""));
+                  X.streamError = errMsg;
+                  jr(X.streamError);
+                  if (is200001 && "live" === X.playerMode && !window.__liveRetrying200001) {
+                    window.__liveRetrying200001 = true;
+                    eo = setTimeout(function () {
+                      window.__liveRetrying200001 = false;
+                      if ("live" === X.playerMode && t === Zr) {
+                        console.log("[live] auto-reintentando conexión tras respuesta del servidor...");
+                        doResolveLive();
+                      }
+                    }, 4000);
+                  }
+                  return;
+                }
+                D("live", resPayload);
+                var i = resPayload.proxyPath || resPayload.url;
+                if (!i) {
+                  clearLiveStallWatch();
+                  try {
+                    xe && (xe.pause(), xe.removeAttribute("src"), xe.load());
+                  } catch (errNoUrl) { }
+                  return (
+                    (X.streamError = "Señal no disponible"),
+                    void jr(X.streamError)
+                  );
+                }
+                (jr(""), pi(), Gr(i));
+              }
+            }
+          ));
+      };
+      t ? doResolveLive() : (eo = setTimeout(doResolveLive, 180));
+    }
+  }
+  function ao() {
+    var e = "live" === X.playerMode,
+      t = F[X.channel] || {},
+      a = we.querySelector(".pi-index"),
+      i = we.querySelector(".pi-name"),
+      n = we.querySelector(".pi-date"),
+      o = we.querySelector(".pi-range"),
+      s = we.querySelector(".pi-now"),
+      d = we.querySelector(".pi-next"),
+      c = we.querySelector(".pi-uhd"),
+      p = we.querySelector(".pi-logo");
+    if (e)
+      (Me && Me.classList.remove("is-active"),
+        (a.style.display = "block"),
+        (a.textContent = r(t.index || X.channel + 1)),
+        (i.textContent = t.name || ""),
+        (n.textContent = "Hoy"),
+        (o.textContent = t.time || ""),
+        (s.style.display = "block"),
+        (s.textContent = t.now || "En vivo"),
+        (d.style.display = t.next ? "block" : "none"),
+        t.next && (d.textContent = "Siguiente: " + t.next),
+        (c.style.display = t.uhd ? "block" : "none"),
+        (p.style.display = "block"),
+        p &&
+        (t.logo
+          ? (p.style.backgroundImage = "url(" + t.logo + ")")
+          : (p.style.backgroundImage = "")));
+    else {
+      we && (we.classList.remove("is-active"), (we.style.display = "none"));
+      var u = X.playerItem || l[0];
+      if (Ee)
+        if (x(u) && X.playerEpisode) {
+          var v = X.playerEpisode.title || X.playerEpisode.name,
+            f = X.playerEpisode.number || X.playerEpisode.seriesNumber,
+            h = v || (f ? "Capítulo " + f : "");
+          Ee.textContent = h ? u.title + " - " + h : u.title;
+        } else Ee.textContent = u.title;
+      (Ie &&
+        (Ie.src =
+          u.poster ||
+          u.cover ||
+          "images/orbivista-poster.png"),
+        oi(xe ? xe.currentTime : 0, xe ? xe.duration : 0));
+    }
+    for (var m in Xe)
+      Xe.hasOwnProperty(m) &&
+        Xe[m].classList.toggle("is-current", Xe[m]._channel === X.channel);
+    io();
+    if (X.channelsOpen) {
+      we && (we.classList.remove("is-active"), (we.style.display = "none"));
+    } else if (e) {
+      we && (we.style.display = "");
+    }
+  }
+  function io() {
+    var e = we.querySelector(".pi-quality"),
+      t = we.querySelector(".pi-scale"),
+      a = we.querySelector(".pi-func");
+    e &&
+      t &&
+      a &&
+      ((e.style.left = "517.5px"),
+        (t.style.left = e.offsetLeft + e.offsetWidth + 30 + "px"),
+        (a.style.left = t.offsetLeft + t.offsetWidth + 30 + "px"));
+  }
+  function no() {
+    if ("live" === X.playerMode) {
+      we && we.classList.remove("is-active");
+      ((X.channelsOpen = !0),
+        Se.classList.add("is-active"),
+        dr(),
+        hr(X.channel),
+        cr());
+      var e = Xe[X.channel];
+      if (e) {
+        rt(e);
+        var t = e.parentNode,
+          a = 111 * X.channel;
+        (a < t.scrollTop || a + 109.5 > t.scrollTop + t.clientHeight) &&
+          smoothScroll(t, null, Math.max(0, a - 120), 180);
+      }
+    }
+  }
+  function ro() {
+    /* Cerrar el panel también termina la búsqueda: si no, la lupa reaparecía
+       con el texto anterior y filtraba la lista la próxima vez que se abría. */
+    if (liveSearchOpen) closeLiveChannelSearch();
+    liveSearchText = "";
+    ((X.channelsOpen = !1),
+      Se && Se.classList.remove("is-active"),
+      "player" === X.screen && (ao(), pi(), rt(Ce)));
+  }
+  function oo() {
+    var e = t("app");
+    if (e) {
+      var a = (function () {
+        var e =
+          window.innerWidth ||
+          (document.documentElement &&
+            document.documentElement.clientWidth) ||
+          0,
+          t =
+            window.innerHeight ||
+            (document.documentElement &&
+              document.documentElement.clientHeight) ||
+            0;
+        (e && t) || ((e = 1920), (t = 1080));
+        /* El panel físico solo sirve como dato de diagnóstico. Escalar con
+           screen.width/haría que en un TV 4K que reporta una ventana de
+           1920×1080 (dpr 2) el lienzo se dibujara a 3840×2160 y quedara
+           recortado a la mitad; la escala debe salir siempre del viewport
+           real que la app puede pintar. */
+        var a = Math.floor((screen && screen.width) || 0),
+          i = Math.floor((screen && screen.height) || 0);
+        return { w: e, h: t, panel: a > 0 && i > 0 ? { w: a, h: i } : null };
+      })(),
+        i = a.w,
+        n = a.h,
+        r = Math.min(i / 1920, n / 1080),
+        displayScale = (Q && Q.uiScaleMode === "hd" && i > 1280) ? (2 / 3) : 1;
+      r *= displayScale;
+      ((!isFinite(r) || r <= 0) && (r = 1), (r = Math.round(1e4 * r) / 1e4));
+      var o = Math.max(0, Math.round((i - 1920 * r) / 2)),
+        s = Math.max(0, Math.round((n - 1080 * r) / 2));
+      ((e.style.left = o + "px"),
+        (e.style.top = s + "px"),
+        (e.style.webkitTransform = "scale(" + r + ")"),
+        (e.style.transform = "scale(" + r + ")"),
+        (window.__xuperViewport = {
+          w: i,
+          h: n,
+          scale: r,
+          uiScaleMode: Q && Q.uiScaleMode ? Q.uiScaleMode : "auto",
+          panelW: a.panel ? a.panel.w : 0,
+          panelH: a.panel ? a.panel.h : 0,
+        }));
+    }
+  }
+  function so() {
+    var welcomeVersion = t("screen-welcome");
+    welcomeVersion = welcomeVersion && welcomeVersion.querySelector(".welcome-version");
+    welcomeVersion && (welcomeVersion.textContent = "v" + APP_VERSION);
+    oo();
+    window.addEventListener("resize", oo, !1);
+    window.addEventListener("orientationchange", oo, !1);
+    document.addEventListener("visibilitychange", oo, !1);
+    setTimeout(oo, 250);
+    setTimeout(oo, 1200);
+    setTimeout(oo, 3e3);
+    document.addEventListener("keydown", ut, !1);
+    document.addEventListener(
+      "keyup",
+      function (e) {
+        var k = e.keyCode || e.which;
+        if (461 === k || "Back" === e.key || "GoBack" === e.key) {
+          if (Date.now() - lastBackKeyDown < 450) {
+            e.preventDefault && e.preventDefault();
+            e.stopPropagation && e.stopPropagation();
+            return;
+          }
+          ut(e);
+        }
+      },
+      !1
+    );
+    window.addEventListener(
+      "popstate",
+      function () {
+        if (Date.now() - lastBackKeyDown < 450) return;
+        ct();
+      },
+      !1
+    );
+    var lastHoverAt = 0;
+    document.addEventListener("mouseover", function (e) {
+      /* El control Magic puede emitir decenas de "mouseover" por segundo.
+         En TVs lentas eso repintaba el foco sin parar; se limita a ~12 fps.
+         Ademas ignoramos hover si acabamos de pulsar Back para evitar recaptura inmediata. */
+      var now = Date.now();
+      if (now - lastBackKeyDown < 500) return;
+      if (now - lastHoverAt < 80) return;
+      lastHoverAt = now;
+      var tElem = n(e.target, ".focusable");
+      if (tElem && at(tElem) && X.focus !== tElem) {
+        rt(tElem, !0);
+      }
+    }, !1);
+    document.addEventListener("click", function (e) {
+      var t = n(e.target, ".focusable");
+      if (t) {
+        rt(t, !0);
+        if (t._activate) {
+          t._activate(e);
+        } else if (t.click && t !== e.target) {
+          t.click();
+        }
+        return;
+      }
+      if (Ht) {
+        if (!n(e.target, ".dialog-addons-box")) {
+          la();
+          return;
+        }
+      } else if (catalogFilterDialog) {
+        if (!n(e.target, ".catalog-filter-card")) {
+          closeCatalogFilter();
+          return;
+        }
+      } else if (liveFavoritePrompt) {
+        if (!n(e.target, ".pc-favorite-box")) {
+          closeLiveFavoriteConfirm();
+          return;
+        }
+      } else if (xa || (DialogManager && DialogManager.isOpen("seasonPopup"))) {
+        if (!n(e.target, ".season-popup")) {
+          Ta();
+          return;
+        }
+      } else if (X.categoryPickerOpen) {
+        if (!n(e.target, ".player-categories") && !n(e.target, ".pcat-box")) {
+          ur();
+          return;
+        }
+      } else if (X.episodeBrowserOpen) {
+        if (!n(e.target, "#player-episodes")) {
+          zn();
+          return;
+        }
+      } else if ("player" === X.screen) {
+        if (!n(e.target, ".player-channels") && !n(e.target, ".player-infobar") && !n(e.target, ".player-vod-infobar")) {
+          if (X.channelsOpen) {
+            no();
+          } else {
+            X.infobar ? ui() : pi();
+          }
+        }
+      }
+    }, !1);
+    window.addEventListener("wheel", function (e) {
+      var delta = e.deltaY || e.wheelDelta || 0;
+      if (!delta) return;
+      var scrollY = findScrollable(e.target, !1);
+      if (scrollY) {
+        smoothScroll(scrollY, null, scrollY.scrollTop + (delta > 0 ? 140 : -140), 160);
+        e.preventDefault && e.preventDefault();
+        return;
+      }
+      var scrollX = findScrollable(e.target, !0);
+      if (scrollX) {
+        smoothScroll(scrollX, scrollX.scrollLeft + (delta > 0 ? 240 : -240), null, 160);
+        e.preventDefault && e.preventDefault();
+        return;
+      }
+    }, !1);
+    try {
+      _a();
+    } catch (e) {
+      console.error("buildSearch error:", e);
+    }
+    try {
+      window.webOS &&
+        "function" == typeof window.webOS.deviceInfo &&
+        window.webOS.deviceInfo(function (e) {
+          if (e && (e.version || e.versionMajor || e.sdkVersion)) {
+            var t = parseFloat(
+              String(e.version || e.versionMajor || e.sdkVersion || "")
+            );
+            !isNaN(t) && t > 0 && (Tr = t);
+          }
+        });
+    } catch (e) { }
+    try {
+      !(function () {
+        if (I()) {
+          var e = p.serviceId || "com.webosflux.xuptertv.fidelity.service";
+          try {
+            window.webOS.service.request("luna://" + e, {
+              method: "keepAlive",
+              parameters: { subscribe: !0 },
+              resubscribe: !0,
+              onSuccess: function () { },
+              onFailure: function () { },
+            });
+          } catch (e) { }
+          setInterval(function () {
+            try {
+              window.webOS.service.request("luna://" + e, {
+                method: "heartbeat",
+                parameters: {},
+                onSuccess: function () { },
+                onFailure: function () { },
+              });
+            } catch (e) { }
+          }, 15e3);
+        }
+      })();
+    } catch (e) { }
+    try {
+      P("prewarm", {}, function () { });
+    } catch (e) { }
+    if (tt) clearTimeout(tt);
+    tt = setTimeout(vt, 4250);
+    try {
+      V();
+    } catch (e) {
+      console.error("loadVodCatalog error:", e);
+    }
+    try {
+      Gt();
+    } catch (e) {
+      console.error("loadLiveChannels error:", e);
+    }
+    ((window.__xuper = {
+        version: "4.34.4",
+        state: X,
+        vod: l,
+        channels: F,
+        api: v,
+        portal: f,
+        service: P,
+        refreshPortal: q,
+        reloadVod: V,
+        skipWelcome: vt,
+        show: function (e) {
+          "home" === e
+            ? vt()
+            : "detail" === e
+              ? ba(l[0])
+              : "search" === e
+                ? La()
+                : "settings" === e
+                  ? Ha()
+                  : "player" === e
+                    ? Yr("live")
+                    : lt(e);
+        },
+        selectTab: function (e) {
+          (vt(), bt(e, !0));
+        },
+        openDetail: function (e) {
+          ba(l[e] || l[0]);
+        },
+        openSearch: La,
+        openSettings: Ha,
+        openPlayer: function (e, t) {
+          Yr(e || "live", l[t] || null);
+        },
+        focus: function (e) {
+          var t = "string" == typeof e ? document.querySelector(e) : e;
+          t && rt(t);
+        },
+        key: function (e) {
+          ut({ keyCode: e, preventDefault: function () { } });
+        },
+        search: function (e) {
+          (La(), Aa(e));
+        },
+        settingsPanel: function (e) {
+          (Ha(), Ua(e, !0));
+        },
+      }),
+      (function () {
+        var e = String(location.search || "").replace(/^\?/, "");
+        if (!e) return;
+        for (var t = {}, a = e.split("&"), i = 0; i < a.length; i++)
+          if (a[i]) {
+            var n = a[i].split("=");
+            t[decodeURIComponent(n[0])] = decodeURIComponent(
+              n.slice(1).join("=") || ""
+            );
+          }
+        if (void 0 !== t.ch) {
+          var r = parseInt(t.ch, 10) || 0;
+          X.channel = Math.max(0, Math.min(F.length - 1, r));
+        }
+        var o = t.screen || "home";
+        if ("welcome" === o) return;
+        (vt(),
+          void 0 !== t.tab
+            ? bt(parseInt(t.tab, 10) || 0, !0)
+            : (bt(0, !1), (typeof Ue !== "undefined" && Ue && Ue[0] ? rt(Ue[0]) : (ne && rt(ne)))));
+        "detail" === o
+          ? ba(l[parseInt(t.vod, 10) || 0])
+          : "search" === o
+            ? (La(), t.q && Aa(t.q))
+            : "settings" === o
+              ? (Ha(), void 0 !== t.panel && Ua(parseInt(t.panel, 10) || 0, !0))
+              : "player" === o &&
+              (Yr(
+                "vod" === t.mode ? "vod" : "live",
+                l[parseInt(t.vod, 10) || 0]
+              ),
+                "1" === t.channels && no());
+        if (t.focus) {
+          var s = document.querySelector(t.focus);
+          s && rt(s);
+        }
+      })());
+  }
+  function lo() {
+    (zr(), Da());
+  }
+  /* webOS puede conservar el audio del canal y perder el plano de imagen al
+     minimizar la app (botón Inicio) o al volver de otra entrada. Repintar la
+     capa del <video> obliga a Starfish a recrear la superficie sin tocar la
+     URL, el modo de reproducción, currentTime ni hacer seek. */
+  var videoResume = null,
+    videoResumeTimer = null,
+    videoResumeRetries = [];
+  function markVideoState() {
+    videoResume = {
+      live: !!(xe && xe.src && !xe.paused),
+      vod: !!(xe && xe.src && !xe.paused),
+      preview: !!(Ot && Ot.src && !Ot.paused),
+    };
+  }
+  function kickVideoSurface(v) {
+    if (!v || !v.src) return;
+    try {
+      var prevDisplay = v.style.display,
+        prevVisibility = v.style.visibility,
+        prevOpacity = v.style.opacity,
+        prevTransform = v.style.transform,
+        prevWebkitTransform = v.style.webkitTransform;
+      /* En webOS 4+ la capa de hardware del <video> se pierde al minimizar.
+         Alternar display + forzar reflow + tocar opacidad/transform obliga al
+         compositor de Starfish a recrear la superficie del vídeo. */
+      v.style.display = "none";
+      void v.offsetHeight;
+      v.style.display = prevDisplay || "";
+      v.style.visibility = "hidden";
+      void v.offsetHeight;
+      v.style.visibility = prevVisibility || "";
+      v.style.opacity = "0.99";
+      void v.offsetHeight;
+      v.style.opacity = prevOpacity || "1";
+      v.style.webkitTransform = prevWebkitTransform || "";
+      v.style.transform = prevTransform || "";
+      void v.offsetHeight;
+      if (prevTransform) v.style.transform = prevTransform;
+      if (prevWebkitTransform) v.style.webkitTransform = prevWebkitTransform;
+    } catch (e) { }
+    try {
+      if (v.paused && !liveUserPaused) {
+        var p = v.play();
+        p && p.catch && p.catch(function () { });
+      }
+    } catch (e) { }
+  }
+  function restoreVideoSurfaces() {
+    if (document.hidden) return;
+    var st = videoResume || {};
+    if (xe && xe.src && ("live" !== X.playerMode || st.live || st.vod)) {
+      kickVideoSurface(xe);
+    }
+    if (Ot && Ot.src && (st.preview || !Ot.paused)) kickVideoSurface(Ot);
+  }
+  function scheduleVideoSurfaceRestore() {
+    if (videoResumeTimer) clearTimeout(videoResumeTimer);
+    for (var r = 0; r < videoResumeRetries.length; r++)
+      clearTimeout(videoResumeRetries[r]);
+    videoResumeRetries = [];
+    /* Varios intentos: al volver de Home la TV tarda en recomponer la
+       superficie; un único repintado a 320 ms puede llegar demasiado pronto. */
+    videoResumeTimer = setTimeout(restoreVideoSurfaces, 150);
+    var delays = [600, 1400, 2600];
+    for (var d = 0; d < delays.length; d++)
+      videoResumeRetries.push(setTimeout(restoreVideoSurfaces, delays[d]));
+  }
+  function onAppHiddenChanged() {
+    if (document.hidden) {
+      markVideoState();
+      /* Al minimizar la app NO se desmonta el reproductor: en webOS el audio
+         del canal sigue vivo y, al volver, solo hay que repintar la superficie
+         de vídeo. Solo se cierran los paneles para que no reaparezcan abiertos. */
+      try { Da(); } catch (e) { }
+    } else {
+      scheduleVideoSurfaceRestore();
+    }
+  }
+  (window.addEventListener("beforeunload", lo),
+    window.addEventListener("unload", lo),
+    window.addEventListener("pagehide", function () {
+      try { Da(); } catch (e) { }
+    }),
+    document.addEventListener("visibilitychange", onAppHiddenChanged),
+    document.addEventListener("webkitvisibilitychange", onAppHiddenChanged),
+    document.addEventListener("webOSLaunch", scheduleVideoSurfaceRestore),
+    document.addEventListener("webOSRelaunch", scheduleVideoSurfaceRestore),
+    window.addEventListener("focus", scheduleVideoSurfaceRestore),
+    window.addEventListener("pageshow", scheduleVideoSurfaceRestore),
+    (window.onerror = function (e, t, a, i, n) {
+      try {
+        (console.error(
+          "[Orbivista error] " + e + " at " + t + ":" + a + (i ? ":" + i : "")
+        ),
+          X && "welcome" === X.screen && vt());
+      } catch (e) { }
+      return !1;
+    }),
+    "loading" === document.readyState
+      ? document.addEventListener("DOMContentLoaded", so)
+      : so());
+})();

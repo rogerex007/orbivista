@@ -1,0 +1,18 @@
+{
+  "id": "com.webosflux.xuptertv.fidelity",
+  "version": "3.1.84",
+  "vendor": "rogerex007",
+  "type": "web",
+  "main": "index.html",
+  "title": "Orbivista",
+  "icon": "images/orbivista-icon.png",
+  "largeIcon": "images/orbivista-large.png",
+  "resolution": "1280x720",
+  "bgColor": "#000000",
+  "bgImage": "",
+  "spinnerOnLaunch": false,
+  "uiRevision": 2,
+  "disableBackHistoryAPI": true,
+  "requiredACG": [],
+  "requiredPermissions": []
+}

@@ -1,0 +1,6 @@
+{
+  "version": "3.1.84",
+  "name": "Orbivista",
+  "minWebos": "1.0.0",
+  "changelog": "Primera versión de Orbivista con identidad propia, catálogo por secciones, filtros combinables y saltos de reproducción."
+}
